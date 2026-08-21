@@ -76,7 +76,6 @@ src/
 ├── utils/
 │   ├── http/         # Axios 实例（适配Laravel原生响应、401防抖、204处理、重试）
 │   ├── echo/         # Laravel Echo + Reverb 单例
-│   ├── socket/       # 原生 WebSocket 客户端类（心跳/指数退避重连/消息队列）
 │   ├── storage/      # StorageKeyManager、StorageCompatibilityManager（迁移/损坏清理）
 │   ├── table/        # LRU缓存（ohash）、响应适配器、防抖
 │   ├── form/         # 响应式列跨度、校验器
@@ -141,9 +140,8 @@ src/
 - 支持 reasoning 思考流、tool_call 可视化、**tool_approval_request 人工审批按钮**→ POST /admin/chat/approve 继续流
 - 会话 CRUD 走 axios
 
-### 4.6 实时通信双方案
+### 4.6 实时通信
 - utils/echo：Laravel Echo + Reverb 单例；自定义 authorizer fetch 带 Bearer + X-Socket-ID；登出 destroyEcho
-- utils/socket：原生 WebSocketClient 单例；心跳5s、ping 10s、超时10s；指数退避+抖动重连（最多10次）；连接前消息队列 flush
 
 ### 4.7 主题
 - LIGHT/DARK/AUTO（usePreferredDark 跟随系统）
@@ -190,19 +188,7 @@ src/
 
 ---
 
-## 七、Laravel 后端侧（laravel-skel-forge/resources）
-
-- `views/main/index.blade.php`：Laravel 默认欢迎页（未替换为 SPA 入口，SPA 独立运行）
-- `views/main/redirect.blade.php`：通用重定向中转页
-- `views/emails/verify_code.blade.php`：邮件验证码模板
-- `views/vendor/pulse/dashboard.blade.php`：Pulse 面板
-- `js/app.js`：仅 `import './echo'`
-- `js/echo.js`：Echo 初始化
-- `css/app.css`：Tailwind 入口
-
----
-
-## 八、业务视图模块（views/）
+## 七、业务视图模块（views/）
 
 | 模块 | 路径 | 功能 |
 |---|---|---|
@@ -225,7 +211,7 @@ src/
 
 ---
 
-## 九、新增模块：前台用户管理（user/list）
+## 八、新增模块：前台用户管理（user/list）
 
 - 视图：`src/views/user/list/index.vue`
 - 子模块（modules/）：
@@ -247,7 +233,7 @@ src/
 
 ---
 
-## 十、关键文件绝对路径索引
+## 九、关键文件绝对路径索引
 
 - HTTP 核心：`/Users/xutongle/Skel/laravel-skel-admin/src/utils/http/index.ts`
 - HTTP 错误：`/Users/xutongle/Skel/laravel-skel-admin/src/utils/http/error.ts`
@@ -257,7 +243,6 @@ src/
 - useAuth Hook：`/Users/xutongle/Skel/laravel-skel-admin/src/hooks/core/useAuth.ts`
 - 主题 Hook：`/Users/xutongle/Skel/laravel-skel-admin/src/hooks/core/useTheme.ts`
 - Echo 封装：`/Users/xutongle/Skel/laravel-skel-admin/src/utils/echo/index.ts`
-- WebSocket 类：`/Users/xutongle/Skel/laravel-skel-admin/src/utils/socket/index.ts`
 - mitt 事件总线：`/Users/xutongle/Skel/laravel-skel-admin/src/utils/sys/mittBus.ts`
 - Pinia 入口：`/Users/xutongle/Skel/laravel-skel-admin/src/store/index.ts`
 - 全局配置：`/Users/xutongle/Skel/laravel-skel-admin/src/config/index.ts`
