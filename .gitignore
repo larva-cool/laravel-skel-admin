@@ -4,6 +4,7 @@ dist
 dist-ssr
 *.local
 .cursorrules
+.idea
 
 # Auto-generated files
 .auto-import.json
