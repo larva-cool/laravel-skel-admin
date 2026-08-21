@@ -1,14 +1,14 @@
-import { defineConfig, loadEnv } from 'vite'
+import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
-import { fileURLToPath } from 'url'
-import vueDevTools from 'vite-plugin-vue-devtools'
-import viteCompression from 'vite-plugin-compression'
-import Components from 'unplugin-vue-components/vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import ElementPlus from 'unplugin-element-plus/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import tailwindcss from '@tailwindcss/vite'
+import Components from 'unplugin-vue-components/vite'
+import { fileURLToPath } from 'url'
+import { defineConfig, loadEnv } from 'vite'
+import viteCompression from 'vite-plugin-compression'
+import vueDevTools from 'vite-plugin-vue-devtools'
 // import { visualizer } from 'rollup-plugin-visualizer'
 
 export default ({ mode }: { mode: string }) => {
@@ -27,10 +27,6 @@ export default ({ mode }: { mode: string }) => {
     server: {
       port: Number(VITE_PORT),
       proxy: {
-        '/api': {
-          target: VITE_API_PROXY_URL,
-          changeOrigin: true
-        },
         '/admin': {
           target: VITE_API_PROXY_URL,
           changeOrigin: true
