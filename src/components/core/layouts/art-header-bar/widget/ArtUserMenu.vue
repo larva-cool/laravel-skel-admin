@@ -14,7 +14,7 @@
     <template #reference>
       <img
         class="size-8.5 mr-5 c-p rounded-full max-sm:w-6.5 max-sm:h-6.5 max-sm:mr-[16px]"
-        src="@imgs/user/avatar.webp"
+        :src="adminInfo.avatar || defaultAvatar"
         alt="avatar"
       />
     </template>
@@ -23,7 +23,7 @@
         <div class="flex-c pb-1 px-0">
           <img
             class="w-10 h-10 mr-3 ml-0 overflow-hidden rounded-full float-left"
-            src="@imgs/user/avatar.webp"
+            :src="adminInfo.avatar || defaultAvatar"
           />
           <div class="w-[calc(100%-60px)] h-full">
             <span class="block text-sm font-medium text-g-800 truncate">{{
@@ -37,17 +37,13 @@
             <ArtSvgIcon icon="ri:user-3-line" />
             <span>{{ $t('topBar.user.userCenter') }}</span>
           </li>
-          <li class="btn-item" @click="toDocs()">
-            <ArtSvgIcon icon="ri:book-2-line" />
-            <span>{{ $t('topBar.user.docs') }}</span>
-          </li>
-          <li class="btn-item" @click="toGithub()">
-            <ArtSvgIcon icon="ri:github-line" />
-            <span>{{ $t('topBar.user.github') }}</span>
-          </li>
           <li class="btn-item" @click="lockScreen()">
             <ArtSvgIcon icon="ri:lock-line" />
             <span>{{ $t('topBar.user.lockScreen') }}</span>
+          </li>
+          <li class="btn-item" @click="clearCache()">
+            <ArtSvgIcon icon="ri:eraser-line" />
+            <span>{{ $t('topBar.user.clearCache') }}</span>
           </li>
           <div class="w-full h-px my-2 bg-g-300/80"></div>
           <div class="log-out c-p" @click="loginOut">
@@ -60,12 +56,13 @@
 </template>
 
 <script setup lang="ts">
+  import { fetchClearCache } from '@/api/auth'
+  import { useUserStore } from '@/store/modules/user'
+  import { mittBus } from '@/utils/sys'
+  import defaultAvatar from '@imgs/user/avatar.webp'
+  import { ElMessage, ElMessageBox } from 'element-plus'
   import { useI18n } from 'vue-i18n'
   import { useRouter } from 'vue-router'
-  import { ElMessageBox } from 'element-plus'
-  import { useUserStore } from '@/store/modules/user'
-  import { WEB_LINKS } from '@/utils/constants'
-  import { mittBus } from '@/utils/sys'
 
   defineOptions({ name: 'ArtUserMenu' })
 
@@ -85,24 +82,23 @@
   }
 
   /**
-   * 打开文档页面
-   */
-  const toDocs = (): void => {
-    window.open(WEB_LINKS.DOCS)
-  }
-
-  /**
-   * 打开 GitHub 页面
-   */
-  const toGithub = (): void => {
-    window.open(WEB_LINKS.GITHUB)
-  }
-
-  /**
    * 打开锁屏功能
    */
   const lockScreen = (): void => {
     mittBus.emit('openLockScreen')
+  }
+
+  /**
+   * 清理应用缓存
+   */
+  const clearCache = async (): Promise<void> => {
+    closeUserMenu()
+    try {
+      const res = await fetchClearCache()
+      ElMessage.success(res?.message || t('topBar.user.clearCacheSuccess'))
+    } catch {
+      ElMessage.error(t('topBar.user.clearCacheFailed'))
+    }
   }
 
   /**

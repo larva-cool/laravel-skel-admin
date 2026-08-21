@@ -22,9 +22,10 @@
     },
     "user": {
       "userCenter": "User center",
-      "docs": "Document",
-      "github": "Github",
       "lockScreen": "Lock screen",
+      "clearCache": "Clear cache",
+      "clearCacheSuccess": "Cache cleared successfully",
+      "clearCacheFailed": "Failed to clear cache",
       "logout": "Log out"
     },
     "guide": {

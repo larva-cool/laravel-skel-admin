@@ -30,3 +30,14 @@ export function fetchLogout() {
     url: '/admin/auth/logout'
   })
 }
+
+/**
+ * 清理应用缓存
+ * @param types 清理类型（all | settings），默认 all
+ */
+export function fetchClearCache(types: string[] = ['all']) {
+  return request.post<{ message: string; types: string[] }>({
+    url: '/admin/cache/clear',
+    params: { types }
+  })
+}

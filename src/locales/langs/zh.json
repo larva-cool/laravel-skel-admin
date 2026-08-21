@@ -22,9 +22,10 @@
     },
     "user": {
       "userCenter": "个人中心",
-      "docs": "使用文档",
-      "github": "Github",
       "lockScreen": "锁定屏幕",
+      "clearCache": "清理缓存",
+      "clearCacheSuccess": "缓存清理成功",
+      "clearCacheFailed": "缓存清理失败",
       "logout": "退出登录"
     },
     "guide": {
