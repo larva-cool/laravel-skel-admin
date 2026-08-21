@@ -1,0 +1,673 @@
+{
+  "httpMsg": {
+    "unauthorized": "未授权访问，请重新登录",
+    "forbidden": "禁止访问该资源",
+    "notFound": "请求的资源不存在",
+    "methodNotAllowed": "请求方法不允许",
+    "requestTimeout": "请求超时，请稍后重试",
+    "internalServerError": "服务器内部错误，请稍后重试",
+    "badGateway": "网关错误，请稍后重试",
+    "serviceUnavailable": "服务暂时不可用，请稍后重试",
+    "gatewayTimeout": "网关超时，请稍后重试",
+    "requestCancelled": "请求已取消",
+    "networkError": "网络连接异常，请检查网络连接",
+    "requestFailed": "请求失败",
+    "requestConfigError": "请求配置错误",
+    "validationError": "表单验证失败，请检查输入",
+    "operationSuccess": "操作成功"
+  },
+  "topBar": {
+    "search": {
+      "title": "搜索"
+    },
+    "user": {
+      "userCenter": "个人中心",
+      "docs": "使用文档",
+      "github": "Github",
+      "lockScreen": "锁定屏幕",
+      "logout": "退出登录"
+    },
+    "guide": {
+      "title": "点击这里查看",
+      "theme": "主题风格",
+      "menu": "开启顶栏菜单",
+      "description": "等更多配置"
+    }
+  },
+  "common": {
+    "tips": "提示",
+    "cancel": "取消",
+    "confirm": "确定",
+    "logOutTips": "您是否要退出登录?"
+  },
+  "chat": {
+    "placeholder": "输入消息，Enter 发送，Shift+Enter 换行",
+    "send": "发送"
+  },
+  "search": {
+    "placeholder": "搜索页面",
+    "historyTitle": "搜索历史",
+    "switchKeydown": "切换",
+    "selectKeydown": "选择",
+    "exitKeydown": "关闭"
+  },
+  "setting": {
+    "menuType": {
+      "title": "菜单布局",
+      "list": ["垂直", "水平", "混合", "双列"]
+    },
+    "theme": {
+      "title": "主题风格",
+      "list": ["浅色", "深色", "系统"]
+    },
+    "menu": {
+      "title": "菜单风格"
+    },
+    "color": {
+      "title": "系统主题色"
+    },
+    "box": {
+      "title": "盒子样式",
+      "list": ["边框", "阴影"]
+    },
+    "container": {
+      "title": "容器宽度",
+      "list": ["铺满", "定宽"]
+    },
+    "basics": {
+      "title": "基础配置",
+      "list": {
+        "multiTab": "开启多标签栏",
+        "accordion": "侧边栏开启手风琴模式",
+        "collapseSidebar": "显示折叠侧边栏按钮",
+        "fastEnter": "显示快速入口",
+        "reloadPage": "显示重载页面按钮",
+        "breadcrumb": "显示全局面包屑导航",
+        "language": "显示多语言选择",
+        "progressBar": "显示顶部进度条",
+        "weakMode": "色弱模式",
+        "watermark": "全局水印",
+        "menuWidth": "菜单宽度",
+        "tabStyle": "标签页风格",
+        "pageTransition": "页面切换动画",
+        "borderRadius": "自定义圆角"
+      }
+    },
+    "tabStyle": {
+      "default": "默认",
+      "card": "卡片",
+      "google": "谷歌"
+    },
+    "transition": {
+      "list": {
+        "none": "无动画",
+        "fade": "淡入淡出",
+        "slideLeft": "左侧滑入",
+        "slideBottom": "下方滑入",
+        "slideTop": "上方滑入"
+      }
+    },
+    "actions": {
+      "resetConfig": "重置配置",
+      "copyConfig": "复制配置",
+      "copySuccess": "配置已复制到剪贴板，可粘贴到 src/config/setting.ts 文件中",
+      "copyFailed": "复制失败，请重试",
+      "resetFailed": "重置失败，请刷新页面后重试"
+    }
+  },
+  "notice": {
+    "title": "通知",
+    "btnRead": "标为已读",
+    "bar": ["通知", "消息", "代办"],
+    "text": ["暂无"],
+    "viewAll": "查看全部"
+  },
+  "worktab": {
+    "btn": {
+      "refresh": "刷新",
+      "fixed": "固定",
+      "unfixed": "取消固定",
+      "closeLeft": "关闭左侧",
+      "closeRight": "关闭右侧",
+      "closeOther": "关闭其他",
+      "closeAll": "关闭全部"
+    }
+  },
+  "login": {
+    "leftView": {
+      "title": "一款兼具设计美学与高效开发的后台系统",
+      "subTitle": "美观实用的界面，经过视觉优化，确保卓越的用户体验"
+    },
+    "title": "欢迎回来",
+    "subTitle": "输入您的账号和密码登录",
+    "roles": {
+      "super": "超级管理员",
+      "admin": "管理员",
+      "user": "普通用户"
+    },
+    "placeholder": {
+      "username": "请输入账号",
+      "password": "请输入密码",
+      "slider": "请拖动滑块完成验证"
+    },
+    "sliderText": "按住滑块拖动",
+    "sliderSuccessText": "验证成功",
+    "rememberPwd": "记住密码",
+    "forgetPwd": "忘记密码",
+    "btnText": "登录",
+    "noAccount": "还没有账号？",
+    "register": "注册",
+    "success": {
+      "title": "登录成功",
+      "message": "欢迎回来"
+    }
+  },
+  "forgetPassword": {
+    "title": "忘记密码？",
+    "subTitle": "输入您的电子邮件来重置您的密码",
+    "placeholder": "请输入您的电子邮件",
+    "submitBtnText": "提交",
+    "backBtnText": "返回"
+  },
+  "register": {
+    "title": "创建账号",
+    "subTitle": "欢迎加入我们，请填写以下信息完成注册",
+    "placeholder": {
+      "username": "请输入账号",
+      "password": "请输入密码",
+      "confirmPassword": "请再次输入密码"
+    },
+    "rule": {
+      "confirmPasswordRequired": "请再次输入密码",
+      "passwordMismatch": "两次输入密码不一致!",
+      "usernameLength": "长度在 3 到 20 个字符",
+      "passwordLength": "密码长度不能小于6位",
+      "agreementRequired": "请同意隐私协议"
+    },
+    "agreeText": "我同意",
+    "privacyPolicy": "《隐私政策》",
+    "submitBtnText": "注册",
+    "hasAccount": "已有账号？",
+    "toLogin": "去登录"
+  },
+  "lockScreen": {
+    "pwdError": "密码错误",
+    "lock": {
+      "inputPlaceholder": "请输入锁屏密码",
+      "btnText": "锁定"
+    },
+    "unlock": {
+      "inputPlaceholder": "请输入解锁密码",
+      "btnText": "解锁",
+      "backBtnText": "返回登录"
+    }
+  },
+  "greeting": {
+    "dawn": "凌晨了！",
+    "morning": "上午好！",
+    "afternoon": "下午好！",
+    "evening": "晚上好！"
+  },
+  "exceptionPage": {
+    "403": "抱歉，您无权访问该页面",
+    "404": "抱歉，您访问的页面不存在",
+    "500": "抱歉，服务器出错了",
+    "gohome": "返回首页"
+  },
+  "menus": {
+    "login": {
+      "title": "登录"
+    },
+    "register": {
+      "title": "注册"
+    },
+    "forgetPassword": {
+      "title": "忘记密码"
+    },
+    "outside": {
+      "title": "内嵌页面"
+    },
+    "dashboard": {
+      "title": "仪表盘",
+      "console": "工作台"
+    },
+    "result": {
+      "title": "结果页面",
+      "success": "成功页",
+      "fail": "失败页"
+    },
+    "exception": {
+      "title": "异常页面",
+      "forbidden": "403",
+      "notFound": "404",
+      "serverError": "500"
+    },
+    "system": {
+      "title": "系统管理",
+      "admin": "管理员管理",
+      "role": "角色管理",
+      "userCenter": "个人中心",
+      "menu": "菜单管理",
+      "setting": "配置项管理",
+      "config": "系统设置",
+      "configPage": {
+        "inputPlaceholder": "请输入{name}",
+        "selectPlaceholder": "请选择{name}",
+        "empty": "暂无配置项",
+        "resetSuccess": "已重置",
+        "groupNav": "配置分组",
+        "groupItemCount": "共 {count} 项配置",
+        "impactTitle": "发布影响",
+        "impactTip": "配置保存后会即时同步到全站，公开配置将影响系统前台展示。",
+        "saveTip": "保存后可即时同步配置，页面标题与系统品牌展示。",
+        "resetForm": "重置当前表单",
+        "savePublish": "保存并发布配置"
+      },
+      "area": "地区管理",
+      "phoneCode": "短信验证码",
+      "mailCode": "邮件验证码",
+      "attachment": "附件管理"
+    }
+  },
+  "table": {
+    "form": {
+      "reset": "重置",
+      "submit": "提交"
+    },
+    "searchBar": {
+      "reset": "重置",
+      "search": "查询",
+      "expand": "展开",
+      "collapse": "收起",
+      "searchInputPlaceholder": "请输入",
+      "searchSelectPlaceholder": "请选择"
+    },
+    "selection": "选择",
+    "sizeOptions": {
+      "small": "紧凑",
+      "default": "默认",
+      "large": "宽松"
+    },
+    "column": {
+      "selection": "勾选",
+      "expand": "展开",
+      "index": "序号"
+    },
+    "zebra": "斑马纹",
+    "border": "边框",
+    "headerBackground": "表头背景"
+  },
+  "monitor": {
+    "common": {
+      "add": "添加",
+      "loadMore": "加载更多",
+      "retry": "重试",
+      "back": "返回",
+      "queue": "队列",
+      "status": "状态",
+      "connection": "连接",
+      "duration": "耗时",
+      "location": "位置",
+      "method": "方法",
+      "path": "路径",
+      "command": "命令",
+      "job": "任务",
+      "action": "动作",
+      "name": "名称",
+      "total": "总数",
+      "processed": "已处理",
+      "failed": "失败",
+      "count": "次数",
+      "empty": "暂无数据",
+      "time": {
+        "secondsAgo": "{n}秒前",
+        "minutesAgo": "{n}分钟前",
+        "hoursAgo": "{n}小时前",
+        "daysAgo": "{n}天前"
+      }
+    },
+    "debug": {
+      "title": "调试面板",
+      "filterPlaceholder": "按标签筛选，如 admin:1",
+      "filter": "筛选",
+      "resume": "恢复记录",
+      "pause": "暂停记录",
+      "clear": "清空记录",
+      "entryTypes": "条目类型",
+      "monitorTags": "监控标签",
+      "monitorTagsHint": "命中标签的条目将被强制记录",
+      "tagPlaceholder": "输入标签",
+      "addTag": "添加",
+      "noTags": "暂无监控标签",
+      "totalLoaded": "共加载 {count} 条，按时间倒序",
+      "empty": "暂无调试记录",
+      "loadMore": "加载更多",
+      "detailTitle": "条目详情",
+      "detailTitleSuffix": "{type}详情",
+      "basicInfo": "基础信息",
+      "entryId": "条目 ID",
+      "hostname": "主机名",
+      "recordedAt": "记录时间",
+      "method": "方法",
+      "controllerAction": "控制器动作",
+      "middleware": "中间件",
+      "path": "路径",
+      "statusCode": "状态码",
+      "duration": "耗时",
+      "ipAddress": "IP 地址",
+      "memoryUsage": "内存使用",
+      "type": "类型",
+      "location": "位置",
+      "occurrences": "出现次数",
+      "viewSame": "查看同类型",
+      "resolvedAt": "解决时间",
+      "markResolved": "标记为已解决",
+      "level": "级别",
+      "connection": "连接",
+      "model": "模型",
+      "action": "动作",
+      "instances": "实例数",
+      "status": "状态",
+      "job": "任务",
+      "queue": "队列",
+      "attempts": "尝试次数",
+      "timeout": "超时时间",
+      "batch": "批处理",
+      "event": "事件",
+      "listeners": "监听器数",
+      "key": "键名",
+      "expiration": "过期时间",
+      "from": "发件人",
+      "to": "收件人",
+      "replyTo": "回复",
+      "cc": "抄送",
+      "bcc": "密送",
+      "subject": "主题",
+      "notification": "通知",
+      "channel": "渠道",
+      "recipient": "接收者",
+      "ability": "能力",
+      "result": "结果",
+      "message": "信息",
+      "exitCode": "退出码",
+      "description": "描述",
+      "expression": "表达式",
+      "user": "用户",
+      "timezone": "时区",
+      "view": "视图",
+      "cancelledAt": "取消时间",
+      "finishedAt": "完成时间",
+      "name": "名称",
+      "totalJobs": "总任务数",
+      "pending": "待处理",
+      "failedJobs": "已失败",
+      "relatedEntries": "关联条目",
+      "viewRelated": "查看{label}",
+      "tags": "标签",
+      "authUser": "认证用户",
+      "id": "ID",
+      "realName": "姓名",
+      "email": "邮箱",
+      "mailPreview": "邮件预览",
+      "queryCountSummary": "{count} 条查询，{duplicated} 条重复",
+      "tagRequired": "请输入标签",
+      "secondsSuffix": "{n} 秒",
+      "confirmClear": {
+        "message": "将删除全部调试记录，此操作不可恢复，是否继续？",
+        "title": "清空记录"
+      },
+      "recordingStatus": {
+        "enabled": "采集中",
+        "paused": "已暂停",
+        "disabled": "已禁用",
+        "off": "该类型未启用"
+      },
+      "entryType": {
+        "request": "请求",
+        "exception": "异常",
+        "log": "日志",
+        "query": "数据库",
+        "model": "模型",
+        "job": "任务",
+        "batch": "批处理",
+        "event": "事件",
+        "cache": "缓存",
+        "redis": "Redis",
+        "mail": "邮件",
+        "notification": "通知",
+        "gate": "授权",
+        "command": "命令",
+        "schedule": "调度",
+        "view": "视图",
+        "dump": "Dump",
+        "client_request": "外部请求"
+      },
+      "tab": {
+        "payload": "Payload",
+        "headers": "Headers",
+        "response": "Response",
+        "responseHeaders": "响应 Headers",
+        "session": "Session",
+        "message": "消息",
+        "context": "上下文",
+        "trace": "堆栈",
+        "logMessage": "日志消息",
+        "sql": "SQL",
+        "bindings": "参数绑定",
+        "changes": "变更",
+        "original": "原始值",
+        "data": "Data",
+        "exceptionMessage": "异常消息",
+        "eventData": "事件数据",
+        "listeners": "监听器",
+        "value": "值",
+        "arguments": "参数",
+        "options": "选项",
+        "output": "输出",
+        "composers": "Composers",
+        "content": "内容",
+        "requestGroup": "请求",
+        "responseGroup": "响应"
+      },
+      "relatedColumn": {
+        "exception": ["异常信息", "位置"],
+        "log": ["日志内容", "级别"],
+        "view": ["视图", "Composer 数"],
+        "query": ["查询语句", "耗时"],
+        "model": ["模型", "动作"],
+        "gate": ["权限", "结果"],
+        "job": ["任务", "状态"],
+        "mail": ["邮件", "状态"],
+        "notification": ["通知", "渠道"],
+        "event": ["事件", "监听器数"],
+        "cache": ["键名", "动作"],
+        "redis": ["命令", "耗时"],
+        "client_request": ["请求地址", "状态"],
+        "default": ["内容", "状态"]
+      },
+      "relatedSubtitle": {
+        "job": "连接：{connection} | 队列：{queue}",
+        "mail": "主题：{subject}",
+        "notification": "接收者：{notifiable}"
+      }
+    },
+    "horizon": {
+      "title": "队列监控",
+      "lastRefresh": "最近刷新：{time}",
+      "navTitle": "监控导航",
+      "overview": "Overview",
+      "overviewSubtitle": "系统整体状态概览",
+      "jobsPerMinute": "每分钟处理",
+      "recentJobs": "最近任务",
+      "recentJobsPeriod": "近 {minutes} 分钟",
+      "failedJobs": "失败任务",
+      "failedJobsPeriod": "近 {minutes} 分钟",
+      "status": "状态",
+      "pausedMasters": "{n} 个已暂停",
+      "totalProcesses": "总进程数",
+      "maxWaitTime": "最大等待时间",
+      "longestRuntime": "最长运行时",
+      "maxThroughput": "最大吞吐量",
+      "currentWorkload": "Current Workload",
+      "currentWorkloadSubtitle": "当前各队列工作负载",
+      "queue": "队列",
+      "jobCount": "任务数",
+      "processCount": "进程数",
+      "wait": "等待",
+      "balanceStrategy": "平衡策略",
+      "monitoring": "标签监控",
+      "monitoringSubtitle": "监控指定标签下的任务",
+      "tagPlaceholder": "输入标签名称",
+      "add": "添加",
+      "noTags": "暂无监控标签",
+      "tagCount": "{n} 个任务",
+      "jobMetrics": "任务指标",
+      "jobMetricsTotal": "共 {n} 个任务",
+      "noJobMetrics": "暂无任务指标",
+      "back": "返回",
+      "throughput": "吞吐量",
+      "throughputEn": "Throughput",
+      "insufficientData": "数据不足",
+      "runtime": "运行时间",
+      "runtimeEn": "Runtime",
+      "queueMetrics": "队列指标",
+      "queueMetricsTotal": "共 {n} 个队列",
+      "noQueueMetrics": "暂无队列指标",
+      "batches": "批处理",
+      "batchesTotal": "共 {n} 个批次",
+      "noBatches": "暂无批处理数据",
+      "total": "总数",
+      "processed": "已处理",
+      "failed": "失败",
+      "clickToView": "点击查看任务详情",
+      "jobDetail": "任务详情",
+      "jobName": "任务名称",
+      "jobId": "任务 ID",
+      "queueField": "队列",
+      "statusField": "状态",
+      "connectionField": "连接",
+      "timeField": "时间",
+      "exceptionInfo": "异常信息",
+      "retryHistory": "重试记录",
+      "retryJob": "重试此任务",
+      "batchDetail": "批处理详情",
+      "name": "名称",
+      "id": "ID",
+      "totalJobs": "任务总数",
+      "progress": "进度",
+      "failedJobsTitle": "失败任务（{n}）",
+      "retryAllFailed": "重试全部失败任务",
+      "emptySuffix": "{title}为空",
+      "totalCount": "共 {n} 条",
+      "jobListTitle": "任务列表",
+      "nav": {
+        "dashboard": "仪表盘",
+        "monitoring": "标签监控",
+        "metricsJobs": "任务指标",
+        "metricsQueues": "队列指标",
+        "batches": "批处理",
+        "pending": "待处理任务",
+        "completed": "已完成任务",
+        "silenced": "静默任务",
+        "failed": "失败任务"
+      },
+      "batchStatus": {
+        "cancelled": "已取消",
+        "hasFailures": "有失败",
+        "finished": "已完成",
+        "processing": "处理中"
+      },
+      "time": {
+        "seconds": "{n} 秒",
+        "minutes": "{n} 分钟",
+        "hours": "{n} 小时"
+      },
+      "msg": {
+        "tagAdded": "已添加监控标签",
+        "addFailed": "添加失败",
+        "tagRemoved": "已移除监控标签",
+        "removeFailed": "移除失败",
+        "retrySubmitted": "已提交重试",
+        "retryFailed": "重试失败"
+      }
+    },
+    "pulse": {
+      "title": "性能监控",
+      "servers": "服务器资源",
+      "serversSubtitle": "CPU · 内存 · 磁盘",
+      "noServers": "暂无服务器数据",
+      "server": "服务器",
+      "memory": "内存",
+      "storage": "存储",
+      "websocketConnections": "WebSocket 连接",
+      "websocketConnectionsSubtitle": "实时连接数统计",
+      "average": "平均",
+      "peak": "峰值",
+      "noConnections": "暂无连接数据",
+      "current": "当前",
+      "messageThroughput": "消息吞吐",
+      "messageThroughputSubtitle": "WebSocket 消息统计",
+      "sent": "发送",
+      "received": "接收",
+      "noMessages": "暂无消息数据",
+      "sentShort": "发",
+      "receivedShort": "收",
+      "usage": "用户使用量",
+      "usageSubtitle": "Top 10 排行",
+      "requests": "请求数",
+      "slowRequests": "慢请求",
+      "jobs": "任务数",
+      "queueThroughput": "队列吞吐",
+      "queueThroughputSubtitle": "实时队列状态",
+      "queued": "入队",
+      "processing": "处理中",
+      "processed": "已处理",
+      "released": "重试",
+      "failed": "失败",
+      "noQueues": "暂无队列数据",
+      "cacheHitRate": "缓存命中率",
+      "cacheHitRateSubtitle": "缓存性能指标",
+      "hits": "命中",
+      "misses": "未命中",
+      "hitRate": "命中率",
+      "slowQueries": "慢查询",
+      "slowQueriesSubtitle": "数据库性能瓶颈",
+      "slowest": "最慢",
+      "count": "次数",
+      "noSlowQueries": "暂无慢查询",
+      "exceptions": "异常统计",
+      "exceptionsSubtitle": "异常捕获记录",
+      "latest": "最近",
+      "noExceptions": "暂无异常",
+      "slowRequestsCard": "慢请求",
+      "slowRequestsSubtitle": "HTTP 路由耗时",
+      "noSlowRequests": "暂无慢请求",
+      "countSuffix": "{n}次",
+      "slowJobs": "慢任务",
+      "slowJobsSubtitle": "队列任务耗时",
+      "noSlowJobs": "暂无慢任务",
+      "slowOutgoing": "慢外部请求",
+      "slowOutgoingSubtitle": "outgoing HTTP 耗时",
+      "noSlowOutgoing": "暂无慢外部请求"
+    },
+    "scheduleLog": {
+      "title": "调度日志",
+      "name": "任务名称",
+      "type": "类型",
+      "expression": "Cron 表达式",
+      "status": "状态",
+      "exitCode": "退出码",
+      "runtime": "耗时",
+      "hostname": "主机名",
+      "startedAt": "开始时间",
+      "finishedAt": "结束时间",
+      "exception": "异常信息",
+      "operation": "操作",
+      "view": "查看",
+      "statusRunning": "执行中",
+      "statusSuccess": "成功",
+      "statusFailed": "失败",
+      "statusSkipped": "跳过"
+    }
+  }
+}

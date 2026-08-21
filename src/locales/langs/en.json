@@ -1,0 +1,673 @@
+{
+  "httpMsg": {
+    "unauthorized": "Unauthorized access, please login again",
+    "forbidden": "Access to this resource is forbidden",
+    "notFound": "The requested resource does not exist",
+    "methodNotAllowed": "Request method not allowed",
+    "requestTimeout": "Request timeout, please try again later",
+    "internalServerError": "Internal server error, please try again later",
+    "badGateway": "Bad gateway error, please try again later",
+    "serviceUnavailable": "Service temporarily unavailable, please try again later",
+    "gatewayTimeout": "Gateway timeout, please try again later",
+    "requestCancelled": "Request cancelled",
+    "networkError": "Network connection error, please check your connection",
+    "requestFailed": "Request failed",
+    "requestConfigError": "Request configuration error",
+    "validationError": "Validation failed, please check your input",
+    "operationSuccess": "Operation successful"
+  },
+  "topBar": {
+    "search": {
+      "title": "Search"
+    },
+    "user": {
+      "userCenter": "User center",
+      "docs": "Document",
+      "github": "Github",
+      "lockScreen": "Lock screen",
+      "logout": "Log out"
+    },
+    "guide": {
+      "title": "Click here to view",
+      "theme": "Theme style",
+      "menu": "Open top menu",
+      "description": "More configurations"
+    }
+  },
+  "common": {
+    "tips": "Prompt",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "logOutTips": "Do you want to log out?"
+  },
+  "chat": {
+    "placeholder": "Type a message, Enter to send, Shift+Enter for newline",
+    "send": "Send"
+  },
+  "search": {
+    "placeholder": "Search page",
+    "historyTitle": "Search history",
+    "switchKeydown": "Navigate",
+    "selectKeydown": "Select",
+    "exitKeydown": "Close"
+  },
+  "setting": {
+    "menuType": {
+      "title": "Menu Layout",
+      "list": ["Vertical", "Horizontal", "Mixed", "Dual"]
+    },
+    "theme": {
+      "title": "Theme Style",
+      "list": ["Light", "Dark", "System"]
+    },
+    "menu": {
+      "title": "Menu Style"
+    },
+    "color": {
+      "title": "Theme Color"
+    },
+    "box": {
+      "title": "Box Style",
+      "list": ["Border", "Shadow"]
+    },
+    "container": {
+      "title": "Container Width",
+      "list": ["Full", "Boxed"]
+    },
+    "basics": {
+      "title": "Basic Config",
+      "list": {
+        "multiTab": "Show work tab",
+        "accordion": "Sidebar opens accordion",
+        "collapseSidebar": "Show sidebar button",
+        "reloadPage": "Show reload page button",
+        "fastEnter": "Show fast enter",
+        "breadcrumb": "Show crumb navigation",
+        "language": "Show multilingual selection",
+        "progressBar": "Show top progress bar",
+        "weakMode": "Color Weakness Mode",
+        "watermark": "Global watermark",
+        "menuWidth": "Menu width",
+        "tabStyle": "Tab style",
+        "pageTransition": "Page animation",
+        "borderRadius": "Custom radius"
+      }
+    },
+    "tabStyle": {
+      "default": "Default",
+      "card": "Card",
+      "google": "Chrome"
+    },
+    "transition": {
+      "list": {
+        "none": "None",
+        "fade": "Fade",
+        "slideLeft": "Slide Left",
+        "slideBottom": "Slide Bottom",
+        "slideTop": "Slide Top"
+      }
+    },
+    "actions": {
+      "resetConfig": "Reset Config",
+      "copyConfig": "Copy Config",
+      "copySuccess": "Configuration copied to clipboard, paste it into src/config/setting.ts file",
+      "copyFailed": "Copy failed, please try again",
+      "resetFailed": "Reset failed, please refresh the page and try again"
+    }
+  },
+  "notice": {
+    "title": "Notice",
+    "btnRead": "Mark as read",
+    "bar": ["Notice", "Message", "Todo"],
+    "text": ["No"],
+    "viewAll": "View all"
+  },
+  "worktab": {
+    "btn": {
+      "refresh": "Refresh",
+      "fixed": "Fixed",
+      "unfixed": "Unfixed",
+      "closeLeft": "Close left",
+      "closeRight": "Close right",
+      "closeOther": "Close other",
+      "closeAll": "Close all"
+    }
+  },
+  "login": {
+    "leftView": {
+      "title": "A backend system of beauty and efficiency",
+      "subTitle": "A sleek and practical interface for a great user experience"
+    },
+    "title": "Welcome back",
+    "subTitle": "Please enter your account and password to login",
+    "roles": {
+      "super": "Super Admin",
+      "admin": "Admin",
+      "user": "User"
+    },
+    "placeholder": {
+      "username": "Please enter your account",
+      "password": "Please enter your password",
+      "slider": "Please slide to verify"
+    },
+    "sliderText": "Please slide to verify",
+    "sliderSuccessText": "Verification successful",
+    "rememberPwd": "Remember password",
+    "forgetPwd": "Forgot password",
+    "btnText": "Login",
+    "noAccount": "No account yet?",
+    "register": "Register",
+    "success": {
+      "title": "Login successful",
+      "message": "Welcome back"
+    }
+  },
+  "forgetPassword": {
+    "title": "Forgot password?",
+    "subTitle": "Enter your email to reset your password",
+    "placeholder": "Please enter your email",
+    "submitBtnText": "Submit",
+    "backBtnText": "Back"
+  },
+  "register": {
+    "title": "Create account",
+    "subTitle": "Welcome to join us, please fill in the following information to complete the registration",
+    "placeholder": {
+      "username": "Please enter your account",
+      "password": "Please enter your password",
+      "confirmPassword": "Please enter your password again"
+    },
+    "rule": {
+      "confirmPasswordRequired": "Please enter your password again",
+      "passwordMismatch": "The two passwords are inconsistent!",
+      "usernameLength": "The length is 3 to 20 characters",
+      "passwordLength": "The password length cannot be less than 6 digits",
+      "agreementRequired": "Please agree to the privacy policy"
+    },
+    "agreeText": "I agree",
+    "privacyPolicy": "Privacy policy",
+    "submitBtnText": "Register",
+    "hasAccount": "Already have an account?",
+    "toLogin": "To login"
+  },
+  "lockScreen": {
+    "pwdError": "Password error",
+    "lock": {
+      "inputPlaceholder": "Please input lock screen password",
+      "btnText": "Lock"
+    },
+    "unlock": {
+      "inputPlaceholder": "Please input unlock password",
+      "btnText": "Unlock",
+      "backBtnText": "Back to login"
+    }
+  },
+  "greeting": {
+    "dawn": "Good morning!",
+    "morning": "Good morning!",
+    "afternoon": "Good afternoon!",
+    "evening": "Good evening!"
+  },
+  "exceptionPage": {
+    "403": "Sorry, you do not have permission to access this page",
+    "404": "Sorry, the page you are trying to access does not exist",
+    "500": "Sorry, there was an error on the server",
+    "gohome": "Go Home"
+  },
+  "menus": {
+    "login": {
+      "title": "Login"
+    },
+    "register": {
+      "title": "Register"
+    },
+    "forgetPassword": {
+      "title": "Forget Password"
+    },
+    "outside": {
+      "title": "Outside"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "console": "Console"
+    },
+    "result": {
+      "title": "Result Page",
+      "success": "Success",
+      "fail": "Fail"
+    },
+    "exception": {
+      "title": "Exception",
+      "forbidden": "403",
+      "notFound": "404",
+      "serverError": "500"
+    },
+    "system": {
+      "title": "System Settings",
+      "admin": "Admin Manage",
+      "role": "Role Manage",
+      "userCenter": "User Center",
+      "menu": "Menu Manage",
+      "setting": "Setting Items",
+      "config": "System Config",
+      "configPage": {
+        "inputPlaceholder": "Please enter {name}",
+        "selectPlaceholder": "Please select {name}",
+        "empty": "No configuration items",
+        "resetSuccess": "Reset successfully",
+        "groupNav": "Config Groups",
+        "groupItemCount": "{count} settings in total",
+        "impactTitle": "Publish Impact",
+        "impactTip": "Saved settings take effect immediately, and public options affect the frontend display.",
+        "saveTip": "Settings sync instantly after saving, including page title and system branding.",
+        "resetForm": "Reset Form",
+        "savePublish": "Save & Publish"
+      },
+      "area": "Area Manage",
+      "phoneCode": "SMS Code",
+      "mailCode": "Email Code",
+      "attachment": "Attachment Manage"
+    }
+  },
+  "table": {
+    "form": {
+      "reset": "Reset",
+      "submit": "Submit"
+    },
+    "searchBar": {
+      "reset": "Reset",
+      "search": "Search",
+      "expand": "Expand",
+      "collapse": "Collapse",
+      "searchInputPlaceholder": "Please enter",
+      "searchSelectPlaceholder": "Please select"
+    },
+    "selection": "Select",
+    "sizeOptions": {
+      "small": "Compact",
+      "default": "Default",
+      "large": "Loose"
+    },
+    "column": {
+      "selection": "Select",
+      "expand": "Expand",
+      "index": "Index"
+    },
+    "zebra": "Zebra",
+    "border": "Border",
+    "headerBackground": "Header BG"
+  },
+  "monitor": {
+    "common": {
+      "add": "Add",
+      "loadMore": "Load more",
+      "retry": "Retry",
+      "back": "Back",
+      "queue": "Queue",
+      "status": "Status",
+      "connection": "Connection",
+      "duration": "Duration",
+      "location": "Location",
+      "method": "Method",
+      "path": "Path",
+      "command": "Command",
+      "job": "Job",
+      "action": "Action",
+      "name": "Name",
+      "total": "Total",
+      "processed": "Processed",
+      "failed": "Failed",
+      "count": "Count",
+      "empty": "No data",
+      "time": {
+        "secondsAgo": "{n}s ago",
+        "minutesAgo": "{n}m ago",
+        "hoursAgo": "{n}h ago",
+        "daysAgo": "{n}d ago"
+      }
+    },
+    "debug": {
+      "title": "Debug Panel",
+      "filterPlaceholder": "Filter by tag, e.g. admin:1",
+      "filter": "Filter",
+      "resume": "Resume Recording",
+      "pause": "Pause Recording",
+      "clear": "Clear Records",
+      "entryTypes": "Entry Types",
+      "monitorTags": "Monitored Tags",
+      "monitorTagsHint": "Entries matching monitored tags will be recorded",
+      "tagPlaceholder": "Enter tag",
+      "addTag": "Add",
+      "noTags": "No monitored tags",
+      "totalLoaded": "{count} entries loaded, newest first",
+      "empty": "No debug entries",
+      "loadMore": "Load more",
+      "detailTitle": "Entry Detail",
+      "detailTitleSuffix": "{type} Detail",
+      "basicInfo": "Basic Info",
+      "entryId": "Entry ID",
+      "hostname": "Hostname",
+      "recordedAt": "Recorded At",
+      "method": "Method",
+      "controllerAction": "Controller Action",
+      "middleware": "Middleware",
+      "path": "Path",
+      "statusCode": "Status Code",
+      "duration": "Duration",
+      "ipAddress": "IP Address",
+      "memoryUsage": "Memory",
+      "type": "Type",
+      "location": "Location",
+      "occurrences": "Occurrences",
+      "viewSame": "View Same",
+      "resolvedAt": "Resolved At",
+      "markResolved": "Mark Resolved",
+      "level": "Level",
+      "connection": "Connection",
+      "model": "Model",
+      "action": "Action",
+      "instances": "Instances",
+      "status": "Status",
+      "job": "Job",
+      "queue": "Queue",
+      "attempts": "Attempts",
+      "timeout": "Timeout",
+      "batch": "Batch",
+      "event": "Event",
+      "listeners": "Listeners",
+      "key": "Key",
+      "expiration": "Expiration",
+      "from": "From",
+      "to": "To",
+      "replyTo": "Reply To",
+      "cc": "Cc",
+      "bcc": "Bcc",
+      "subject": "Subject",
+      "notification": "Notification",
+      "channel": "Channel",
+      "recipient": "Recipient",
+      "ability": "Ability",
+      "result": "Result",
+      "message": "Message",
+      "exitCode": "Exit Code",
+      "description": "Description",
+      "expression": "Expression",
+      "user": "User",
+      "timezone": "Timezone",
+      "view": "View",
+      "cancelledAt": "Cancelled At",
+      "finishedAt": "Finished At",
+      "name": "Name",
+      "totalJobs": "Total Jobs",
+      "pending": "Pending",
+      "failedJobs": "Failed Jobs",
+      "relatedEntries": "Related Entries",
+      "viewRelated": "View {label}",
+      "tags": "Tags",
+      "authUser": "Authenticated User",
+      "id": "ID",
+      "realName": "Name",
+      "email": "Email",
+      "mailPreview": "Mail Preview",
+      "queryCountSummary": "{count} queries, {duplicated} duplicated",
+      "tagRequired": "Please enter a tag",
+      "secondsSuffix": "{n} s",
+      "confirmClear": {
+        "message": "All debug records will be deleted. This action cannot be undone. Continue?",
+        "title": "Clear Records"
+      },
+      "recordingStatus": {
+        "enabled": "Collecting",
+        "paused": "Paused",
+        "disabled": "Disabled",
+        "off": "Not enabled for this type"
+      },
+      "entryType": {
+        "request": "Request",
+        "exception": "Exception",
+        "log": "Log",
+        "query": "Database",
+        "model": "Model",
+        "job": "Job",
+        "batch": "Batch",
+        "event": "Event",
+        "cache": "Cache",
+        "redis": "Redis",
+        "mail": "Mail",
+        "notification": "Notification",
+        "gate": "Gate",
+        "command": "Command",
+        "schedule": "Schedule",
+        "view": "View",
+        "dump": "Dump",
+        "client_request": "Client Request"
+      },
+      "tab": {
+        "payload": "Payload",
+        "headers": "Headers",
+        "response": "Response",
+        "responseHeaders": "Response Headers",
+        "session": "Session",
+        "message": "Message",
+        "context": "Context",
+        "trace": "Trace",
+        "logMessage": "Log Message",
+        "sql": "SQL",
+        "bindings": "Bindings",
+        "changes": "Changes",
+        "original": "Original",
+        "data": "Data",
+        "exceptionMessage": "Exception Message",
+        "eventData": "Event Data",
+        "listeners": "Listeners",
+        "value": "Value",
+        "arguments": "Arguments",
+        "options": "Options",
+        "output": "Output",
+        "composers": "Composers",
+        "content": "Content",
+        "requestGroup": "Request",
+        "responseGroup": "Response"
+      },
+      "relatedColumn": {
+        "exception": ["Exception", "Location"],
+        "log": ["Log", "Level"],
+        "view": ["View", "Composers"],
+        "query": ["Query", "Duration"],
+        "model": ["Model", "Action"],
+        "gate": ["Ability", "Result"],
+        "job": ["Job", "Status"],
+        "mail": ["Mail", "Status"],
+        "notification": ["Notification", "Channel"],
+        "event": ["Event", "Listeners"],
+        "cache": ["Key", "Action"],
+        "redis": ["Command", "Duration"],
+        "client_request": ["URI", "Status"],
+        "default": ["Content", "Status"]
+      },
+      "relatedSubtitle": {
+        "job": "Connection: {connection} | Queue: {queue}",
+        "mail": "Subject: {subject}",
+        "notification": "Recipient: {notifiable}"
+      }
+    },
+    "horizon": {
+      "title": "Queue Monitor",
+      "lastRefresh": "Last refresh: {time}",
+      "navTitle": "Navigation",
+      "overview": "Overview",
+      "overviewSubtitle": "System status overview",
+      "jobsPerMinute": "Jobs Per Minute",
+      "recentJobs": "Recent Jobs",
+      "recentJobsPeriod": "Last {minutes} min",
+      "failedJobs": "Failed Jobs",
+      "failedJobsPeriod": "Last {minutes} min",
+      "status": "Status",
+      "pausedMasters": "{n} paused",
+      "totalProcesses": "Total Processes",
+      "maxWaitTime": "Max Wait Time",
+      "longestRuntime": "Longest Runtime",
+      "maxThroughput": "Max Throughput",
+      "currentWorkload": "Current Workload",
+      "currentWorkloadSubtitle": "Current queue workloads",
+      "queue": "Queue",
+      "jobCount": "Jobs",
+      "processCount": "Processes",
+      "wait": "Wait",
+      "balanceStrategy": "Balance",
+      "monitoring": "Tag Monitoring",
+      "monitoringSubtitle": "Monitor jobs with specific tags",
+      "tagPlaceholder": "Enter tag name",
+      "add": "Add",
+      "noTags": "No monitored tags",
+      "tagCount": "{n} jobs",
+      "jobMetrics": "Job Metrics",
+      "jobMetricsTotal": "{n} jobs in total",
+      "noJobMetrics": "No job metrics",
+      "back": "Back",
+      "throughput": "Throughput",
+      "throughputEn": "Throughput",
+      "insufficientData": "Insufficient data",
+      "runtime": "Runtime",
+      "runtimeEn": "Runtime",
+      "queueMetrics": "Queue Metrics",
+      "queueMetricsTotal": "{n} queues in total",
+      "noQueueMetrics": "No queue metrics",
+      "batches": "Batches",
+      "batchesTotal": "{n} batches in total",
+      "noBatches": "No batch data",
+      "total": "Total",
+      "processed": "Processed",
+      "failed": "Failed",
+      "clickToView": "Click to view job details",
+      "jobDetail": "Job Detail",
+      "jobName": "Job Name",
+      "jobId": "Job ID",
+      "queueField": "Queue",
+      "statusField": "Status",
+      "connectionField": "Connection",
+      "timeField": "Time",
+      "exceptionInfo": "Exception",
+      "retryHistory": "Retry History",
+      "retryJob": "Retry This Job",
+      "batchDetail": "Batch Detail",
+      "name": "Name",
+      "id": "ID",
+      "totalJobs": "Total Jobs",
+      "progress": "Progress",
+      "failedJobsTitle": "Failed Jobs ({n})",
+      "retryAllFailed": "Retry All Failed",
+      "emptySuffix": "{title} is empty",
+      "totalCount": "{n} in total",
+      "jobListTitle": "Job List",
+      "nav": {
+        "dashboard": "Dashboard",
+        "monitoring": "Tag Monitoring",
+        "metricsJobs": "Job Metrics",
+        "metricsQueues": "Queue Metrics",
+        "batches": "Batches",
+        "pending": "Pending Jobs",
+        "completed": "Completed Jobs",
+        "silenced": "Silenced Jobs",
+        "failed": "Failed Jobs"
+      },
+      "batchStatus": {
+        "cancelled": "Cancelled",
+        "hasFailures": "Failed",
+        "finished": "Finished",
+        "processing": "Processing"
+      },
+      "time": {
+        "seconds": "{n} s",
+        "minutes": "{n} min",
+        "hours": "{n} h"
+      },
+      "msg": {
+        "tagAdded": "Monitoring tag added",
+        "addFailed": "Failed to add",
+        "tagRemoved": "Monitoring tag removed",
+        "removeFailed": "Failed to remove",
+        "retrySubmitted": "Retry submitted",
+        "retryFailed": "Retry failed"
+      }
+    },
+    "pulse": {
+      "title": "Performance Monitor",
+      "servers": "Server Resources",
+      "serversSubtitle": "CPU · Memory · Storage",
+      "noServers": "No server data",
+      "server": "Server",
+      "memory": "Memory",
+      "storage": "Storage",
+      "websocketConnections": "WebSocket Connections",
+      "websocketConnectionsSubtitle": "Live connection stats",
+      "average": "Average",
+      "peak": "Peak",
+      "noConnections": "No connection data",
+      "current": "Current",
+      "messageThroughput": "Message Throughput",
+      "messageThroughputSubtitle": "WebSocket message stats",
+      "sent": "Sent",
+      "received": "Received",
+      "noMessages": "No message data",
+      "sentShort": "Sent",
+      "receivedShort": "Recv",
+      "usage": "Usage",
+      "usageSubtitle": "Top 10",
+      "requests": "Requests",
+      "slowRequests": "Slow Requests",
+      "jobs": "Jobs",
+      "queueThroughput": "Queue Throughput",
+      "queueThroughputSubtitle": "Live queue status",
+      "queued": "Queued",
+      "processing": "Processing",
+      "processed": "Processed",
+      "released": "Retried",
+      "failed": "Failed",
+      "noQueues": "No queue data",
+      "cacheHitRate": "Cache Hit Rate",
+      "cacheHitRateSubtitle": "Cache performance metrics",
+      "hits": "Hits",
+      "misses": "Misses",
+      "hitRate": "Hit Rate",
+      "slowQueries": "Slow Queries",
+      "slowQueriesSubtitle": "Database bottlenecks",
+      "slowest": "Slowest",
+      "count": "Count",
+      "noSlowQueries": "No slow queries",
+      "exceptions": "Exceptions",
+      "exceptionsSubtitle": "Captured exceptions",
+      "latest": "Latest",
+      "noExceptions": "No exceptions",
+      "slowRequestsCard": "Slow Requests",
+      "slowRequestsSubtitle": "HTTP route duration",
+      "noSlowRequests": "No slow requests",
+      "countSuffix": "{n}",
+      "slowJobs": "Slow Jobs",
+      "slowJobsSubtitle": "Queue job duration",
+      "noSlowJobs": "No slow jobs",
+      "slowOutgoing": "Slow Outgoing",
+      "slowOutgoingSubtitle": "Outgoing HTTP duration",
+      "noSlowOutgoing": "No slow outgoing requests"
+    },
+    "scheduleLog": {
+      "title": "Schedule Logs",
+      "name": "Task Name",
+      "type": "Type",
+      "expression": "Cron Expression",
+      "status": "Status",
+      "exitCode": "Exit Code",
+      "runtime": "Duration",
+      "hostname": "Hostname",
+      "startedAt": "Started At",
+      "finishedAt": "Finished At",
+      "exception": "Exception",
+      "operation": "Action",
+      "view": "View",
+      "statusRunning": "Running",
+      "statusSuccess": "Success",
+      "statusFailed": "Failed",
+      "statusSkipped": "Skipped"
+    }
+  }
+}
