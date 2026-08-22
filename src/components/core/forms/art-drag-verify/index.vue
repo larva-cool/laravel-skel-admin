@@ -156,7 +156,7 @@
   const getNumericWidth = (): number => {
     if (typeof props.width === 'string') {
       // 如果是字符串，尝试从DOM元素获取实际宽度
-      return dragVerify.value?.offsetWidth || 260
+      return dragVerify.value?.clientWidth || 260
     }
     return props.width
   }
@@ -339,16 +339,20 @@
     box-sizing: border-box;
     overflow: hidden;
     text-align: center;
-    border: 1px solid var(--art-gray-300);
+    border: 1px solid var(--art-gray-400);
+    box-shadow: 0 0 0 1px var(--art-gray-300) inset;
 
     .dv_handler {
       position: absolute;
       top: 0;
       left: 0;
+      box-sizing: border-box;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: move;
+      border: 1px solid var(--art-gray-300);
+      border-radius: inherit;
 
       i {
         padding-left: 0;
