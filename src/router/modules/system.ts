@@ -77,6 +77,23 @@ export const systemRoutes: AppRouteRecord = {
       }
     },
     {
+      path: 'dict',
+      name: 'Dict',
+      component: '/system/dict',
+      meta: {
+        title: 'menus.system.dict',
+        keep_alive: true,
+        auth_list: [
+          { title: '新增字典', auth_mark: 'dicts.create' },
+          { title: '编辑字典', auth_mark: 'dicts.edit' },
+          { title: '删除字典', auth_mark: 'dicts.delete' },
+          { title: '新增字典数据', auth_mark: 'dict-items.create' },
+          { title: '编辑字典数据', auth_mark: 'dict-items.edit' },
+          { title: '删除字典数据', auth_mark: 'dict-items.delete' }
+        ]
+      }
+    },
+    {
       path: 'app',
       name: 'AppRelease',
       component: '/system/app',

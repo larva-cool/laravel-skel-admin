@@ -938,5 +938,72 @@ declare namespace Api {
       origin_name: string
       storage: string
     }
+
+    // ========== 字典管理 ==========
+
+    /** 字典类型列表（Laravel 分页） */
+    type DictList = Api.Common.PaginatedResponse<DictListItem>
+
+    /** 字典类型列表项 */
+    interface DictListItem {
+      id: number
+      name: string
+      code: string
+      status: number
+      sort: number
+      remark: string | null
+      created_at: string | null
+      updated_at: string | null
+    }
+
+    /** 字典类型保存参数 */
+    interface DictSaveParams {
+      name: string
+      code: string
+      status: number
+      sort?: number
+      remark?: string | null
+    }
+
+    /** 字典类型搜索参数 */
+    interface DictSearchParams extends Api.Common.CommonSearchParams {
+      keyword?: string
+      status?: number | string
+    }
+
+    /** 字典数据项列表（Laravel 分页） */
+    type DictItemList = Api.Common.PaginatedResponse<DictItemListItem>
+
+    /** 字典数据项列表项 */
+    interface DictItemListItem {
+      id: number
+      dict_id: number
+      label: string
+      value: string
+      label_type: string
+      status: number
+      sort: number
+      remark: string | null
+      created_at: string | null
+      updated_at: string | null
+    }
+
+    /** 字典数据项保存参数 */
+    interface DictItemSaveParams {
+      dict_id: number
+      label: string
+      value: string
+      label_type?: string
+      status: number
+      sort?: number
+      remark?: string | null
+    }
+
+    /** 字典数据项搜索参数 */
+    interface DictItemSearchParams extends Api.Common.CommonSearchParams {
+      dict_id?: number
+      keyword?: string
+      status?: number | string
+    }
   }
 }

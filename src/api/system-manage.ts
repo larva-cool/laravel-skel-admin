@@ -501,3 +501,93 @@ export function fetchRegisterAttachment(data: Api.SystemManage.AttachmentRegiste
     data
   })
 }
+
+// ========== 字典管理 ==========
+
+// 获取字典类型列表（分页）
+export function fetchGetDictList(params: Api.SystemManage.DictSearchParams) {
+  return request.get<Api.SystemManage.DictList>({
+    url: '/admin/dicts',
+    params
+  })
+}
+
+// 获取字典类型详情
+export function fetchGetDictDetail(id: number) {
+  return request.get<Api.SystemManage.DictListItem>({
+    url: `/admin/dicts/${id}`
+  })
+}
+
+// 创建字典类型
+export function fetchCreateDict(data: Api.SystemManage.DictSaveParams) {
+  return request.post<Api.SystemManage.DictListItem>({
+    url: '/admin/dicts',
+    data,
+    showSuccessMessage: true,
+    successMessage: '创建成功'
+  })
+}
+
+// 更新字典类型
+export function fetchUpdateDict(id: number, data: Api.SystemManage.DictSaveParams) {
+  return request.put<Api.SystemManage.DictListItem>({
+    url: `/admin/dicts/${id}`,
+    data,
+    showSuccessMessage: true,
+    successMessage: '更新成功'
+  })
+}
+
+// 删除字典类型
+export function fetchDeleteDict(id: number) {
+  return request.del<null>({
+    url: `/admin/dicts/${id}`,
+    showSuccessMessage: true,
+    successMessage: '删除成功'
+  })
+}
+
+// 获取字典数据项列表（分页）
+export function fetchGetDictItemList(params: Api.SystemManage.DictItemSearchParams) {
+  return request.get<Api.SystemManage.DictItemList>({
+    url: '/admin/dict-items',
+    params
+  })
+}
+
+// 获取字典数据项详情
+export function fetchGetDictItemDetail(id: number) {
+  return request.get<Api.SystemManage.DictItemListItem>({
+    url: `/admin/dict-items/${id}`
+  })
+}
+
+// 创建字典数据项
+export function fetchCreateDictItem(data: Api.SystemManage.DictItemSaveParams) {
+  return request.post<Api.SystemManage.DictItemListItem>({
+    url: '/admin/dict-items',
+    data,
+    showSuccessMessage: true,
+    successMessage: '创建成功'
+  })
+}
+
+// 更新字典数据项
+export function fetchUpdateDictItem(id: number, data: Api.SystemManage.DictItemSaveParams) {
+  return request.put<Api.SystemManage.DictItemListItem>({
+    url: `/admin/dict-items/${id}`,
+    data,
+    showSuccessMessage: true,
+    successMessage: '更新成功'
+  })
+}
+
+// 删除字典数据项
+export function fetchDeleteDictItem(id: number) {
+  return request.del<null>({
+    url: `/admin/dict-items/${id}`,
+    showSuccessMessage: true,
+    successMessage: '删除成功'
+  })
+}
