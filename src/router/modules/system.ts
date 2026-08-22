@@ -86,7 +86,11 @@ export const systemRoutes: AppRouteRecord = {
         auth_list: [
           { title: '新增应用', auth_mark: 'apps.create' },
           { title: '编辑应用', auth_mark: 'apps.edit' },
-          { title: '删除应用', auth_mark: 'apps.delete' }
+          { title: '删除应用', auth_mark: 'apps.delete' },
+          { title: '版本管理', auth_mark: 'app-versions.index' },
+          { title: '新增版本', auth_mark: 'app-versions.create' },
+          { title: '编辑版本', auth_mark: 'app-versions.edit' },
+          { title: '删除版本', auth_mark: 'app-versions.delete' }
         ]
       }
     },
