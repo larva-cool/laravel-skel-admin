@@ -122,3 +122,13 @@ export function fetchObsoleteVersion(appId: number, id: number) {
     successMessage: '废弃成功'
   })
 }
+
+// 上传 APK 文件
+export function fetchUploadApk(file: File) {
+  const formData = new FormData()
+  formData.append('file', file)
+  return request.post<Api.AppManage.ApkUploadResult>({
+    url: '/admin/uploader/apk',
+    data: formData
+  })
+}

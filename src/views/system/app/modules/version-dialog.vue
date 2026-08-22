@@ -27,11 +27,23 @@
         />
       </ElFormItem>
       <ElFormItem label="下载地址" prop="download_url">
-        <ElInput
-          v-model="form.download_url"
-          placeholder="APK 直链 / App Store URL / 鸿蒙应用市场 URL"
-          clearable
-        />
+        <div class="flex gap-2 w-full">
+          <ElInput
+            v-model="form.download_url"
+            :placeholder="downloadUrlPlaceholder"
+            clearable
+            class="flex-1"
+          />
+          <ElUpload
+            v-if="form.platform === 'android'"
+            :show-file-list="false"
+            :before-upload="handleBeforeUpload"
+            :http-request="handleUploadApk"
+            accept=".apk"
+          >
+            <ElButton :loading="uploading" type="primary">上传 APK</ElButton>
+          </ElUpload>
+        </div>
       </ElFormItem>
       <ElFormItem label="更新说明" prop="release_notes">
         <ElInput v-model="form.release_notes" type="textarea" :rows="4" placeholder="更新说明" />
@@ -73,8 +85,10 @@
 </template>
 
 <script setup lang="ts">
-  import { fetchCreateVersion, fetchUpdateVersion } from '@/api/app-manage'
-  import type { FormInstance, FormRules } from 'element-plus'
+  import { fetchCreateVersion, fetchUpdateVersion, fetchUploadApk } from '@/api/app-manage'
+  import { ElMessage } from 'element-plus'
+  import type { FormInstance, FormRules, UploadRequestOptions } from 'element-plus'
+  import CryptoJS from 'crypto-js'
 
   defineOptions({ name: 'VersionDialog' })
 
@@ -89,9 +103,16 @@
   const dialogVisible = ref(false)
   const formRef = ref<FormInstance>()
   const submitting = ref(false)
+  const uploading = ref(false)
   const id = ref<number | null>(null)
   const isEdit = computed(() => id.value !== null)
   const title = computed(() => (isEdit.value ? '编辑版本' : '新增版本'))
+
+  const downloadUrlPlaceholder = computed(() => {
+    if (form.platform === 'android') return 'APK 直链，可直接输入或点击右侧上传'
+    if (form.platform === 'ios') return 'App Store URL'
+    return '鸿蒙应用市场 URL'
+  })
 
   const form = reactive({
     platform: 'android',
@@ -117,7 +138,52 @@
       }
     ],
     build: [{ required: true, message: '请输入构建号', trigger: 'blur' }],
-    download_url: [{ required: true, message: '请输入下载地址', trigger: 'blur' }]
+    download_url: [{ required: true, message: '请输入或上传下载地址', trigger: 'blur' }]
+  }
+
+  const handleBeforeUpload = (file: File) => {
+    if (!file.name.toLowerCase().endsWith('.apk')) {
+      ElMessage.error('仅支持上传 APK 文件')
+      return false
+    }
+    return true
+  }
+
+  const computeFileHash = (file: File, algorithm: 'MD5' | 'SHA256'): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        try {
+          const wordArray = CryptoJS.lib.WordArray.create(e.target?.result as ArrayBuffer)
+          const hash = algorithm === 'MD5' ? CryptoJS.MD5(wordArray) : CryptoJS.SHA256(wordArray)
+          resolve(hash.toString())
+        } catch (err) {
+          reject(err)
+        }
+      }
+      reader.onerror = reject
+      reader.readAsArrayBuffer(file)
+    })
+  }
+
+  const handleUploadApk = async (options: UploadRequestOptions) => {
+    uploading.value = true
+    try {
+      const file = options.file as File
+      const [res, md5, sha256] = await Promise.all([
+        fetchUploadApk(file),
+        computeFileHash(file, 'MD5'),
+        computeFileHash(file, 'SHA256')
+      ])
+      form.download_url = res.url
+      if (res.file_size) {
+        form.file_size = res.file_size
+      }
+      form.file_hash = `MD5:${md5} SHA256:${sha256}`
+      ElMessage.success('上传成功')
+    } finally {
+      uploading.value = false
+    }
   }
 
   const open = (row: Api.AppManage.VersionListItem | null) => {

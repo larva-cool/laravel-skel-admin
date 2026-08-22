@@ -926,5 +926,17 @@ declare namespace Api {
       file_hash?: string | null
       status?: string
     }
+
+    /** APK 上传返回 */
+    interface ApkUploadResult {
+      id: number
+      url: string
+      file_name: string
+      file_path: string
+      file_size: number
+      file_ext: string
+      origin_name: string
+      storage: string
+    }
   }
 }

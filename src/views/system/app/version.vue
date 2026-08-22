@@ -143,6 +143,13 @@
             )
         },
         {
+          prop: 'file_size',
+          label: '安装包大小',
+          width: 120,
+          formatter: (row: VersionListItem) =>
+            row.file_size ? `${(row.file_size / 1024 / 1024).toFixed(2)} MB` : '-'
+        },
+        {
           prop: 'status',
           label: '状态',
           width: 100,
