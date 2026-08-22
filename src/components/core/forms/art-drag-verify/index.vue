@@ -91,7 +91,7 @@
     progressBarBg: '#1385FF',
     completedBg: '#57D187',
     circle: false,
-    radius: 'calc(var(--custom-radius) / 3 + 2px)',
+    radius: 'calc(var(--custom-radius) / 2 + 4px)',
     handlerIcon: 'solar:double-alt-arrow-right-linear',
     successIcon: 'ri:check-fill',
     handlerBg: '#fff',
@@ -339,7 +339,7 @@
     box-sizing: border-box;
     overflow: hidden;
     text-align: center;
-    border: 1px solid var(--default-border-dashed);
+    border: 1px solid var(--art-gray-300);
 
     .dv_handler {
       position: absolute;
