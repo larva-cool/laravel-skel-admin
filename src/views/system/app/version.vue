@@ -47,6 +47,7 @@
   } from '@/api/app-manage'
   import ArtButtonMore, { ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
   import { useTable } from '@/hooks/core/useTable'
+  import { mittBus } from '@/utils/sys'
   import { ElTag, ElMessageBox } from 'element-plus'
   import { ArrowLeft } from '@element-plus/icons-vue'
   import VersionDialog from './modules/version-dialog.vue'
@@ -234,6 +235,7 @@
   }
 
   const handleBack = (): void => {
+    mittBus.emit('refreshAppList')
     router.push('/system/app')
   }
 

@@ -41,6 +41,7 @@
   import ArtButtonMore, { ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
   import ArtIconButton from '@/components/core/widget/art-icon-button/index.vue'
   import { useTable } from '@/hooks/core/useTable'
+  import { mittBus } from '@/utils/sys'
   import { ElMessageBox, ElTag, ElTooltip } from 'element-plus'
   import AppDialog from './modules/app-dialog.vue'
 
@@ -213,7 +214,16 @@
 
   const { push: routerPush } = useRouter()
 
+  const handleRefreshAppList = (): void => {
+    getData()
+  }
+
   onMounted(() => {
     getData()
+    mittBus.on('refreshAppList', handleRefreshAppList)
+  })
+
+  onUnmounted(() => {
+    mittBus.off('refreshAppList', handleRefreshAppList)
   })
 </script>
