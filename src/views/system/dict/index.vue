@@ -27,12 +27,7 @@
           shadow="never"
         >
           <div class="shrink-0">
-            <ElButton
-              type="primary"
-              plain
-              v-auth="'dicts.create'"
-              @click="dictEditDialogRef?.open()"
-            >
+            <ElButton type="primary" v-auth="'dicts.create'" @click="dictEditDialogRef?.open()">
               新增字典
             </ElButton>
           </div>
@@ -106,6 +101,7 @@
           >
             <template #left>
               <ElButton
+                type="primary"
                 v-auth="'dict-items.create'"
                 :disabled="!currentDict"
                 @click="openItemEditDialog()"
