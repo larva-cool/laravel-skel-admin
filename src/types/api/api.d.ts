@@ -497,6 +497,131 @@ declare namespace Api {
       disk?: string
       original_name?: string
     }
+
+    // ========== 字典管理 ==========
+
+    /** 字典类型列表（Laravel 分页） */
+    type DictList = Api.Common.PaginatedResponse<DictListItem>
+
+    /** 字典类型列表项 */
+    interface DictListItem {
+      id: number
+      name: string
+      code: string
+      status: number
+      sort: number
+      remark: string | null
+      created_at: string | null
+      updated_at: string | null
+    }
+
+    /** 字典类型保存参数 */
+    interface DictSaveParams {
+      name: string
+      code: string
+      status: number
+      sort?: number
+      remark?: string | null
+    }
+
+    /** 字典类型搜索参数 */
+    interface DictSearchParams extends Api.Common.CommonSearchParams {
+      keyword?: string
+      status?: number | string
+    }
+
+    /** 字典数据项列表（Laravel 分页） */
+    type DictItemList = Api.Common.PaginatedResponse<DictItemListItem>
+
+    /** 字典数据项列表项 */
+    interface DictItemListItem {
+      id: number
+      dict_id: number
+      label: string
+      value: string
+      label_type: string
+      status: number
+      sort: number
+      remark: string | null
+      created_at: string | null
+      updated_at: string | null
+    }
+
+    /** 字典数据项保存参数 */
+    interface DictItemSaveParams {
+      dict_id: number
+      label: string
+      value: string
+      label_type?: string
+      status: number
+      sort?: number
+      remark?: string | null
+    }
+
+    /** 字典数据项搜索参数 */
+    interface DictItemSearchParams extends Api.Common.CommonSearchParams {
+      dict_id?: number
+      keyword?: string
+      status?: number | string
+    }
+
+    // ========== 反馈管理 ==========
+
+    /** 反馈统计数据 */
+    interface FeedbackStats {
+      total: number
+      pending: number
+      today: number
+      closed: number
+    }
+
+    /** 反馈列表（Laravel 分页） */
+    type FeedbackList = Api.Common.PaginatedResponse<FeedbackListItem>
+
+    /** 反馈列表项 */
+    interface FeedbackListItem {
+      id: number
+      code: string
+      title: string
+      content?: string
+      images: string[]
+      type: string
+      type_label: string
+      type_label_type: string
+      status: number
+      status_label: string
+      status_label_type: string
+      priority: number
+      priority_label: string
+      priority_label_type: string
+      contact_name: string | null
+      contact_info: string | null
+      user_agent?: string | null
+      ip_address?: string | null
+      user_id: number | null
+      admin_id: number | null
+      admin_name?: string | null
+      admin_remark: string | null
+      resolved_at: string | null
+      closed_at: string | null
+      created_at: string | null
+      updated_at: string | null
+    }
+
+    /** 反馈搜索参数 */
+    interface FeedbackSearchParams extends Api.Common.CommonSearchParams {
+      keyword?: string
+      type?: string
+      status?: number | string
+      priority?: number | string
+    }
+
+    /** 反馈更新参数（处理反馈） */
+    interface FeedbackUpdateParams {
+      status?: number
+      priority?: number
+      admin_remark?: string | null
+    }
   }
 
   /** 用户管理模块（前台用户） */
@@ -937,73 +1062,6 @@ declare namespace Api {
       file_ext: string
       origin_name: string
       storage: string
-    }
-
-    // ========== 字典管理 ==========
-
-    /** 字典类型列表（Laravel 分页） */
-    type DictList = Api.Common.PaginatedResponse<DictListItem>
-
-    /** 字典类型列表项 */
-    interface DictListItem {
-      id: number
-      name: string
-      code: string
-      status: number
-      sort: number
-      remark: string | null
-      created_at: string | null
-      updated_at: string | null
-    }
-
-    /** 字典类型保存参数 */
-    interface DictSaveParams {
-      name: string
-      code: string
-      status: number
-      sort?: number
-      remark?: string | null
-    }
-
-    /** 字典类型搜索参数 */
-    interface DictSearchParams extends Api.Common.CommonSearchParams {
-      keyword?: string
-      status?: number | string
-    }
-
-    /** 字典数据项列表（Laravel 分页） */
-    type DictItemList = Api.Common.PaginatedResponse<DictItemListItem>
-
-    /** 字典数据项列表项 */
-    interface DictItemListItem {
-      id: number
-      dict_id: number
-      label: string
-      value: string
-      label_type: string
-      status: number
-      sort: number
-      remark: string | null
-      created_at: string | null
-      updated_at: string | null
-    }
-
-    /** 字典数据项保存参数 */
-    interface DictItemSaveParams {
-      dict_id: number
-      label: string
-      value: string
-      label_type?: string
-      status: number
-      sort?: number
-      remark?: string | null
-    }
-
-    /** 字典数据项搜索参数 */
-    interface DictItemSearchParams extends Api.Common.CommonSearchParams {
-      dict_id?: number
-      keyword?: string
-      status?: number | string
     }
   }
 }

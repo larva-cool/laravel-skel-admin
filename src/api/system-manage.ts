@@ -591,3 +591,53 @@ export function fetchDeleteDictItem(id: number) {
     successMessage: '删除成功'
   })
 }
+
+// 按字典编码获取启用的字典项（用于下拉选项/标签渲染，带缓存）
+export function fetchDictItemsByCode(code: string) {
+  return request.get<Api.SystemManage.DictItemListItem[]>({
+    url: `/admin/dicts/by-code/${code}/items`
+  })
+}
+
+// ========== 反馈管理 ==========
+
+// 获取反馈列表（分页）
+export function fetchGetFeedbackList(params: Api.SystemManage.FeedbackSearchParams) {
+  return request.get<Api.SystemManage.FeedbackList>({
+    url: '/admin/feedbacks',
+    params
+  })
+}
+
+// 获取反馈统计数据
+export function fetchGetFeedbackStats() {
+  return request.get<Api.SystemManage.FeedbackStats>({
+    url: '/admin/feedbacks/stats'
+  })
+}
+
+// 获取反馈详情
+export function fetchGetFeedbackDetail(id: number) {
+  return request.get<Api.SystemManage.FeedbackListItem>({
+    url: `/admin/feedbacks/${id}`
+  })
+}
+
+// 更新反馈（处理反馈）
+export function fetchUpdateFeedback(id: number, data: Api.SystemManage.FeedbackUpdateParams) {
+  return request.put<Api.SystemManage.FeedbackListItem>({
+    url: `/admin/feedbacks/${id}`,
+    data,
+    showSuccessMessage: true,
+    successMessage: '处理成功'
+  })
+}
+
+// 删除反馈
+export function fetchDeleteFeedback(id: number) {
+  return request.del<null>({
+    url: `/admin/feedbacks/${id}`,
+    showSuccessMessage: true,
+    successMessage: '删除成功'
+  })
+}
