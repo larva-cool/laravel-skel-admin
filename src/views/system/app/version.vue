@@ -130,7 +130,7 @@
           width: 100,
           formatter: (row: VersionListItem) => h(ElTag, { size: 'small' }, () => row.platform.label)
         },
-        { prop: 'version', label: '版本号', width: 120 },
+        { prop: 'version', label: '版本号', minWidth: 120 },
         { prop: 'build', label: '构建号', width: 100 },
         {
           prop: 'force_update',

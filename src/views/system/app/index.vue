@@ -39,9 +39,9 @@
 <script setup lang="ts">
   import { fetchDeleteApp, fetchGetAppList } from '@/api/app-manage'
   import ArtButtonMore, { ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
+  import ArtIconButton from '@/components/core/widget/art-icon-button/index.vue'
   import { useTable } from '@/hooks/core/useTable'
-  import { ElTag, ElTooltip, ElButton, ElMessageBox } from 'element-plus'
-  import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
+  import { ElMessageBox, ElTag, ElTooltip } from 'element-plus'
   import AppDialog from './modules/app-dialog.vue'
 
   defineOptions({ name: 'AppRelease' })
@@ -136,21 +136,16 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 240,
+          width: 220,
           align: 'right',
           formatter: (row: AppListItem) => {
             return h('div', { class: 'flex items-center justify-end gap-2' }, [
-              h(
-                ElButton,
-                {
-                  size: 'small',
-                  type: 'primary',
-                  circle: true,
-                  title: '版本管理',
-                  onClick: () => handleVersions(row)
-                },
-                () => h(ArtSvgIcon, { icon: 'ri:git-branch-line' })
-              ),
+              h(ArtIconButton, {
+                icon: 'ri:git-branch-line',
+                title: '版本管理',
+                class: '!size-8 bg-g-200 dark:bg-g-300/45 text-sm',
+                onClick: () => handleVersions(row)
+              }),
               h(ArtButtonMore, {
                 list: [
                   { key: 'edit', label: '编辑', icon: 'ri:edit-2-line', auth: 'apps.edit' },
