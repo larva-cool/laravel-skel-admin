@@ -63,12 +63,14 @@
       <ElFormItem label="强制更新" prop="force_update">
         <ElSwitch v-model="form.force_update" active-text="是" inactive-text="否" />
       </ElFormItem>
-      <ElFormItem label="安装包大小" prop="file_size">
+      <ElFormItem label="安装包大小" prop="file_size_mb">
         <ElInputNumber
-          v-model="form.file_size"
+          v-model="form.file_size_mb"
           :min="0"
+          :precision="2"
+          :step="0.1"
           controls-position="right"
-          placeholder="字节"
+          placeholder="MB"
           style="width: 100%"
         />
       </ElFormItem>
@@ -123,7 +125,7 @@
     min_supported_version: '',
     min_supported_build: 0,
     force_update: false,
-    file_size: null as number | null,
+    file_size_mb: null as number | null,
     file_hash: ''
   })
 
@@ -177,7 +179,7 @@
       ])
       form.download_url = res.url
       if (res.file_size) {
-        form.file_size = res.file_size
+        form.file_size_mb = +(res.file_size / 1024 / 1024).toFixed(2)
       }
       form.file_hash = `MD5:${md5} SHA256:${sha256}`
       ElMessage.success('上传成功')
@@ -199,7 +201,7 @@
         min_supported_version: row.min_supported_version ?? '',
         min_supported_build: row.min_supported_build,
         force_update: row.force_update,
-        file_size: row.file_size,
+        file_size_mb: row.file_size ? +(row.file_size / 1024 / 1024).toFixed(2) : null,
         file_hash: row.file_hash ?? ''
       })
     } else {
@@ -213,7 +215,7 @@
         min_supported_version: '',
         min_supported_build: 0,
         force_update: false,
-        file_size: null,
+        file_size_mb: null,
         file_hash: ''
       })
     }
@@ -234,7 +236,7 @@
           min_supported_version: form.min_supported_version || null,
           min_supported_build: form.min_supported_build,
           force_update: form.force_update,
-          file_size: form.file_size,
+          file_size: form.file_size_mb ? Math.round(form.file_size_mb * 1024 * 1024) : null,
           file_hash: form.file_hash || null
         }
         if (isEdit.value && id.value) {
