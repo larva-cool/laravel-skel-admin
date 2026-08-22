@@ -267,7 +267,9 @@
       "area": "地区管理",
       "phoneCode": "短信验证码",
       "mailCode": "邮件验证码",
-      "attachment": "附件管理"
+      "attachment": "附件管理",
+      "app": "应用管理",
+      "appVersion": "版本管理"
     }
   },
   "table": {

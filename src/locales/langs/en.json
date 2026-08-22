@@ -267,7 +267,9 @@
       "area": "Area Manage",
       "phoneCode": "SMS Code",
       "mailCode": "Email Code",
-      "attachment": "Attachment Manage"
+      "attachment": "Attachment Manage",
+      "app": "App Manage",
+      "appVersion": "Version Manage"
     }
   },
   "table": {

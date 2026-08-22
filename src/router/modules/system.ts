@@ -75,6 +75,35 @@ export const systemRoutes: AppRouteRecord = {
           { title: '删除附件', auth_mark: 'attachments.delete' }
         ]
       }
+    },
+    {
+      path: 'app',
+      name: 'AppRelease',
+      component: '/system/app',
+      meta: {
+        title: 'menus.system.app',
+        keep_alive: true,
+        auth_list: [
+          { title: '新增应用', auth_mark: 'apps.create' },
+          { title: '编辑应用', auth_mark: 'apps.edit' },
+          { title: '删除应用', auth_mark: 'apps.delete' }
+        ]
+      }
+    },
+    {
+      path: 'app/:id/versions',
+      name: 'AppVersion',
+      component: '/system/app/version',
+      meta: {
+        title: 'menus.system.appVersion',
+        keep_alive: true,
+        is_hide: true,
+        auth_list: [
+          { title: '新增版本', auth_mark: 'app-versions.create' },
+          { title: '编辑版本', auth_mark: 'app-versions.edit' },
+          { title: '删除版本', auth_mark: 'app-versions.delete' }
+        ]
+      }
     }
   ]
 }
