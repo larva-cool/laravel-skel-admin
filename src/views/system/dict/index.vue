@@ -1,170 +1,155 @@
 <template>
-  <div class="dict-page">
-    <!-- 左侧：字典类型 -->
-    <ElCard class="dict-panel dict-left-panel">
-      <!-- 搜索栏 -->
-      <div class="dict-search-bar">
-        <ElInput
-          v-model="dictKeyword"
-          placeholder="请输入字典名称或字典编码"
-          clearable
-          class="dict-search-input"
-          @keyup.enter="handleDictSearch"
-        >
-          <template #prefix>
-            <ElIcon><Search /></ElIcon>
-          </template>
-        </ElInput>
-        <ElButton type="primary" @click="handleDictSearch">查询</ElButton>
-      </div>
-
-      <!-- 新增按钮 -->
-      <div class="dict-left-toolbar">
-        <ElButton type="primary" plain v-auth="'dicts.create'" @click="dictEditDialogRef?.open()">
-          新增字典
-        </ElButton>
-      </div>
-
-      <!-- 左侧表格 -->
-      <ArtTable
-        :loading="dictLoading"
-        :data="dictData"
-        :columns="dictColumns"
-        :pagination="dictPagination"
-        :showTableHeader="false"
-        :paginationOptions="{ align: 'center', pageSizes: [10, 20, 50] }"
-        @pagination:size-change="handleDictSizeChange"
-        @pagination:current-change="handleDictCurrentChange"
-        @row-click="handleDictRowClick"
+  <div class="dict-page art-full-height overflow-visible" style="min-height: calc(-119px + 100vh)">
+    <div class="dict-page-splitter flex h-full gap-4 overflow-visible">
+      <!-- 左侧：字典类型列表 -->
+      <section
+        class="dict-panel dict-panel-primary flex h-full min-h-0 w-[640px] shrink-0 flex-col overflow-visible"
       >
-        <template #status="{ row }">
-          <ElTag :type="row.status === 1 ? 'success' : 'info'">
-            {{ row.status === 1 ? '启用' : '禁用' }}
-          </ElTag>
-        </template>
-        <template #action="{ row }">
-          <div class="dict-action-btns">
-            <ElIcon
-              class="dict-action-btn edit"
-              v-auth="'dicts.edit'"
-              @click.stop="handleDictEdit(row)"
-              title="编辑"
-            >
-              <Edit />
-            </ElIcon>
-            <ElIcon
-              class="dict-action-btn delete"
-              v-auth="'dicts.delete'"
-              @click.stop="handleDictDelete(row)"
-              title="删除"
-            >
-              <Delete />
-            </ElIcon>
-          </div>
-        </template>
-      </ArtTable>
-    </ElCard>
-
-    <!-- 右侧：字典数据项 -->
-    <ElCard class="dict-panel dict-right-panel">
-      <!-- 搜索栏 -->
-      <div class="dict-search-bar dict-item-search-bar">
-        <ElInput
-          v-model="itemLabel"
-          placeholder="请输入数据标签"
-          clearable
-          style="width: 220px"
-          @keyup.enter="handleItemSearch"
-        >
-          <template #prepend>数据标签</template>
-        </ElInput>
-        <ElInput
-          v-model="itemValue"
-          placeholder="请输入数据键值"
-          clearable
-          style="width: 220px; margin-left: 12px"
-          @keyup.enter="handleItemSearch"
-        >
-          <template #prepend>数据键值</template>
-        </ElInput>
-        <ElButton style="margin-left: 12px" @click="handleItemReset">重置</ElButton>
-        <ElButton type="primary" style="margin-left: 8px" @click="handleItemSearch">查询</ElButton>
-      </div>
-
-      <!-- 标题 + 工具栏 -->
-      <div class="dict-right-header">
-        <div class="dict-right-title">
-          <span>字典数据 ·</span>
-          <span class="dict-right-name">{{ currentDict?.name || '--' }}</span>
-          <ElTag
-            v-if="currentDict"
-            size="small"
-            :type="currentDict.status === 1 ? 'success' : 'info'"
+        <!-- 搜索区 -->
+        <div class="art-card-xs flex items-center gap-3 p-4">
+          <ElInput
+            v-model="dictKeyword"
+            class="flex-1"
+            placeholder="请输入字典名称或字典编码"
+            clearable
+            @keyup.enter="handleDictSearch"
           >
-            {{ currentDict.status === 1 ? '启用' : '禁用' }}
-          </ElTag>
+            <template #prefix>
+              <ElIcon><Search /></ElIcon>
+            </template>
+          </ElInput>
+          <ElButton type="primary" @click="handleDictSearch">查询</ElButton>
         </div>
-        <ArtTableHeader
-          v-model:columns="itemColumnChecks"
-          :loading="itemLoading"
-          layout="refresh,size,fullscreen,columns,settings"
-          @refresh="refreshItemData"
+
+        <!-- 表格卡片 -->
+        <ElCard
+          class="art-table-card mt-3 flex min-h-0 flex-1 flex-col overflow-hidden"
+          shadow="never"
         >
-          <template #left>
+          <div class="shrink-0">
             <ElButton
               type="primary"
               plain
-              :disabled="!currentDict"
-              v-auth="'dict-items.create'"
-              @click="openItemEditDialog()"
+              v-auth="'dicts.create'"
+              @click="dictEditDialogRef?.open()"
             >
-              新增数据
+              新增字典
             </ElButton>
-          </template>
-        </ArtTableHeader>
-      </div>
-
-      <!-- 右侧表格 -->
-      <ArtTable
-        :loading="itemLoading"
-        :data="itemData"
-        :columns="itemColumns"
-        :pagination="itemPagination"
-        :showTableHeader="false"
-        empty-text="暂无数据"
-        @pagination:size-change="handleItemSizeChange"
-        @pagination:current-change="handleItemCurrentChange"
-      >
-        <template #label_type="{ row }">
-          <ElTag :type="row.label_type as any">{{ row.label }}</ElTag>
-        </template>
-        <template #status="{ row }">
-          <ElTag :type="row.status === 1 ? 'success' : 'info'">
-            {{ row.status === 1 ? '启用' : '禁用' }}
-          </ElTag>
-        </template>
-        <template #action="{ row }">
-          <div class="dict-action-btns">
-            <ElIcon
-              class="dict-action-btn edit"
-              v-auth="'dict-items.edit'"
-              @click="handleItemEdit(row)"
-              title="编辑"
-            >
-              <Edit />
-            </ElIcon>
-            <ElIcon
-              class="dict-action-btn delete"
-              v-auth="'dict-items.delete'"
-              @click="handleItemDelete(row)"
-              title="删除"
-            >
-              <Delete />
-            </ElIcon>
           </div>
-        </template>
-      </ArtTable>
-    </ElCard>
+          <ArtTable
+            class="dict-left-table"
+            :loading="dictLoading"
+            :data="dictData"
+            :columns="dictColumns"
+            :pagination="dictPagination"
+            :paginationOptions="{ align: 'center', pageSizes: [10, 20, 50] }"
+            @pagination:size-change="handleDictSizeChange"
+            @pagination:current-change="handleDictCurrentChange"
+            @row-click="handleDictRowClick"
+          >
+            <template #status="{ row }">
+              <ElTag :type="row.status === 1 ? 'success' : 'info'" effect="light">
+                {{ row.status === 1 ? '启用' : '禁用' }}
+              </ElTag>
+            </template>
+            <template #action="{ row }">
+              <div class="flex items-center">
+                <ArtButtonTable type="edit" v-auth="'dicts.edit'" @click="handleDictEdit(row)" />
+                <ArtButtonTable
+                  type="delete"
+                  v-auth="'dicts.delete'"
+                  @click="handleDictDelete(row)"
+                />
+              </div>
+            </template>
+          </ArtTable>
+        </ElCard>
+      </section>
+
+      <!-- 右侧：字典数据项 -->
+      <section
+        class="dict-panel dict-panel-secondary flex h-full min-h-0 flex-1 flex-col overflow-visible"
+      >
+        <!-- 搜索区 -->
+        <ArtSearchBar
+          v-model="itemFilters"
+          :items="itemFormItems"
+          :showExpand="false"
+          :labelWidth="'70px'"
+          :span="8"
+          @reset="handleItemReset"
+          @search="handleItemSearch"
+        />
+
+        <!-- 表格卡片 -->
+        <ElCard
+          class="art-table-card flex min-h-0 flex-1 flex-col overflow-hidden"
+          :style="{ 'margin-top': '12px' }"
+          shadow="never"
+        >
+          <template #header>
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium">字典数据 · {{ currentDict?.name || '--' }}</span>
+                <ElTag v-if="currentDict" size="small" type="success" effect="light">
+                  {{ currentDict.code }}
+                </ElTag>
+              </div>
+            </div>
+          </template>
+
+          <ArtTableHeader
+            v-model:columns="itemColumnChecks"
+            :loading="itemLoading"
+            layout="refresh,size,fullscreen,columns,settings"
+            @refresh="refreshItemData"
+          >
+            <template #left>
+              <ElButton
+                v-auth="'dict-items.create'"
+                :disabled="!currentDict"
+                @click="openItemEditDialog()"
+              >
+                新增数据
+              </ElButton>
+            </template>
+          </ArtTableHeader>
+
+          <ArtTable
+            :loading="itemLoading"
+            :data="itemData"
+            :columns="itemColumns"
+            :pagination="itemPagination"
+            empty-text="暂无数据"
+            @pagination:size-change="handleItemSizeChange"
+            @pagination:current-change="handleItemCurrentChange"
+          >
+            <template #label_type="{ row }">
+              <ElTag :type="row.label_type as any" effect="light">{{ row.label }}</ElTag>
+            </template>
+            <template #status="{ row }">
+              <ElTag :type="row.status === 1 ? 'success' : 'info'" effect="light">
+                {{ row.status === 1 ? '启用' : '禁用' }}
+              </ElTag>
+            </template>
+            <template #action="{ row }">
+              <div class="flex items-center">
+                <ArtButtonTable
+                  type="edit"
+                  v-auth="'dict-items.edit'"
+                  @click="handleItemEdit(row)"
+                />
+                <ArtButtonTable
+                  type="delete"
+                  v-auth="'dict-items.delete'"
+                  @click="handleItemDelete(row)"
+                />
+              </div>
+            </template>
+          </ArtTable>
+        </ElCard>
+      </section>
+    </div>
 
     <!-- 弹窗 -->
     <DictEditDialog ref="dictEditDialogRef" @refresh="refreshDictCreate" />
@@ -183,14 +168,17 @@
     fetchGetDictItemList,
     fetchGetDictList
   } from '@/api/system-manage'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
+  import ArtSearchBar from '@/components/core/forms/art-search-bar/index.vue'
   import ArtTableHeader from '@/components/core/tables/art-table-header/index.vue'
   import ArtTable from '@/components/core/tables/art-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
-  import { Delete, Edit, Search } from '@element-plus/icons-vue'
+  import { Search } from '@element-plus/icons-vue'
   import { ElMessage, ElMessageBox, ElTag } from 'element-plus'
-  import { ref } from 'vue'
   import DictEditDialog from './modules/dict-edit-dialog.vue'
   import DictItemEditDialog from './modules/dict-item-edit-dialog.vue'
+
+  defineOptions({ name: 'DictManage' })
 
   // ============== 左侧：字典类型 ==============
 
@@ -214,16 +202,10 @@
       apiParams: { page: 1, per_page: 10 },
       paginationKey: { current: 'page', size: 'per_page' },
       columnsFactory: () => [
-        { type: 'globalIndex', label: '序号', width: 60 },
-        { prop: 'name', label: '字典名称', minWidth: 140 },
-        { prop: 'code', label: '字典编码', minWidth: 120 },
-        {
-          prop: 'status',
-          label: '状态',
-          width: 90,
-          useSlot: true,
-          slotName: 'status'
-        },
+        { type: 'globalIndex', label: '序号', width: 70 },
+        { prop: 'name', label: '字典名称', minWidth: 125 },
+        { prop: 'code', label: '字典编码', minWidth: 125 },
+        { prop: 'status', label: '状态', width: 90, useSlot: true, slotName: 'status' },
         {
           prop: 'action',
           label: '操作',
@@ -239,7 +221,9 @@
   const handleDictSearch = () => {
     const params = dictSearchParams as Record<string, unknown>
     Object.keys(params).forEach((key) => {
-      if (key !== 'page' && key !== 'per_page') delete params[key]
+      if (key !== 'page' && key !== 'per_page') {
+        delete params[key]
+      }
     })
     if (dictKeyword.value) {
       params.keyword = dictKeyword.value
@@ -277,9 +261,26 @@
   // ============== 右侧：字典数据项 ==============
 
   const currentDict = ref<Api.SystemManage.DictListItem | null>(null)
-  const itemLabel = ref('')
-  const itemValue = ref('')
   const itemEditDialogRef = ref<InstanceType<typeof DictItemEditDialog>>()
+
+  const itemFilters = reactive<Record<string, any>>({ label: '', value: '' })
+
+  const itemFormItems = [
+    {
+      label: '数据标签',
+      key: 'label',
+      type: 'input',
+      span: 8,
+      props: { clearable: true, placeholder: '请输入数据标签' }
+    },
+    {
+      label: '数据键值',
+      key: 'value',
+      type: 'input',
+      span: 8,
+      props: { clearable: true, placeholder: '请输入数据键值' }
+    }
+  ]
 
   const {
     columns: itemColumns,
@@ -301,24 +302,18 @@
       paginationKey: { current: 'page', size: 'per_page' },
       immediate: false,
       columnsFactory: () => [
-        { type: 'globalIndex', label: '序号', width: 70 },
-        { prop: 'label', label: '数据标签', minWidth: 140 },
-        { prop: 'value', label: '数据键值', minWidth: 140 },
+        { type: 'globalIndex', label: '序号', width: 60 },
+        { prop: 'label', label: '数据标签', minWidth: 150 },
+        { prop: 'value', label: '数据键值', minWidth: 150 },
         {
           prop: 'label_type',
           label: '标签类型',
-          width: 120,
+          width: 110,
           useSlot: true,
           slotName: 'label_type'
         },
-        { prop: 'sort', label: '排序', width: 80 },
-        {
-          prop: 'status',
-          label: '状态',
-          width: 90,
-          useSlot: true,
-          slotName: 'status'
-        },
+        { prop: 'sort', label: '排序', width: 80, align: 'center' },
+        { prop: 'status', label: '状态', width: 90, useSlot: true, slotName: 'status' },
         { prop: 'updated_at', label: '更新时间', width: 170 },
         {
           prop: 'action',
@@ -336,32 +331,33 @@
     if (!currentDict.value) return
     const params = itemSearchParams as Record<string, unknown>
     Object.keys(params).forEach((key) => {
-      if (key !== 'page' && key !== 'per_page') delete params[key]
+      if (key !== 'page' && key !== 'per_page') {
+        delete params[key]
+      }
     })
     params.dict_id = currentDict.value.id
     params.page = 1
+    itemFilters.label = ''
+    itemFilters.value = ''
     getItemData()
   }
 
-  const handleItemSearch = () => {
+  const handleItemSearch = (params: Record<string, any> = {}) => {
     if (!currentDict.value) return
-    const params = itemSearchParams as Record<string, unknown>
-    Object.keys(params).forEach((key) => {
-      if (key !== 'page' && key !== 'per_page') delete params[key]
+    const searchRecord = itemSearchParams as Record<string, unknown>
+    Object.keys(searchRecord).forEach((key) => {
+      if (key !== 'page' && key !== 'per_page') {
+        delete searchRecord[key]
+      }
     })
-    params.dict_id = currentDict.value.id
-    if (itemLabel.value) {
-      params.label = itemLabel.value
-    }
-    if (itemValue.value) {
-      params.value = itemValue.value
-    }
+    searchRecord.dict_id = currentDict.value.id
+    Object.assign(searchRecord, params)
     getItemData()
   }
 
   const handleItemReset = () => {
-    itemLabel.value = ''
-    itemValue.value = ''
+    itemFilters.label = ''
+    itemFilters.value = ''
     handleItemSearch()
   }
 
@@ -390,110 +386,16 @@
 </script>
 
 <style lang="scss" scoped>
-  .dict-page {
-    box-sizing: border-box;
-    display: flex;
-    gap: 16px;
-    height: 100%;
-    padding: 16px;
-  }
-
-  .dict-panel {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-
-    :deep(.el-card__body) {
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      padding: 16px;
-      overflow: hidden;
+  .dict-page-splitter {
+    /* 参考效果图的分隔线 */
+    > .dict-panel + .dict-panel {
+      border-left: none;
     }
   }
 
-  .dict-left-panel {
-    flex-shrink: 0;
-    width: 420px;
-  }
-
-  .dict-right-panel {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .dict-search-bar {
-    display: flex;
-    flex-shrink: 0;
-    gap: 8px;
-    align-items: center;
-    margin-bottom: 12px;
-  }
-
-  .dict-search-input {
-    flex: 1;
-  }
-
-  .dict-item-search-bar {
-    :deep(.el-input__prepend) {
-      padding: 0 10px;
-      color: var(--el-text-color-regular);
-      background: var(--el-fill-color-light);
-    }
-  }
-
-  .dict-left-toolbar {
-    flex-shrink: 0;
-    margin-bottom: 12px;
-  }
-
-  .dict-right-header {
-    display: flex;
-    flex-shrink: 0;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-  }
-
-  .dict-right-title {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--el-text-color-primary);
-
-    .dict-right-name {
-      color: var(--el-color-primary);
-    }
-  }
-
-  .dict-action-btns {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-
-  .dict-action-btn {
-    font-size: 16px;
-    cursor: pointer;
-    transition: color 0.2s;
-
-    &.edit {
-      color: var(--el-color-primary);
-
-      &:hover {
-        color: var(--el-color-primary-light-3);
-      }
-    }
-
-    &.delete {
-      color: var(--el-color-danger);
-
-      &:hover {
-        color: var(--el-color-danger-light-3);
-      }
+  .dict-left-table {
+    :deep(.el-table) {
+      height: calc(100% - 48px) !important;
     }
   }
 </style>
