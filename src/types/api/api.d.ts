@@ -836,6 +836,26 @@ declare namespace Api {
       icon: string | null
       sort: number
       status: boolean
+      latest_versions: {
+        android: {
+          version: string
+          build: number
+          force_update: boolean
+          published_at: string | null
+        } | null
+        ios: {
+          version: string
+          build: number
+          force_update: boolean
+          published_at: string | null
+        } | null
+        harmony: {
+          version: string
+          build: number
+          force_update: boolean
+          published_at: string | null
+        } | null
+      }
       created_at: string | null
       updated_at: string | null
     }
