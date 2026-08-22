@@ -1,7 +1,7 @@
 <template>
   <ElRow :gutter="20" class="flex">
     <ElCol v-for="(item, index) in dataList" :key="index" :sm="12" :md="6" :lg="6">
-      <div v-loading="loading" class="art-surface-sm px-5 py-5 mb-4">
+      <div v-loading="loading" class="art-card-sm px-5 py-5 mb-4">
         <div class="flex items-center justify-between gap-3">
           <span class="text-sm text-g-600">{{ item.des }}</span>
           <div
