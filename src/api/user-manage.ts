@@ -142,3 +142,31 @@ export function fetchUserCoinTrades(
     params
   })
 }
+
+// ========== 回收站（软删除用户） ==========
+
+// 获取回收站用户列表（分页）
+export function fetchGetTrashUserList(params: Api.UserManage.UserSearchParams) {
+  return request.get<Api.UserManage.UserList>({
+    url: '/admin/users/trash',
+    params
+  })
+}
+
+// 恢复软删除用户
+export function fetchRestoreUser(id: number) {
+  return request.put<Api.UserManage.UserListItem>({
+    url: `/admin/users/${id}/restore`,
+    showSuccessMessage: true,
+    successMessage: '恢复成功'
+  })
+}
+
+// 彻底删除用户
+export function fetchForceDeleteUser(id: number) {
+  return request.del<null>({
+    url: `/admin/users/${id}/force-delete`,
+    showSuccessMessage: true,
+    successMessage: '彻底删除成功'
+  })
+}

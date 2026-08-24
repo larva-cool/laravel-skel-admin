@@ -661,6 +661,7 @@ declare namespace Api {
       last_active_at: string | null
       created_at: string | null
       updated_at: string | null
+      deleted_at?: string | null
     }
 
     /** 用户详情（含 profile） */
