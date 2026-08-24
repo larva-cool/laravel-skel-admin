@@ -87,7 +87,7 @@
       apiFn: fetchGetFeedbackList,
       apiParams: { page: 1, per_page: 20 },
       columnsFactory: () => [
-        { prop: 'code', label: '反馈编号', width: 180, showOverflowTooltip: true },
+        { prop: 'code', label: '反馈编号', width: 220, showOverflowTooltip: true, fixed: 'left' },
         { prop: 'title', label: '标题', minWidth: 200, showOverflowTooltip: true },
         {
           prop: 'type_label',
