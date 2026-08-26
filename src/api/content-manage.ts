@@ -13,7 +13,7 @@ export function fetchGetCommentList(params: Api.ContentManage.CommentSearchParam
 // 获取评论源类型选项
 export function fetchGetCommentSourceTypes() {
   return request.get<{ label: string; value: string }[]>({
-    url: '/admin/comments/source-types'
+    url: '/admin/common/source-types'
   })
 }
 
