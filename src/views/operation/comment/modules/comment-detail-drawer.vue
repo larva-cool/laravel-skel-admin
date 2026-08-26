@@ -6,10 +6,12 @@
     ElDescriptions,
     ElDescriptionsItem,
     ElButton,
-    ElSkeleton
+    ElSkeleton,
+    ElEmpty,
+    ElPagination
   } from 'element-plus'
   import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
-  import { fetchGetCommentDetail } from '@/api/content-manage'
+  import { fetchGetCommentDetail, fetchGetCommentReplies } from '@/api/content-manage'
 
   interface Props {
     canReview?: boolean
@@ -30,6 +32,13 @@
   const loading = ref(false)
   const detail = ref<Api.ContentManage.CommentListItem | null>(null)
 
+  // 回复链
+  const repliesLoading = ref(false)
+  const replies = ref<Api.ContentManage.CommentListItem[]>([])
+  const repliesPage = ref(1)
+  const repliesPerPage = ref(10)
+  const repliesTotal = ref(0)
+
   const sourceTypeLabel = (t?: string) => {
     return props.sourceTypeMap[t || ''] || t || '-'
   }
@@ -39,10 +48,39 @@
     return t as 'primary' | 'success' | 'warning' | 'danger' | 'info'
   }
 
+  /** 加载指定评论的回复列表 */
+  async function loadReplies(id: number) {
+    repliesLoading.value = true
+    try {
+      const res = await fetchGetCommentReplies(id, {
+        page: repliesPage.value,
+        per_page: repliesPerPage.value
+      })
+      replies.value = res.data || []
+      repliesTotal.value = res.meta?.total || 0
+    } catch {
+      replies.value = []
+      repliesTotal.value = 0
+    } finally {
+      repliesLoading.value = false
+    }
+  }
+
+  function handleRepliesPageChange(page: number) {
+    repliesPage.value = page
+    if (detail.value) {
+      loadReplies(detail.value.id)
+    }
+  }
+
   const open = async (row: Api.ContentManage.CommentListItem) => {
     detail.value = { ...row }
     visible.value = true
     loading.value = true
+    // 重置回复链状态
+    replies.value = []
+    repliesTotal.value = 0
+    repliesPage.value = 1
     try {
       const res = await fetchGetCommentDetail(row.id)
       detail.value = res
@@ -51,11 +89,16 @@
     } finally {
       loading.value = false
     }
+    // 详情加载完成后加载回复链
+    loadReplies(row.id)
   }
 
   const close = () => {
     visible.value = false
     detail.value = null
+    replies.value = []
+    repliesTotal.value = 0
+    repliesPage.value = 1
   }
 
   const handleReview = () => {
@@ -63,11 +106,39 @@
     emit('review', detail.value)
   }
 
+  /** 按 ID 打开评论详情（用于回复链内跳转，无需完整行数据） */
+  const openById = async (id: number) => {
+    visible.value = true
+    loading.value = true
+    detail.value = null
+    replies.value = []
+    repliesTotal.value = 0
+    repliesPage.value = 1
+    try {
+      detail.value = await fetchGetCommentDetail(id)
+    } finally {
+      loading.value = false
+    }
+    loadReplies(id)
+  }
+
+  /** 点击回复项，切换查看该回复的详情 */
+  const viewReply = (reply: Api.ContentManage.CommentListItem) => {
+    openById(reply.id)
+  }
+
+  /** 点击上级评论，跳转查看上级评论详情 */
+  const viewParent = () => {
+    const parent = detail.value?.parent_comment
+    if (!parent) return
+    openById(parent.id)
+  }
+
   defineExpose({ open })
 </script>
 
 <template>
-  <ElDrawer v-model="visible" size="640px" :destroy-on-close="true" :with-header="false">
+  <ElDrawer v-model="visible" size="680px" :destroy-on-close="true" :with-header="false">
     <div v-loading="loading" class="h-full flex flex-col">
       <!-- 自定义头部 -->
       <div
@@ -83,6 +154,7 @@
             >
               {{ detail.status_label }}
             </ElTag>
+            <ElTag v-if="detail?.is_reply" type="info" size="small" effect="plain">回复</ElTag>
             <ElTag v-if="detail?.is_top" type="warning" size="small" effect="plain">置顶</ElTag>
           </div>
           <div class="flex items-center gap-2 text-xs text-[var(--el-text-color-secondary)]">
@@ -101,6 +173,44 @@
         <ElSkeleton v-if="loading && !detail" :rows="8" animated />
 
         <template v-else-if="detail">
+          <!-- 上级评论（回复对象） -->
+          <div v-if="detail.is_reply && detail.parent_comment" class="mb-4">
+            <div
+              class="mb-2 flex items-center gap-1.5 text-sm font-medium text-[var(--el-text-color-primary)]"
+            >
+              <ArtSvgIcon
+                icon="ri:corner-up-left-line"
+                class="text-[var(--el-text-color-secondary)]"
+              />
+              回复的评论
+            </div>
+            <div
+              class="cursor-pointer rounded-md border-l-2 border-[var(--el-color-primary)] bg-[var(--el-fill-color-lighter)] px-4 py-3 transition-colors hover:bg-[var(--el-fill-color)]"
+              @click="viewParent"
+            >
+              <div
+                class="mb-1.5 flex items-center gap-2 text-xs text-[var(--el-text-color-secondary)]"
+              >
+                <span class="font-medium text-[var(--el-text-color-regular)]">
+                  {{ detail.parent_comment.username || `ID:${detail.parent_comment.user_id}` }}
+                </span>
+                <ElTag
+                  :type="mapTagType(detail.parent_comment.status_label_type)"
+                  size="small"
+                  effect="plain"
+                >
+                  {{ detail.parent_comment.status_label }}
+                </ElTag>
+                <span>{{ detail.parent_comment.created_at }}</span>
+              </div>
+              <div
+                class="line-clamp-3 text-sm leading-6 text-[var(--el-text-color-regular)] whitespace-pre-wrap break-all"
+              >
+                {{ detail.parent_comment.content }}
+              </div>
+            </div>
+          </div>
+
           <!-- 评论内容 -->
           <div class="mb-5">
             <div class="mb-2 text-sm font-medium text-[var(--el-text-color-primary)]">评论内容</div>
@@ -112,7 +222,7 @@
           </div>
 
           <!-- 基本信息 -->
-          <ElDescriptions :column="2" border size="small">
+          <ElDescriptions :column="2" border size="small" class="mb-5">
             <ElDescriptionsItem label="评论ID" :span="1">
               {{ detail.id }}
             </ElDescriptionsItem>
@@ -142,6 +252,73 @@
               {{ detail.created_at || '-' }}
             </ElDescriptionsItem>
           </ElDescriptions>
+
+          <!-- 回复链 -->
+          <div>
+            <div
+              class="mb-2 flex items-center gap-1.5 text-sm font-medium text-[var(--el-text-color-primary)]"
+            >
+              <ArtSvgIcon icon="ri:chat-3-line" class="text-[var(--el-text-color-secondary)]" />
+              回复列表
+              <span class="text-xs font-normal text-[var(--el-text-color-secondary)]">
+                （{{ repliesTotal }}）
+              </span>
+            </div>
+
+            <div v-loading="repliesLoading">
+              <ElEmpty
+                v-if="!repliesLoading && replies.length === 0"
+                description="暂无回复"
+                :image-size="60"
+              />
+
+              <div v-else class="flex flex-col gap-2">
+                <div
+                  v-for="reply in replies"
+                  :key="reply.id"
+                  class="cursor-pointer rounded-md border border-[var(--el-border-color-lighter)] px-4 py-3 transition-colors hover:border-[var(--el-color-primary-light-5)] hover:bg-[var(--el-fill-color-lighter)]"
+                  @click="viewReply(reply)"
+                >
+                  <div
+                    class="mb-1.5 flex flex-wrap items-center gap-2 text-xs text-[var(--el-text-color-secondary)]"
+                  >
+                    <span class="font-medium text-[var(--el-text-color-regular)]">
+                      {{ reply.username || `ID:${reply.user_id}` }}
+                    </span>
+                    <ElTag :type="mapTagType(reply.status_label_type)" size="small" effect="plain">
+                      {{ reply.status_label }}
+                    </ElTag>
+                    <span>{{ reply.created_at }}</span>
+                    <span v-if="reply.comment_count > 0" class="flex items-center gap-0.5">
+                      <ArtSvgIcon icon="ri:chat-3-line" />
+                      {{ reply.comment_count }}
+                    </span>
+                    <span v-if="reply.like_count > 0" class="flex items-center gap-0.5">
+                      <ArtSvgIcon icon="ri:thumb-up-line" />
+                      {{ reply.like_count }}
+                    </span>
+                  </div>
+                  <div
+                    class="line-clamp-3 text-sm leading-6 text-[var(--el-text-color-regular)] whitespace-pre-wrap break-all"
+                  >
+                    {{ reply.content }}
+                  </div>
+                </div>
+              </div>
+
+              <div v-if="repliesTotal > repliesPerPage" class="mt-3 flex justify-end">
+                <ElPagination
+                  v-model:current-page="repliesPage"
+                  :page-size="repliesPerPage"
+                  :total="repliesTotal"
+                  layout="prev, pager, next"
+                  small
+                  background
+                  @current-change="handleRepliesPageChange"
+                />
+              </div>
+            </div>
+          </div>
         </template>
       </div>
 

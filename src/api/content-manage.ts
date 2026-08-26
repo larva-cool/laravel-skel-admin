@@ -24,6 +24,17 @@ export function fetchGetCommentDetail(id: number) {
   })
 }
 
+// 获取评论回复列表
+export function fetchGetCommentReplies(
+  id: number,
+  params?: Partial<Api.Common.LaravelPaginationRequest>
+) {
+  return request.get<Api.ContentManage.CommentList>({
+    url: `/admin/comments/${id}/replies`,
+    params
+  })
+}
+
 // 审核评论
 export function fetchReviewComment(id: number, data: Api.ContentManage.CommentReviewParams) {
   return request.post<Api.ContentManage.CommentListItem>({

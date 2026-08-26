@@ -629,6 +629,18 @@ declare namespace Api {
     /** 评论列表（Laravel 分页） */
     type CommentList = Api.Common.PaginatedResponse<CommentListItem>
 
+    /** 上级评论摘要（当前评论为回复时返回） */
+    interface CommentParentSummary {
+      id: number
+      user_id: number
+      username?: string | null
+      content: string
+      status: string
+      status_label: string
+      status_label_type: string
+      created_at: string | null
+    }
+
     /** 评论列表项（Admin CommentResource） */
     interface CommentListItem {
       id: number
@@ -644,6 +656,8 @@ declare namespace Api {
       like_count: number
       comment_count: number
       mentioned_users: number[]
+      is_reply: boolean
+      parent_comment?: CommentParentSummary | null
       ip_address?: string | null
       created_at: string | null
     }
