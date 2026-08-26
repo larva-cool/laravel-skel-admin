@@ -101,7 +101,7 @@
       apiFn: fetchGetCommentList,
       apiParams: { page: 1, per_page: 20 },
       columnsFactory: () => [
-        { prop: 'id', label: 'ID', width: 80 },
+        { prop: 'id', label: 'ID', width: 100 },
         {
           prop: 'username',
           label: '评论用户',
