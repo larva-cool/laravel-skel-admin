@@ -624,6 +624,45 @@ declare namespace Api {
     }
   }
 
+  /** 内容运营模块 */
+  namespace ContentManage {
+    /** 评论列表（Laravel 分页） */
+    type CommentList = Api.Common.PaginatedResponse<CommentListItem>
+
+    /** 评论列表项（Admin CommentResource） */
+    interface CommentListItem {
+      id: number
+      user_id: number
+      username?: string | null
+      source_type: string
+      source_id: number
+      is_top: boolean
+      status: string
+      status_label: string
+      status_label_type: string
+      content: string
+      like_count: number
+      comment_count: number
+      mentioned_users: number[]
+      ip_address?: string | null
+      created_at: string | null
+    }
+
+    /** 评论搜索参数 */
+    interface CommentSearchParams extends Api.Common.CommonSearchParams {
+      keyword?: string
+      status?: string
+      source_type?: string
+      user_id?: number | string
+    }
+
+    /** 评论审核参数 */
+    interface CommentReviewParams {
+      status: string
+      remark?: string | null
+    }
+  }
+
   /** 用户管理模块（前台用户） */
   namespace UserManage {
     /** 用户列表（分页） */
