@@ -999,6 +999,37 @@ declare namespace Api {
       start_date?: string
       end_date?: string
     }
+
+    /** 登录历史列表（Laravel 分页） */
+    type LoginHistoryList = Api.Common.PaginatedResponse<LoginHistoryItem>
+
+    /** 登录历史列表项（GlobalLoginHistoryResource） */
+    interface LoginHistoryItem {
+      id: number
+      guard: 'user' | 'admin'
+      user_id: number
+      user_name: string | null
+      result: boolean
+      ip: string
+      port: number | null
+      platform: string | null
+      device: string | null
+      browser: string | null
+      user_agent: string | null
+      address: string | null
+      login_at: string | null
+    }
+
+    /** 登录历史搜索参数 */
+    interface LoginHistorySearchParams extends Api.Common.CommonSearchParams {
+      guard?: 'user' | 'admin'
+      user_id?: number
+      keyword?: string
+      ip?: string
+      result?: boolean
+      login_start?: string
+      login_end?: string
+    }
   }
 
   /** App 版本管理类型 */

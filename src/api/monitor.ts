@@ -311,3 +311,10 @@ export function fetchAuditLogList(params: Api.Monitor.AuditLogSearchParams) {
 export function fetchAuditLogDetail(id: number) {
   return request.get<Api.Monitor.AuditLogItem>({ url: `/admin/audit-logs/${id}` })
 }
+
+// ========== 登录历史（跨管理员与前台用户） ==========
+
+/** 全局登录历史列表（分页） */
+export function fetchLoginHistoryList(params: Api.Monitor.LoginHistorySearchParams) {
+  return request.get<Api.Monitor.LoginHistoryList>({ url: '/admin/login-histories', params })
+}
