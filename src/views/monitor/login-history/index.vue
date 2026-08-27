@@ -30,6 +30,7 @@
 
 <script setup lang="ts">
   import { fetchLoginHistoryList } from '@/api/monitor'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { ElTag } from 'element-plus'
   import { h, ref } from 'vue'
@@ -130,15 +131,14 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 100,
+          width: 80,
           fixed: 'right',
           formatter: (row: LoginHistoryItem) =>
-            h('div', [
-              h(
-                'ElLink',
-                { type: 'primary', underline: false, onClick: () => handleAction(row) },
-                () => '查看'
-              )
+            h('div', { class: 'flex items-center' }, [
+              h(ArtButtonTable, {
+                type: 'view',
+                onClick: () => handleAction(row)
+              })
             ])
         }
       ]
