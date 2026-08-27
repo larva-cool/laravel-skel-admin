@@ -46,6 +46,8 @@ interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
   showSuccessMessage?: boolean
   /** 自定义成功消息（后端无 msg 字段时使用） */
   successMessage?: string
+  /** 返回完整 AxiosResponse（含 headers），用于需要读取响应头的场景（如导出下载） */
+  returnRawResponse?: boolean
 }
 
 const { VITE_API_URL, VITE_WITH_CREDENTIALS } = import.meta.env
@@ -198,6 +200,13 @@ async function request<T = any>(config: ExtendedAxiosRequestConfig): Promise<T> 
 
   try {
     const res = await axiosInstance.request(config)
+
+    // 需要完整响应（含 headers）时直接返回
+    if (config.returnRawResponse) {
+      if (config.showSuccessMessage)
+        showSuccess(config.successMessage || $t('httpMsg.operationSuccess'))
+      return res as T
+    }
 
     // 204 No Content 返回 null
     if (res.status === ApiStatus.noContent) {

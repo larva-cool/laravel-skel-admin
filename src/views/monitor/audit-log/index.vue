@@ -12,7 +12,20 @@
         v-model:showSearchBar="showSearchBar"
         :loading="loading"
         @refresh="refreshData"
-      />
+      >
+        <template #left>
+          <ElSpace wrap>
+            <ElButton
+              v-auth="'audit-logs.export'"
+              :loading="isExporting"
+              :icon="'ri:download-2-line'"
+              @click="handleExport"
+            >
+              导出
+            </ElButton>
+          </ElSpace>
+        </template>
+      </ArtTableHeader>
 
       <ArtTable
         :loading="loading"
@@ -29,8 +42,9 @@
 </template>
 
 <script setup lang="ts">
-  import { fetchAuditLogList } from '@/api/monitor'
+  import { fetchAuditLogList, fetchExportAuditLogs } from '@/api/monitor'
   import ArtButtonMore from '@/components/core/forms/art-button-more/index.vue'
+  import { useExport } from '@/hooks/core/useExport'
   import { useTable } from '@/hooks/core/useTable'
   import { ElTag } from 'element-plus'
   import { h, ref } from 'vue'
@@ -135,6 +149,18 @@
       ]
     }
   })
+
+  // 导出
+  const { isExporting, handleExport: doExport } = useExport()
+  const handleExport = () => {
+    const filters = { ...(searchParams as Record<string, unknown>) }
+    delete filters.page
+    delete filters.per_page
+    doExport(
+      () => fetchExportAuditLogs(filters as unknown as Api.Monitor.AuditLogSearchParams),
+      'audit_logs'
+    )
+  }
 
   const handleAction = (row: AuditLogItem) => {
     detailDialogRef.value?.open(row)

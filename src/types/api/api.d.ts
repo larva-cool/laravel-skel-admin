@@ -73,6 +73,12 @@ declare namespace Api {
 
     /** 启用状态 */
     type EnableStatus = '1' | '2'
+
+    /** 导出异步响应（HTTP 202） */
+    interface ExportTaskResponse {
+      message: string
+      file_name: string
+    }
   }
 
   /** 认证类型 */

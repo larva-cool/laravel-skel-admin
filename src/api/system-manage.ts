@@ -1,5 +1,6 @@
 import { AppRouteRecord } from '@/types/router'
 import request from '@/utils/http'
+import type { AxiosResponse } from 'axios'
 
 // ========== 管理员管理 ==========
 
@@ -639,5 +640,16 @@ export function fetchDeleteFeedback(id: number) {
     url: `/admin/feedbacks/${id}`,
     showSuccessMessage: true,
     successMessage: '删除成功'
+  })
+}
+
+// 导出反馈列表
+export function fetchExportFeedbacks(params?: Api.SystemManage.FeedbackSearchParams) {
+  return request.get<AxiosResponse>({
+    url: '/admin/feedbacks/export',
+    params,
+    responseType: 'blob',
+    returnRawResponse: true,
+    showErrorMessage: true
   })
 }

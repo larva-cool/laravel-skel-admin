@@ -183,6 +183,13 @@
             @change="handlePointSearch"
           />
           <ElButton type="primary" @click="handlePointSearch">搜索</ElButton>
+          <ElButton
+            :loading="isPointExporting"
+            :icon="'ri:download-2-line'"
+            @click="handlePointExport"
+          >
+            导出
+          </ElButton>
         </div>
         <ElTable
           v-loading="pointLoading"
@@ -251,6 +258,13 @@
             @change="handleCoinSearch"
           />
           <ElButton type="primary" @click="handleCoinSearch">搜索</ElButton>
+          <ElButton
+            :loading="isCoinExporting"
+            :icon="'ri:download-2-line'"
+            @click="handleCoinExport"
+          >
+            导出
+          </ElButton>
         </div>
         <ElTable
           v-loading="coinLoading"
@@ -303,12 +317,15 @@
 
 <script setup lang="ts">
   import {
+    fetchExportUserCoinTrades,
+    fetchExportUserPointTrades,
     fetchGetUserDetail,
     fetchUserCoinTrades,
     fetchUserLoginHistories,
     fetchUserPointTrades,
     fetchUserSocials
   } from '@/api/user-manage'
+  import { useExport } from '@/hooks/core/useExport'
 
   defineOptions({ name: 'UserDetailDialog' })
 
@@ -355,6 +372,32 @@
   const coinKeyword = ref('')
   const coinDateRange = ref<string[]>([])
   const coinPage = reactive({ page: 1, per_page: 15 })
+
+  // 导出
+  const { isExporting: isPointExporting, handleExport: doPointExport } = useExport()
+  const { isExporting: isCoinExporting, handleExport: doCoinExport } = useExport()
+
+  const buildTradeExportParams = (keyword: string, range: string[]) => {
+    const params: { keyword?: string; type?: string; start_date?: string; end_date?: string } = {}
+    if (keyword) params.keyword = keyword
+    if (range?.length === 2) {
+      params.start_date = range[0]
+      params.end_date = range[1]
+    }
+    return params
+  }
+
+  const handlePointExport = () => {
+    if (!user.value) return
+    const params = buildTradeExportParams(pointKeyword.value, pointDateRange.value)
+    doPointExport(() => fetchExportUserPointTrades(user.value!.id, params), 'point_trades')
+  }
+
+  const handleCoinExport = () => {
+    if (!user.value) return
+    const params = buildTradeExportParams(coinKeyword.value, coinDateRange.value)
+    doCoinExport(() => fetchExportUserCoinTrades(user.value!.id, params), 'coin_trades')
+  }
 
   const open = async (row: Api.UserManage.UserListItem) => {
     dialogVisible.value = true

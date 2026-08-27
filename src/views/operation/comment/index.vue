@@ -15,7 +15,20 @@
         v-model:showSearchBar="showSearchBar"
         :loading="loading"
         @refresh="handleRefresh"
-      />
+      >
+        <template #left>
+          <ElSpace wrap>
+            <ElButton
+              v-auth="'comments.export'"
+              :loading="isExporting"
+              :icon="'ri:download-2-line'"
+              @click="handleExport"
+            >
+              导出
+            </ElButton>
+          </ElSpace>
+        </template>
+      </ArtTableHeader>
 
       <ArtTable
         :loading="loading"
@@ -50,11 +63,13 @@
   import {
     fetchGetCommentList,
     fetchDeleteComment,
-    fetchGetCommentSourceTypes
+    fetchGetCommentSourceTypes,
+    fetchExportComments
   } from '@/api/content-manage'
   import CommentSearch from './modules/comment-search.vue'
   import CommentDetailDrawer from './modules/comment-detail-drawer.vue'
   import CommentReviewDialog from './modules/comment-review-dialog.vue'
+  import { useExport } from '@/hooks/core/useExport'
 
   defineOptions({ name: 'Comment' })
 
@@ -181,6 +196,18 @@
       ]
     }
   })
+
+  // 导出
+  const { isExporting, handleExport: doExport } = useExport()
+  const handleExport = () => {
+    const filters = { ...(searchParams as Record<string, unknown>) }
+    delete filters.page
+    delete filters.per_page
+    doExport(
+      () => fetchExportComments(filters as unknown as Api.ContentManage.CommentSearchParams),
+      'comments'
+    )
+  }
 
   const viewDetail = (row: CommentListItem) => {
     detailDrawerRef.value?.open(row)

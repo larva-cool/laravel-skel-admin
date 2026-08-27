@@ -1,4 +1,5 @@
 import request from '@/utils/http'
+import type { AxiosResponse } from 'axios'
 
 // ========== 性能监控（Laravel Pulse） ==========
 
@@ -310,6 +311,17 @@ export function fetchAuditLogList(params: Api.Monitor.AuditLogSearchParams) {
 /** 审计日志详情 */
 export function fetchAuditLogDetail(id: number) {
   return request.get<Api.Monitor.AuditLogItem>({ url: `/admin/audit-logs/${id}` })
+}
+
+/** 导出审计日志 */
+export function fetchExportAuditLogs(params?: Api.Monitor.AuditLogSearchParams) {
+  return request.get<AxiosResponse>({
+    url: '/admin/audit-logs/export',
+    params,
+    responseType: 'blob',
+    returnRawResponse: true,
+    showErrorMessage: true
+  })
 }
 
 // ========== 登录历史（跨管理员与前台用户） ==========

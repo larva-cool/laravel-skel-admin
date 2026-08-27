@@ -18,6 +18,14 @@
             <ElTooltip content="用户由前台注册，后台不支持新增">
               <ElButton type="primary" disabled v-ripple>新增用户</ElButton>
             </ElTooltip>
+            <ElButton
+              v-auth="'users.export'"
+              :loading="isExporting"
+              :icon="'ri:download-2-line'"
+              @click="handleExport"
+            >
+              导出
+            </ElButton>
           </ElSpace>
         </template>
       </ArtTableHeader>
@@ -43,8 +51,14 @@
 </template>
 
 <script setup lang="ts">
-  import { fetchDeleteUser, fetchGetUserList, fetchToggleUserStatus } from '@/api/user-manage'
+  import {
+    fetchDeleteUser,
+    fetchExportUsers,
+    fetchGetUserList,
+    fetchToggleUserStatus
+  } from '@/api/user-manage'
   import ArtButtonMore, { ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
+  import { useExport } from '@/hooks/core/useExport'
   import { useTable } from '@/hooks/core/useTable'
   import { ElAvatar, ElMessageBox, ElTag } from 'element-plus'
   import { h } from 'vue'
@@ -205,6 +219,16 @@
       ]
     }
   })
+
+  // 导出
+  const { isExporting, handleExport: doExport } = useExport()
+  const handleExport = () => {
+    // 仅传递筛选条件（剔除分页参数，后端会自动判断同步/异步）
+    const filters = { ...(searchParams as Record<string, unknown>) }
+    delete filters.page
+    delete filters.per_page
+    doExport(() => fetchExportUsers(filters as unknown as Api.UserManage.UserSearchParams), 'users')
+  }
 
   const handleAction = (item: ButtonMoreItem, row: UserListItem) => {
     switch (item.key) {

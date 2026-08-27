@@ -17,7 +17,20 @@
         v-model:showSearchBar="showSearchBar"
         :loading="loading"
         @refresh="handleRefresh"
-      />
+      >
+        <template #left>
+          <ElSpace wrap>
+            <ElButton
+              v-auth="'feedbacks.export'"
+              :loading="isExporting"
+              :icon="'ri:download-2-line'"
+              @click="handleExport"
+            >
+              导出
+            </ElButton>
+          </ElSpace>
+        </template>
+      </ArtTableHeader>
 
       <ArtTable
         :loading="loading"
@@ -48,11 +61,16 @@
   import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { useAuth } from '@/hooks/core/useAuth'
-  import { fetchGetFeedbackList, fetchDeleteFeedback } from '@/api/system-manage'
+  import {
+    fetchGetFeedbackList,
+    fetchDeleteFeedback,
+    fetchExportFeedbacks
+  } from '@/api/system-manage'
   import FeedbackStats from './modules/feedback-stats.vue'
   import FeedbackSearch from './modules/feedback-search.vue'
   import FeedbackDetailDrawer from './modules/feedback-detail-drawer.vue'
   import FeedbackHandleDialog from './modules/feedback-handle-dialog.vue'
+  import { useExport } from '@/hooks/core/useExport'
 
   defineOptions({ name: 'Feedback' })
 
@@ -171,6 +189,18 @@
       ]
     }
   })
+
+  // 导出
+  const { isExporting, handleExport: doExport } = useExport()
+  const handleExport = () => {
+    const filters = { ...(searchParams as Record<string, unknown>) }
+    delete filters.page
+    delete filters.per_page
+    doExport(
+      () => fetchExportFeedbacks(filters as unknown as Api.SystemManage.FeedbackSearchParams),
+      'feedbacks'
+    )
+  }
 
   const viewDetail = (row: FeedbackListItem) => {
     detailDrawerRef.value?.open(row)

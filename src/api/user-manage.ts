@@ -1,4 +1,5 @@
 import request from '@/utils/http'
+import type { AxiosResponse } from 'axios'
 
 // ========== 用户管理（前台用户） ==========
 
@@ -168,5 +169,44 @@ export function fetchForceDeleteUser(id: number) {
     url: `/admin/users/${id}/force-delete`,
     showSuccessMessage: true,
     successMessage: '彻底删除成功'
+  })
+}
+
+// 导出用户列表
+export function fetchExportUsers(params?: Api.UserManage.UserSearchParams) {
+  return request.get<AxiosResponse>({
+    url: '/admin/users/export',
+    params,
+    responseType: 'blob',
+    returnRawResponse: true,
+    showErrorMessage: true
+  })
+}
+
+// 导出用户积分流水
+export function fetchExportUserPointTrades(
+  id: number | string,
+  params?: { keyword?: string; type?: string; start_date?: string; end_date?: string }
+) {
+  return request.get<AxiosResponse>({
+    url: `/admin/users/${id}/point-trades/export`,
+    params,
+    responseType: 'blob',
+    returnRawResponse: true,
+    showErrorMessage: true
+  })
+}
+
+// 导出用户金币流水
+export function fetchExportUserCoinTrades(
+  id: number | string,
+  params?: { keyword?: string; type?: string; start_date?: string; end_date?: string }
+) {
+  return request.get<AxiosResponse>({
+    url: `/admin/users/${id}/coin-trades/export`,
+    params,
+    responseType: 'blob',
+    returnRawResponse: true,
+    showErrorMessage: true
   })
 }
