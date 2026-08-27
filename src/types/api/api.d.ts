@@ -683,6 +683,61 @@ declare namespace Api {
     }
   }
 
+  /** 运营管理模块（Banner / 轮播图） */
+  namespace OperationManage {
+    /** Banner 列表（分页） */
+    type BannerList = Api.Common.PaginatedResponse<BannerListItem>
+
+    /** Banner 列表项（Admin BannerResource） */
+    interface BannerListItem {
+      id: number
+      position: string
+      position_label?: string | null
+      title: string
+      image: string
+      link_type: string
+      link_type_label?: string | null
+      link_value: string | null
+      sort: number
+      status: boolean
+      start_at: string | null
+      end_at: string | null
+      created_at: string | null
+      updated_at: string | null
+    }
+
+    /** Banner 搜索参数 */
+    interface BannerSearchParams extends Api.Common.CommonSearchParams {
+      keyword?: string
+      position?: string
+      status?: boolean
+    }
+
+    /** Banner 保存参数（创建/编辑共用） */
+    interface BannerSaveParams {
+      position: string
+      title?: string
+      image: string
+      link_type: string
+      link_value?: string | null
+      sort?: number
+      status?: boolean
+      start_at?: string | null
+      end_at?: string | null
+    }
+
+    /** 拖拽排序参数 */
+    interface BannerSortParams {
+      ids: number[]
+    }
+
+    /** 广告位选项 */
+    interface BannerPositionOption {
+      label: string
+      value: string
+    }
+  }
+
   /** 用户管理模块（前台用户） */
   namespace UserManage {
     /** 用户列表（分页） */
