@@ -18,12 +18,8 @@
       >
         <template #left>
           <ElSpace wrap>
-            <ElButton
-              v-auth="'banners.create'"
-              type="primary"
-              :icon="'ri:add-line'"
-              @click="openCreateDialog"
-            >
+            <ElButton v-auth="'banners.create'" type="primary" @click="openCreateDialog">
+              <ElIcon class="mr-1"><Plus /></ElIcon>
               新增 Banner
             </ElButton>
           </ElSpace>
@@ -52,6 +48,7 @@
 <script setup lang="ts">
   import { h, ref } from 'vue'
   import { ElTag, ElButton, ElMessageBox, ElSwitch, ElMessage, ElImage } from 'element-plus'
+  import { Plus } from '@element-plus/icons-vue'
   import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { useAuth } from '@/hooks/core/useAuth'

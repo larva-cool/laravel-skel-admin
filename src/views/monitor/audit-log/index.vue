@@ -15,12 +15,8 @@
       >
         <template #left>
           <ElSpace wrap>
-            <ElButton
-              v-auth="'audit-logs.export'"
-              :loading="isExporting"
-              :icon="'ri:download-2-line'"
-              @click="handleExport"
-            >
+            <ElButton v-auth="'audit-logs.export'" :loading="isExporting" @click="handleExport">
+              <ElIcon class="mr-1"><Download /></ElIcon>
               导出
             </ElButton>
           </ElSpace>
@@ -47,6 +43,7 @@
   import { useExport } from '@/hooks/core/useExport'
   import { useTable } from '@/hooks/core/useTable'
   import { ElTag } from 'element-plus'
+  import { Download } from '@element-plus/icons-vue'
   import { h, ref } from 'vue'
   import AuditLogDetailDialog from './modules/audit-log-detail-dialog.vue'
   import AuditLogSearch from './modules/audit-log-search.vue'

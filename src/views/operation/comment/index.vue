@@ -18,12 +18,8 @@
       >
         <template #left>
           <ElSpace wrap>
-            <ElButton
-              v-auth="'comments.export'"
-              :loading="isExporting"
-              :icon="'ri:download-2-line'"
-              @click="handleExport"
-            >
+            <ElButton v-auth="'comments.export'" :loading="isExporting" @click="handleExport">
+              <ElIcon class="mr-1"><Download /></ElIcon>
               导出
             </ElButton>
           </ElSpace>
@@ -57,6 +53,7 @@
 <script setup lang="ts">
   import { computed, h, ref } from 'vue'
   import { ElTag, ElButton, ElMessageBox } from 'element-plus'
+  import { Download } from '@element-plus/icons-vue'
   import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { useAuth } from '@/hooks/core/useAuth'
