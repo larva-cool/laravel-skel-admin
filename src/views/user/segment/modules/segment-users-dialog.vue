@@ -146,8 +146,14 @@
       return
     }
     try {
-      await fetchDetachSegmentUsers(segment.value.id, { user_ids: [row.id] })
-      ElMessage.success('已移出')
+      const result = await fetchDetachSegmentUsers(segment.value.id, { user_ids: [row.id] })
+      if ((result as Api.SegmentManage.SegmentAsyncResponse).task_id) {
+        ElMessage.success(
+          `任务已提交（ID: ${(result as Api.SegmentManage.SegmentAsyncResponse).task_id}），完成后将通过站内信通知`
+        )
+      } else {
+        ElMessage.success('已移出')
+      }
       getData()
     } catch {
       // 拦截器已统一提示

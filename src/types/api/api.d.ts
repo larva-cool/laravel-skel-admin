@@ -864,6 +864,42 @@ declare namespace Api {
       removed: number
       requested: number
     }
+
+    /** 分群异步任务列表（分页） */
+    type SegmentTaskList = Api.Common.PaginatedResponse<SegmentTaskItem>
+
+    /** 分群异步任务搜索参数 */
+    interface SegmentTaskSearchParams extends Api.Common.CommonSearchParams {
+      status?: 'pending' | 'running' | 'completed' | 'failed'
+      type?: 'attach' | 'detach'
+    }
+
+    /** 分群异步任务项（SegmentTaskResource） */
+    interface SegmentTaskItem {
+      id: number
+      admin_id: number
+      type: 'attach' | 'detach'
+      type_label: string
+      status: 'pending' | 'running' | 'completed' | 'failed'
+      status_label: string
+      total_count: number
+      processed_count: number
+      added_count: number
+      progress_percent: number
+      error_message: string | null
+      started_at: string | null
+      finished_at: string | null
+      created_at: string | null
+    }
+
+    /** 异步任务提交响应（202） */
+    interface SegmentAsyncResponse {
+      task_id: number
+      status: 'pending'
+      mode: 'async'
+      requested?: number
+      message: string
+    }
   }
 
   /** 用户管理模块（前台用户） */

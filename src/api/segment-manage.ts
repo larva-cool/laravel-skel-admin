@@ -78,9 +78,11 @@ export function fetchGetSegmentOptions() {
   })
 }
 
-/** 单分群批量绑用户 */
+/** 单分群批量绑用户（≤1000 同步；>1000 返回 202 异步） */
 export function fetchAttachSegmentUsers(id: number, data: Api.SegmentManage.SegmentAttachParams) {
-  return request.post<Api.SegmentManage.SegmentAttachResponse>({
+  return request.post<
+    Api.SegmentManage.SegmentAttachResponse | Api.SegmentManage.SegmentAsyncResponse
+  >({
     url: `/admin/user-segments/${id}/attach`,
     data,
     showSuccessMessage: true,
@@ -88,9 +90,11 @@ export function fetchAttachSegmentUsers(id: number, data: Api.SegmentManage.Segm
   })
 }
 
-/** 单分群批量解绑用户 */
+/** 单分群批量解绑用户（≤1000 同步；>1000 返回 202 异步） */
 export function fetchDetachSegmentUsers(id: number, data: Api.SegmentManage.SegmentAttachParams) {
-  return request.post<Api.SegmentManage.SegmentDetachResponse>({
+  return request.post<
+    Api.SegmentManage.SegmentDetachResponse | Api.SegmentManage.SegmentAsyncResponse
+  >({
     url: `/admin/user-segments/${id}/detach`,
     data,
     showSuccessMessage: true,
@@ -98,9 +102,11 @@ export function fetchDetachSegmentUsers(id: number, data: Api.SegmentManage.Segm
   })
 }
 
-/** 笛卡尔批量打标 */
+/** 笛卡尔批量打标（任一维度 >1000 返回 202 异步） */
 export function fetchBatchAttachSegments(data: Api.SegmentManage.SegmentBatchAttachParams) {
-  return request.post<Api.SegmentManage.SegmentAttachResponse>({
+  return request.post<
+    Api.SegmentManage.SegmentAttachResponse | Api.SegmentManage.SegmentAsyncResponse
+  >({
     url: '/admin/user-segments/batch-attach',
     data,
     showSuccessMessage: true,
@@ -108,12 +114,31 @@ export function fetchBatchAttachSegments(data: Api.SegmentManage.SegmentBatchAtt
   })
 }
 
-/** 笛卡尔批量解标 */
+/** 笛卡尔批量解标（任一维度 >1000 返回 202 异步） */
 export function fetchBatchDetachSegments(data: Api.SegmentManage.SegmentBatchAttachParams) {
-  return request.post<Api.SegmentManage.SegmentDetachResponse>({
+  return request.post<
+    Api.SegmentManage.SegmentDetachResponse | Api.SegmentManage.SegmentAsyncResponse
+  >({
     url: '/admin/user-segments/batch-detach',
     data,
     showSuccessMessage: true,
     successMessage: '批量解标完成'
+  })
+}
+
+// ========== 分群异步任务（> 1000 ID 时自动入队） ==========
+
+/** 获取分群异步任务列表（分页） */
+export function fetchGetSegmentTaskList(params: Api.SegmentManage.SegmentTaskSearchParams) {
+  return request.get<Api.SegmentManage.SegmentTaskList>({
+    url: '/admin/segment-tasks',
+    params
+  })
+}
+
+/** 获取分群异步任务详情 */
+export function fetchGetSegmentTaskDetail(id: number) {
+  return request.get<Api.SegmentManage.SegmentTaskItem>({
+    url: `/admin/segment-tasks/${id}`
   })
 }
