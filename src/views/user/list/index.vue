@@ -161,11 +161,13 @@
             h('div', { class: 'flex items-center' }, [
               h(ArtButtonTable, {
                 type: 'view',
+                title: '查看',
                 onClick: () => handleAction({ key: 'view' } as ButtonMoreItem, row)
               }),
               hasAuth('users.edit')
                 ? h(ArtButtonTable, {
                     type: 'edit',
+                    title: '编辑',
                     onClick: () => handleAction({ key: 'edit' } as ButtonMoreItem, row)
                   })
                 : null,

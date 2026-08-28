@@ -28,7 +28,9 @@
 
 <script setup lang="ts">
   import { fetchForceDeleteUser, fetchGetTrashUserList, fetchRestoreUser } from '@/api/user-manage'
-  import ArtButtonMore, { ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
+  import { ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
+  import { useAuth } from '@/hooks/core/useAuth'
   import { useTable } from '@/hooks/core/useTable'
   import { ElAvatar, ElMessageBox, ElTag } from 'element-plus'
   import { h } from 'vue'
@@ -37,6 +39,8 @@
   defineOptions({ name: 'UserTrash' })
 
   type UserListItem = Api.UserManage.UserListItem
+
+  const { hasAuth } = useAuth()
 
   const showSearchBar = ref(true)
 
@@ -94,28 +98,26 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 160,
+          width: 200,
           fixed: 'right',
           formatter: (row: UserListItem) =>
-            h('div', [
-              h(ArtButtonMore, {
-                list: [
-                  {
-                    key: 'restore',
-                    label: '恢复',
+            h('div', { class: 'flex items-center' }, [
+              hasAuth('users.edit')
+                ? h(ArtButtonTable, {
                     icon: 'ri:arrow-go-back-line',
-                    auth: 'users.edit'
-                  },
-                  {
-                    key: 'force-delete',
-                    label: '彻底删除',
+                    iconClass: 'bg-success/12 text-success',
+                    title: '恢复',
+                    onClick: () => handleAction({ key: 'restore' } as ButtonMoreItem, row)
+                  })
+                : null,
+              hasAuth('users.delete')
+                ? h(ArtButtonTable, {
                     icon: 'ri:delete-bin-2-line',
-                    color: '#f56c6c',
-                    auth: 'users.delete'
-                  }
-                ] as ButtonMoreItem[],
-                onClick: (item: ButtonMoreItem) => handleAction(item, row)
-              })
+                    iconClass: 'bg-error/12 text-error',
+                    title: '彻底删除',
+                    onClick: () => handleAction({ key: 'force-delete' } as ButtonMoreItem, row)
+                  })
+                : null
             ])
         }
       ]
