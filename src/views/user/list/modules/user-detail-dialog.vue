@@ -183,11 +183,8 @@
             @change="handlePointSearch"
           />
           <ElButton type="primary" @click="handlePointSearch">搜索</ElButton>
-          <ElButton
-            :loading="isPointExporting"
-            :icon="'ri:download-2-line'"
-            @click="handlePointExport"
-          >
+          <ElButton :loading="isPointExporting" @click="handlePointExport">
+            <ElIcon class="mr-1"><Download /></ElIcon>
             导出
           </ElButton>
         </div>
@@ -258,11 +255,8 @@
             @change="handleCoinSearch"
           />
           <ElButton type="primary" @click="handleCoinSearch">搜索</ElButton>
-          <ElButton
-            :loading="isCoinExporting"
-            :icon="'ri:download-2-line'"
-            @click="handleCoinExport"
-          >
+          <ElButton :loading="isCoinExporting" @click="handleCoinExport">
+            <ElIcon class="mr-1"><Download /></ElIcon>
             导出
           </ElButton>
         </div>
@@ -326,6 +320,7 @@
     fetchUserSocials
   } from '@/api/user-manage'
   import { useExport } from '@/hooks/core/useExport'
+  import { Download } from '@element-plus/icons-vue'
 
   defineOptions({ name: 'UserDetailDialog' })
 

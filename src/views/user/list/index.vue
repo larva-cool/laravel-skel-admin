@@ -18,12 +18,8 @@
             <ElTooltip content="用户由前台注册，后台不支持新增">
               <ElButton type="primary" disabled v-ripple>新增用户</ElButton>
             </ElTooltip>
-            <ElButton
-              v-auth="'users.export'"
-              :loading="isExporting"
-              :icon="'ri:download-2-line'"
-              @click="handleExport"
-            >
+            <ElButton v-auth="'users.export'" :loading="isExporting" @click="handleExport">
+              <ElIcon class="mr-1"><Download /></ElIcon>
               导出
             </ElButton>
           </ElSpace>
@@ -58,9 +54,12 @@
     fetchToggleUserStatus
   } from '@/api/user-manage'
   import ArtButtonMore, { ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
+  import { useAuth } from '@/hooks/core/useAuth'
   import { useExport } from '@/hooks/core/useExport'
   import { useTable } from '@/hooks/core/useTable'
   import { ElAvatar, ElMessageBox, ElTag } from 'element-plus'
+  import { Download } from '@element-plus/icons-vue'
   import { h } from 'vue'
   import UserAdjustCoinsDialog from './modules/user-adjust-coins-dialog.vue'
   import UserAdjustPointsDialog from './modules/user-adjust-points-dialog.vue'
@@ -74,6 +73,8 @@
   defineOptions({ name: 'UserList' })
 
   type UserListItem = Api.UserManage.UserListItem
+
+  const { hasAuth } = useAuth()
 
   const showSearchBar = ref(true)
   const detailDialogRef = ref<InstanceType<typeof UserDetailDialog>>()
@@ -157,11 +158,19 @@
           width: 200,
           fixed: 'right',
           formatter: (row: UserListItem) =>
-            h('div', [
+            h('div', { class: 'flex items-center' }, [
+              h(ArtButtonTable, {
+                type: 'view',
+                onClick: () => handleAction({ key: 'view' } as ButtonMoreItem, row)
+              }),
+              hasAuth('users.edit')
+                ? h(ArtButtonTable, {
+                    type: 'edit',
+                    onClick: () => handleAction({ key: 'edit' } as ButtonMoreItem, row)
+                  })
+                : null,
               h(ArtButtonMore, {
                 list: [
-                  { key: 'view', label: '查看', icon: 'ri:eye-line' },
-                  { key: 'edit', label: '编辑', icon: 'ri:edit-2-line', auth: 'users.edit' },
                   {
                     key: 'toggle',
                     label: row.status.value === 1 ? '冻结' : '启用',
