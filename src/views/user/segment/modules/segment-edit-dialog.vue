@@ -2,7 +2,7 @@
   <ElDialog
     v-model="visible"
     :title="isEdit ? '编辑分群' : '新增分群'"
-    width="640px"
+    width="960px"
     :close-on-click-modal="false"
     @closed="handleClosed"
   >
@@ -92,7 +92,7 @@
   </ElDialog>
 
   <!-- 预览弹窗 -->
-  <ElDialog v-model="previewVisible" title="规则预览" width="560px">
+  <ElDialog v-model="previewVisible" title="规则预览" width="720px">
     <div v-loading="previewLoading">
       <div class="mb-3">
         共匹配

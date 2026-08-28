@@ -17,12 +17,8 @@
       >
         <template #left>
           <ElSpace wrap>
-            <ElButton
-              v-auth="'segments.create'"
-              type="primary"
-              :icon="'ri:add-line'"
-              @click="openCreateDialog"
-            >
+            <ElButton v-auth="'segments.create'" type="primary" @click="openCreateDialog">
+              <ElIcon class="mr-1"><Plus /></ElIcon>
               新增分群
             </ElButton>
           </ElSpace>
@@ -52,8 +48,9 @@
 
 <script setup lang="ts">
   import { h, ref } from 'vue'
-  import { ElButton, ElMessage, ElMessageBox, ElSwitch, ElTag } from 'element-plus'
-  import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
+  import { ElButton, ElIcon, ElMessage, ElMessageBox, ElSwitch, ElTag } from 'element-plus'
+  import { Plus } from '@element-plus/icons-vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { useAuth } from '@/hooks/core/useAuth'
   import {
@@ -161,66 +158,38 @@
           width: 280,
           fixed: 'right',
           formatter: (row: Item) =>
-            h('div', { class: 'flex items-center gap-1' }, [
+            h('div', { class: 'flex items-center' }, [
               hasAuth('segments.index')
-                ? h(
-                    ElButton,
-                    {
-                      type: 'primary',
-                      link: true,
-                      size: 'small',
-                      onClick: () => openUsersDialog(row)
-                    },
-                    () => [h(ArtSvgIcon, { icon: 'ri:user-line', class: 'mr-0.5' }), '成员']
-                  )
+                ? h(ArtButtonTable, {
+                    icon: 'ri:user-line',
+                    iconClass: 'bg-secondary/12 text-secondary',
+                    onClick: () => openUsersDialog(row)
+                  })
                 : null,
               row.type === 2 && hasAuth('segments.edit')
-                ? h(
-                    ElButton,
-                    {
-                      type: 'primary',
-                      link: true,
-                      size: 'small',
-                      onClick: () => openPreviewDialog(row)
-                    },
-                    () => [h(ArtSvgIcon, { icon: 'ri:eye-line', class: 'mr-0.5' }), '预览']
-                  )
+                ? h(ArtButtonTable, {
+                    type: 'view',
+                    onClick: () => openPreviewDialog(row)
+                  })
                 : null,
               row.type === 2 && hasAuth('segments.edit')
-                ? h(
-                    ElButton,
-                    {
-                      type: 'primary',
-                      link: true,
-                      size: 'small',
-                      onClick: () => handleSync(row)
-                    },
-                    () => [h(ArtSvgIcon, { icon: 'ri:refresh-line', class: 'mr-0.5' }), '同步']
-                  )
+                ? h(ArtButtonTable, {
+                    icon: 'ri:refresh-line',
+                    iconClass: 'bg-warning/12 text-warning',
+                    onClick: () => handleSync(row)
+                  })
                 : null,
               hasAuth('segments.edit')
-                ? h(
-                    ElButton,
-                    {
-                      type: 'primary',
-                      link: true,
-                      size: 'small',
-                      onClick: () => openEditDialog(row)
-                    },
-                    () => [h(ArtSvgIcon, { icon: 'ri:edit-line', class: 'mr-0.5' }), '编辑']
-                  )
+                ? h(ArtButtonTable, {
+                    type: 'edit',
+                    onClick: () => openEditDialog(row)
+                  })
                 : null,
               hasAuth('segments.delete')
-                ? h(
-                    ElButton,
-                    {
-                      type: 'danger',
-                      link: true,
-                      size: 'small',
-                      onClick: () => handleDelete(row)
-                    },
-                    () => [h(ArtSvgIcon, { icon: 'ri:delete-bin-line', class: 'mr-0.5' }), '删除']
-                  )
+                ? h(ArtButtonTable, {
+                    type: 'delete',
+                    onClick: () => handleDelete(row)
+                  })
                 : null
             ])
         }

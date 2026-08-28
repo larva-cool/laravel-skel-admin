@@ -7,7 +7,7 @@
         <ElRadioButton :value="'or'">满足任一</ElRadioButton>
       </ElRadioGroup>
       <ElButton size="small" type="primary" link @click="addCondition">
-        <ArtSvgIcon icon="ri:add-line" class="mr-0.5" />
+        <ElIcon class="mr-0.5"><Plus /></ElIcon>
         添加条件
       </ElButton>
     </div>
@@ -107,7 +107,7 @@
       </template>
 
       <ElButton type="danger" link size="small" @click="removeCondition(idx)">
-        <ArtSvgIcon icon="ri:delete-bin-line" class="mr-0.5" />
+        <ElIcon class="mr-0.5"><Delete /></ElIcon>
         移除
       </ElButton>
     </div>
@@ -117,7 +117,8 @@
 </template>
 
 <script setup lang="ts">
-  import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
+  import { ElIcon } from 'element-plus'
+  import { Plus, Delete } from '@element-plus/icons-vue'
 
   type Condition = Api.SegmentManage.SegmentRuleCondition
   type Rule = Api.SegmentManage.SegmentRule
@@ -196,17 +197,24 @@
   }
 
   // 双向绑定：把 modelValue 拆为本地状态
+  // 注意：localConditions 引用变化与 props.modelValue 经父组件回传会形成互相触发，
+  // 这里仅在 props 引用真正变化（即外部主动更新）时同步一次，避免与 sync() 互踢形成递归更新。
   const localLogic = ref<'and' | 'or'>('and')
   const localConditions = ref<Condition[]>([])
   const betweenFrom = ref<Record<number, string>>({})
   const betweenTo = ref<Record<number, string>>({})
 
-  watch(
-    () => props.modelValue,
-    (v) => {
+  // 仅 watch props 引用变化，不再 deep watch；避免与 sync() 互踢形成递归更新。
+  // 通过内部守卫位避免本次 emit 触发的 props 回传再次重置本地状态。
+  let syncing = false
+  function syncFromProps(v: Rule | null | undefined) {
+    syncing = true
+    try {
       localLogic.value = (v?.logic as 'and' | 'or') ?? 'and'
       localConditions.value = (v?.conditions ?? []).map((c) => ({ ...c }))
       // 拆 between
+      betweenFrom.value = {}
+      betweenTo.value = {}
       localConditions.value.forEach((c, idx) => {
         if (c.op === 'between' && Array.isArray(c.value)) {
           const arr = c.value as (string | number)[]
@@ -214,8 +222,21 @@
           betweenTo.value[idx] = String(arr[1] ?? '')
         }
       })
-    },
-    { immediate: true, deep: true }
+    } finally {
+      // 在下一个微任务中释放，确保本轮由 emit 触发的 props 变更已落地
+      Promise.resolve().then(() => {
+        syncing = false
+      })
+    }
+  }
+
+  syncFromProps(props.modelValue)
+  watch(
+    () => props.modelValue,
+    (v) => {
+      if (syncing) return
+      syncFromProps(v)
+    }
   )
 
   function sync() {
@@ -301,8 +322,13 @@
     sync()
   }
 
-  // 监听本地变更
-  watch([localLogic, localConditions], () => sync(), { deep: true })
+  // 监听本地变更已由各变更处理函数（addCondition / onFieldChange / onOpChange 等）显式 sync()，
+  // 此处不再添加 deep watch，避免与 props watcher 形成递归更新。
+  // 保留 radio 组合逻辑变更的同步（不在显式处理中），并跳过 props 同步期间的回传。
+  watch(localLogic, () => {
+    if (syncing) return
+    sync()
+  })
 </script>
 
 <style scoped lang="scss">
