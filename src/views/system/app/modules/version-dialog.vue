@@ -88,9 +88,9 @@
 
 <script setup lang="ts">
   import { fetchCreateVersion, fetchUpdateVersion, fetchUploadApk } from '@/api/app-manage'
-  import { ElMessage } from 'element-plus'
-  import type { FormInstance, FormRules, UploadRequestOptions } from 'element-plus'
   import CryptoJS from 'crypto-js'
+  import type { FormInstance, FormRules, UploadRequestOptions } from 'element-plus'
+  import { ElMessage } from 'element-plus'
 
   defineOptions({ name: 'VersionDialog' })
 
@@ -121,7 +121,7 @@
     version: '',
     build: 1,
     download_url: '',
-    release_notes: '',
+    release_notes: '1、修复了已知问题。',
     min_supported_version: '',
     min_supported_build: 0,
     force_update: false,
