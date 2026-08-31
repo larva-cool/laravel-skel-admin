@@ -653,3 +653,54 @@ export function fetchExportFeedbacks(params?: Api.SystemManage.FeedbackSearchPar
     showErrorMessage: true
   })
 }
+
+// ========== 实名认证审核 ==========
+
+/** 获取实名认证列表（分页） */
+export function fetchGetIdentityVerificationList(
+  params: Api.SystemManage.IdentityVerificationSearchParams
+) {
+  return request.get<Api.SystemManage.IdentityVerificationList>({
+    url: '/admin/identity-verifications',
+    params
+  })
+}
+
+/** 获取实名认证统计 */
+export function fetchGetIdentityVerificationStats() {
+  return request.get<Api.SystemManage.IdentityVerificationStats>({
+    url: '/admin/identity-verifications/stats'
+  })
+}
+
+/** 获取实名认证详情 */
+export function fetchGetIdentityVerificationDetail(id: number) {
+  return request.get<Api.SystemManage.IdentityVerificationListItem>({
+    url: `/admin/identity-verifications/${id}`
+  })
+}
+
+/** 审核通过 */
+export function fetchApproveIdentityVerification(id: number) {
+  return request.post<Api.SystemManage.IdentityVerificationListItem>({
+    url: `/admin/identity-verifications/${id}/approve`,
+    showSuccessMessage: true,
+    successMessage: '审核已通过'
+  })
+}
+
+/** 驳回请求参数 */
+export interface RejectIdentityParams {
+  reason: string
+  remark?: string
+}
+
+/** 审核驳回 */
+export function fetchRejectIdentityVerification(id: number, data: RejectIdentityParams) {
+  return request.post<Api.SystemManage.IdentityVerificationListItem>({
+    url: `/admin/identity-verifications/${id}/reject`,
+    data,
+    showSuccessMessage: true,
+    successMessage: '已驳回'
+  })
+}

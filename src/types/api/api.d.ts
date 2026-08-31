@@ -622,6 +622,81 @@ declare namespace Api {
       priority?: number | string
     }
 
+    /** 实名认证统计数据 */
+    interface IdentityVerificationStats {
+      total: number
+      pending: number
+      today: number
+      approved: number
+      rejected: number
+    }
+
+    /** 实名认证附件 */
+    interface IdentityAttachment {
+      id: number
+      url: string
+      name: string
+      size: number
+      size_text: string
+    }
+
+    /** 实名认证申请用户（管理端简化） */
+    interface IdentityUserBrief {
+      id: number
+      username: string
+      name: string | null
+      phone: string | null
+    }
+
+    /** 实名认证列表项（对齐 Admin IdentityVerificationResource） */
+    interface IdentityVerificationListItem {
+      id: number
+      user_id: number
+      user: IdentityUserBrief | null
+      type: 'personal' | 'enterprise'
+      type_label: string
+      status: 'pending' | 'review' | 'approved' | 'rejected'
+      status_label: string
+      status_label_type: string
+      real_name: string | null
+      id_card_no: string | null
+      id_card_front: IdentityAttachment | null
+      id_card_back: IdentityAttachment | null
+      handheld: IdentityAttachment | null
+      company_name: string | null
+      credit_code: string | null
+      legal_person_name: string | null
+      legal_person_id_card_no: string | null
+      business_license: IdentityAttachment | null
+      opening_permit: IdentityAttachment | null
+      bank_account: string | null
+      bank_name: string | null
+      admin_id: number | null
+      admin_name: string | null
+      reject_reason: string | null
+      reject_reason_label: string | null
+      reject_reason_label_type: string
+      reject_remark: string | null
+      submitted_at: string | null
+      reviewed_at: string | null
+      expires_at: string | null
+      created_at: string | null
+      updated_at: string | null
+    }
+
+    /** 实名认证列表（分页） */
+    type IdentityVerificationList = Api.Common.PaginatedResponse<IdentityVerificationListItem>
+
+    /** 实名认证搜索参数 */
+    interface IdentityVerificationSearchParams extends Api.Common.CommonSearchParams {
+      keyword?: string
+      user_id?: number
+      type?: 'personal' | 'enterprise'
+      status?: 'pending' | 'review' | 'approved' | 'rejected'
+      start_date?: string
+      end_date?: string
+    }
+
     /** 反馈更新参数（处理反馈） */
     interface FeedbackUpdateParams {
       status?: number
