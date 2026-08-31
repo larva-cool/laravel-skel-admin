@@ -1,12 +1,15 @@
 <!-- 按钮组件 -->
 <template>
-  <div
-    class="size-8.5 inline-flex flex-cc c-p text-g-600 dark:text-g-800 text-xl rounded tad-300 hover:bg-hover-color"
-    :class="{ 'rounded-full': circle }"
-  >
-    <ArtSvgIcon :icon="icon"></ArtSvgIcon>
-    <slot></slot>
-  </div>
+  <ElTooltip :content="title" placement="top" :show-after="0" :disabled="!title">
+    <div
+      class="size-8.5 inline-flex flex-cc c-p text-g-600 dark:text-g-800 text-xl rounded tad-300 hover:bg-hover-color"
+      :class="{ 'rounded-full': circle }"
+      :title="title"
+    >
+      <ArtSvgIcon :icon="icon"></ArtSvgIcon>
+      <slot></slot>
+    </div>
+  </ElTooltip>
 </template>
 
 <script lang="ts" setup>
@@ -17,6 +20,8 @@
     icon: string
     /** 圆角按钮 */
     circle?: boolean
+    /** 鼠标悬停提示文本（HTML title 属性） */
+    title?: string
   }
 
   withDefaults(defineProps<Props>(), {})
