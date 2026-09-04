@@ -1,5 +1,5 @@
 {
-  "name": "art-design-pro",
+  "name": "laravel-skel-admin",
   "version": "1.0.0",
   "private": true,
   "license": "AGPL-3.0-or-later",
@@ -10,7 +10,10 @@
   },
   "scripts": {
     "dev": "vite --open",
+    "dev:testing": "vite --mode testing",
     "build": "vue-tsc --noEmit && vite build",
+    "build:testing": "vue-tsc --noEmit && vite build --mode testing",
+    "build:production": "vue-tsc --noEmit && vite build --mode production",
     "serve": "vite preview",
     "lint": "eslint",
     "fix": "eslint --fix",
