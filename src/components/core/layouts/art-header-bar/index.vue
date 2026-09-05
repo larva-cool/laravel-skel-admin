@@ -89,6 +89,7 @@
 
         <!-- 国际化按钮 -->
         <ElDropdown
+          trigger="click"
           @command="changeLanguage"
           popper-class="langDropDownStyle"
           v-if="shouldShowLanguage"
@@ -130,13 +131,16 @@
         </ArtIconButton>
 
         <!-- 设置按钮 -->
-        <div v-if="shouldShowSettings">
-          <ElPopover :visible="showSettingGuide" placement="bottom-start" :width="190" :offset="0">
-            <template #reference>
-              <div class="flex-cc">
-                <ArtIconButton icon="ri:settings-line" class="setting-btn" @click="openSetting" />
-              </div>
-            </template>
+        <div v-if="shouldShowSettings" class="relative">
+          <ArtIconButton icon="ri:settings-line" class="setting-btn" @click="openSetting" />
+          <ElPopover
+            v-if="showSettingGuide"
+            :visible="showSettingGuide"
+            placement="bottom-start"
+            :width="190"
+            :offset="0"
+            :show-arrow="true"
+          >
             <template #default>
               <p
                 >{{ $t('topBar.guide.title')

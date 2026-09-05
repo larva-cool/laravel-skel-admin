@@ -33,6 +33,7 @@
       </div>
       <ElDropdown
         v-if="shouldShowLanguage"
+        trigger="click"
         @command="changeLanguage"
         popper-class="langDropDownStyle"
       >

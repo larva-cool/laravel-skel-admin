@@ -26,7 +26,7 @@
         />
       </div>
 
-      <ElDropdown v-if="shouldShow('size')" @command="handleTableSizeChange">
+      <ElDropdown v-if="shouldShow('size')" trigger="click" @command="handleTableSizeChange">
         <div class="button">
           <ArtSvgIcon icon="ri:arrow-up-down-fill" />
         </div>

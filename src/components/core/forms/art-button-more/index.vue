@@ -1,27 +1,25 @@
 <!-- 更多按钮 -->
 <template>
   <div>
-    <ElTooltip v-if="hasAnyAuthItem" content="更多" placement="top" :show-after="0">
-      <ElDropdown>
-        <ArtIconButton icon="ri:more-2-fill" class="!size-8 bg-g-200 dark:bg-g-300/45 text-sm" />
-        <template #dropdown>
-          <ElDropdownMenu>
-            <template v-for="item in list" :key="item.key">
-              <ElDropdownItem
-                v-if="!item.auth || hasAuth(item.auth)"
-                :disabled="item.disabled"
-                @click="handleClick(item)"
-              >
-                <div class="flex-c gap-2" :style="{ color: item.color }">
-                  <ArtSvgIcon v-if="item.icon" :icon="item.icon" />
-                  <span>{{ item.label }}</span>
-                </div>
-              </ElDropdownItem>
-            </template>
-          </ElDropdownMenu>
-        </template>
-      </ElDropdown>
-    </ElTooltip>
+    <ElDropdown v-if="hasAnyAuthItem" trigger="click">
+      <ArtIconButton icon="ri:more-2-fill" class="!size-8 bg-g-200 dark:bg-g-300/45 text-sm" />
+      <template #dropdown>
+        <ElDropdownMenu>
+          <template v-for="item in list" :key="item.key">
+            <ElDropdownItem
+              v-if="!item.auth || hasAuth(item.auth)"
+              :disabled="item.disabled"
+              @click="handleClick(item)"
+            >
+              <div class="flex-c gap-2" :style="{ color: item.color }">
+                <ArtSvgIcon v-if="item.icon" :icon="item.icon" />
+                <span>{{ item.label }}</span>
+              </div>
+            </ElDropdownItem>
+          </template>
+        </ElDropdownMenu>
+      </template>
+    </ElDropdown>
   </div>
 </template>
 
