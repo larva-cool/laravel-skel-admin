@@ -1,8 +1,13 @@
 <!-- 更多按钮 -->
 <template>
-  <div>
-    <ElDropdown v-if="hasAnyAuthItem" trigger="click">
-      <ArtIconButton icon="ri:more-2-fill" class="!size-8 bg-g-200 dark:bg-g-300/45 text-sm" />
+  <div v-if="hasAnyAuthItem" class="inline-block">
+    <ElDropdown trigger="click">
+      <div
+        class="size-8 inline-flex flex-cc c-p text-g-600 dark:text-g-800 text-sm rounded bg-g-200 dark:bg-g-300/45 tad-300 hover:bg-hover-color"
+        title="更多"
+      >
+        <ArtSvgIcon icon="ri:more-2-fill" />
+      </div>
       <template #dropdown>
         <ElDropdownMenu>
           <template v-for="item in list" :key="item.key">

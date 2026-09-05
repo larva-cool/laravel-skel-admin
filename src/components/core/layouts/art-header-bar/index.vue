@@ -94,7 +94,12 @@
           popper-class="langDropDownStyle"
           v-if="shouldShowLanguage"
         >
-          <ArtIconButton icon="ri:translate-2" class="language-btn text-[19px]" />
+          <div
+            class="size-8.5 inline-flex flex-cc c-p text-g-600 dark:text-g-800 text-xl rounded tad-300 hover:bg-hover-color language-btn text-[19px]"
+            title="语言"
+          >
+            <ArtSvgIcon icon="ri:translate-2" />
+          </div>
           <template #dropdown>
             <ElDropdownMenu>
               <div v-for="item in languageOptions" :key="item.value" class="lang-btn-item">
@@ -269,12 +274,13 @@
 
   /**
    * 刷新页面
-   * @param {number} time - 延迟时间，默认为0毫秒
+   * @param {number | Event} time - 延迟时间（毫秒），或 MouseEvent（来自按钮 click），默认为0毫秒
    */
-  const reload = (time: number = 0): void => {
+  const reload = (time: number | Event = 0): void => {
+    const delay = typeof time === 'number' ? time : 0
     setTimeout(() => {
       refresh()
-    }, time)
+    }, delay)
   }
 
   /**
