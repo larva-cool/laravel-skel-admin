@@ -71,7 +71,7 @@ export interface TableError {
  */
 export function defaultResponseAdapter<T>(response: any): ApiResponse<T> {
   if (!response || typeof response !== 'object') {
-    return { records: [], total: 0, current: 1, size: 10 }
+    return { records: [], total: 0, current: 1, size: tableConfig.defaultPagination.size }
   }
 
   const listKey = tableConfig.responseKey.list
@@ -98,7 +98,10 @@ export function defaultResponseAdapter<T>(response: any): ApiResponse<T> {
 
   const total = Number(source[totalKey] ?? source.totalCount ?? source.total ?? 0)
   const current = Number(source[currentKey] ?? source.pageNum ?? source.current ?? 1)
-  const size = Number((source[sizeKey] ?? source.pageSize ?? source.size ?? records.length) || 10)
+  const size = Number(
+    (source[sizeKey] ?? source.pageSize ?? source.size ?? records.length) ||
+      tableConfig.defaultPagination.size
+  )
 
   return { records, total, current, size }
 }

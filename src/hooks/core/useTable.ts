@@ -205,7 +205,7 @@ function useTableImpl<TApiFn extends (params: any) => Promise<any>>(
     Object.assign(
       {
         [pageKey]: 1,
-        [sizeKey]: 10
+        [sizeKey]: tableConfig.defaultPagination.size
       },
       apiParams || {}
     ) as TParams
@@ -214,7 +214,9 @@ function useTableImpl<TApiFn extends (params: any) => Promise<any>>(
   // 分页配置
   const pagination = reactive<Api.Common.PaginationParams>({
     current: ((searchParams as Record<string, unknown>)[pageKey] as number) || 1,
-    size: ((searchParams as Record<string, unknown>)[sizeKey] as number) || 10,
+    size:
+      ((searchParams as Record<string, unknown>)[sizeKey] as number) ||
+      tableConfig.defaultPagination.size,
     total: 0
   })
 
@@ -394,7 +396,7 @@ function useTableImpl<TApiFn extends (params: any) => Promise<any>>(
       if (err instanceof Error && err.message === '请求已取消') {
         // 请求被取消，回到 idle 状态
         loadingState.value = 'idle'
-        return { records: [], total: 0, current: 1, size: 10 }
+        return { records: [], total: 0, current: 1, size: tableConfig.defaultPagination.size }
       }
 
       // 状态机：请求失败，进入 error 状态
@@ -448,7 +450,7 @@ function useTableImpl<TApiFn extends (params: any) => Promise<any>>(
     const paramsRecord = searchParams as Record<string, unknown>
     const defaultPagination = {
       [pageKey]: 1,
-      [sizeKey]: (paramsRecord[sizeKey] as number) || 10
+      [sizeKey]: (paramsRecord[sizeKey] as number) || tableConfig.defaultPagination.size
     }
 
     // 清空所有搜索参数

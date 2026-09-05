@@ -34,16 +34,16 @@ export const tableConfig = {
     /** 默认当前页 */
     current: 1,
     /** 默认每页条数 */
-    size: 10,
+    size: 15,
     /** 默认总条数 */
     total: 0
   },
 
   /** 每页条数选项 */
-  pageSizes: [10, 20, 30, 50, 100],
+  pageSizes: [10, 15, 20, 30, 50, 100],
 
   /** 默认每页条数 */
-  pageSize: 10,
+  pageSize: 15,
 
   /** 默认防抖延迟（毫秒） */
   defaultDebounceTime: 300
