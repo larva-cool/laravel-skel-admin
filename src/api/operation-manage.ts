@@ -71,3 +71,61 @@ export function fetchGetBannerPositions() {
     url: '/api/v1/common/dict-items/banner_positions'
   })
 }
+
+// ========== 公告管理（运营） ==========
+
+/** 获取公告列表（分页） */
+export function fetchGetAnnouncementList(params: Api.OperationManage.AnnouncementSearchParams) {
+  return request.get<Api.OperationManage.AnnouncementList>({
+    url: '/admin/announcements',
+    params
+  })
+}
+
+/** 获取公告详情 */
+export function fetchGetAnnouncementDetail(id: number) {
+  return request.get<Api.OperationManage.AnnouncementListItem>({
+    url: `/admin/announcements/${id}`
+  })
+}
+
+/** 创建公告 */
+export function fetchCreateAnnouncement(data: Api.OperationManage.AnnouncementSaveParams) {
+  return request.post<Api.OperationManage.AnnouncementListItem>({
+    url: '/admin/announcements',
+    data,
+    showSuccessMessage: true,
+    successMessage: '创建成功'
+  })
+}
+
+/** 更新公告 */
+export function fetchUpdateAnnouncement(
+  id: number,
+  data: Api.OperationManage.AnnouncementSaveParams
+) {
+  return request.put<Api.OperationManage.AnnouncementListItem>({
+    url: `/admin/announcements/${id}`,
+    data,
+    showSuccessMessage: true,
+    successMessage: '更新成功'
+  })
+}
+
+/** 删除公告 */
+export function fetchDeleteAnnouncement(id: number) {
+  return request.del<null>({
+    url: `/admin/announcements/${id}`,
+    showSuccessMessage: true,
+    successMessage: '删除成功'
+  })
+}
+
+/** 切换公告状态（草稿→发布 / 发布→归档 / 归档→发布） */
+export function fetchToggleAnnouncementStatus(id: number) {
+  return request.put<Api.OperationManage.AnnouncementListItem>({
+    url: `/admin/announcements/${id}/toggle-status`,
+    showSuccessMessage: true,
+    successMessage: '状态切换成功'
+  })
+}

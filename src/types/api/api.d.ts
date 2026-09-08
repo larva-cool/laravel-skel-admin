@@ -811,6 +811,43 @@ declare namespace Api {
       label: string
       value: string
     }
+
+    /** 公告列表（分页） */
+    type AnnouncementList = Api.Common.PaginatedResponse<AnnouncementListItem>
+
+    /** 公告列表项（Admin AnnouncementResource） */
+    interface AnnouncementListItem {
+      id: number
+      title: string
+      summary: string | null
+      content?: string
+      cover_image: string | null
+      status: string
+      status_label?: string
+      status_label_type?: string
+      sort: number
+      admin_id: number
+      admin?: { id: number; name: string } | null
+      published_at: string | null
+      created_at: string | null
+      updated_at: string | null
+    }
+
+    /** 公告搜索参数 */
+    interface AnnouncementSearchParams extends Api.Common.CommonSearchParams {
+      keyword?: string
+      status?: string
+    }
+
+    /** 公告保存参数（创建/编辑共用） */
+    interface AnnouncementSaveParams {
+      title: string
+      summary?: string | null
+      content: string
+      cover_image?: string | null
+      status?: string
+      sort?: number
+    }
   }
 
   /** 用户分群管理模块（用户管理 → 分群管理） */
