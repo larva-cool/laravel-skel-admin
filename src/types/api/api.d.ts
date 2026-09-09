@@ -1486,4 +1486,129 @@ declare namespace Api {
       storage: string
     }
   }
+
+  /** 钱包管理（充值 / 提现） */
+  namespace WalletManage {
+    // ========== 充值订单 ==========
+
+    /** 充值列表项 */
+    interface Recharge {
+      id: number
+      order_no: string
+      amount: number | string
+      bonus_amount: number | string
+      total_amount: number | string
+      pay_channel: string
+      pay_channel_label_type?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | string
+      pay_status: 'pending' | 'success' | 'failed' | 'expired' | 'closed' | string
+      pay_status_label_type?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | string
+      transaction_id: string | null
+      confirmed_by: number | null
+      client_ip: string | null
+      remark: string | null
+      is_expired: boolean
+      owner?: { id: number; name: string } | null
+      /** 仅详情接口返回 */
+      callback_payload?: Record<string, any> | null
+      paid_at: string | null
+      expired_at: string | null
+      created_at: string | null
+    }
+
+    /** 充值列表（Laravel 分页） */
+    type RechargeList = Api.Common.PaginatedResponse<Recharge>
+
+    /** 充值统计 */
+    interface RechargeStats {
+      total_amount: number | string
+      total_bonus: number | string
+      today_amount: number | string
+      total_count: number
+      success_count: number
+      pending_count: number
+      success_rate: number | string
+    }
+
+    /** 充值搜索参数 */
+    interface RechargeSearchParams extends Api.Common.CommonSearchParams {
+      pay_status?: string
+      pay_channel?: string
+      order_no?: string
+      start_date?: string
+      end_date?: string
+    }
+
+    /** 充值操作参数（备注可选） */
+    interface RechargeHandleParams {
+      remark?: string | null
+    }
+
+    // ========== 提现申请 ==========
+
+    /** 提现账户信息（已脱敏） */
+    interface WithdrawAccountInfo {
+      account?: string
+      real_name?: string
+      bank_name?: string
+      [key: string]: any
+    }
+
+    /** 提现列表项 */
+    interface Withdraw {
+      id: number
+      order_no: string
+      amount: number | string
+      fee: number | string
+      actual_amount: number | string
+      account_type: 'wechat' | 'alipay' | 'bank' | string
+      account_type_label_type?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | string
+      account_info: WithdrawAccountInfo | null
+      status: 'pending' | 'approved' | 'rejected' | 'success' | 'failed' | string
+      status_label_type?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | string
+      reviewed_by: number | null
+      reject_reason: string | null
+      fail_reason: string | null
+      remark: string | null
+      owner?: { id: number; name: string } | null
+      reviewed_at: string | null
+      transfer_at: string | null
+      created_at: string | null
+    }
+
+    /** 提现列表（Laravel 分页） */
+    type WithdrawList = Api.Common.PaginatedResponse<Withdraw>
+
+    /** 提现统计 */
+    interface WithdrawStats {
+      total_amount: number | string
+      total_fee: number | string
+      today_amount: number | string
+      total_count: number
+      success_count: number
+      pending_count: number
+      success_rate: number | string
+    }
+
+    /** 提现搜索参数 */
+    interface WithdrawSearchParams extends Api.Common.CommonSearchParams {
+      status?: string
+      account_type?: string
+      order_no?: string
+      owner_id?: number
+      owner_type?: string
+      start_date?: string
+      end_date?: string
+    }
+
+    /** 提现通过/打款参数（备注可选） */
+    interface WithdrawRemarkParams {
+      remark?: string | null
+    }
+
+    /** 提现驳回/打款失败参数（原因必填） */
+    interface WithdrawRejectParams {
+      reason: string
+      remark?: string | null
+    }
+  }
 }
