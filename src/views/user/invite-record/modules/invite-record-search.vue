@@ -3,6 +3,7 @@
     ref="searchBarRef"
     v-model="formData"
     :items="formItems"
+    label-width="100px"
     @reset="handleReset"
     @search="handleSearch"
   />
