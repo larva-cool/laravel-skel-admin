@@ -210,3 +210,20 @@ export function fetchExportUserCoinTrades(
     showErrorMessage: true
   })
 }
+
+// ========== 邀请记录（只读） ==========
+
+/** 邀请记录列表（分页） */
+export function fetchGetInviteRecordList(params: Api.UserManage.InviteRecordSearchParams) {
+  return request.get<Api.UserManage.InviteRecordList>({
+    url: '/admin/invite-records',
+    params
+  })
+}
+
+/** 邀请记录详情 */
+export function fetchGetInviteRecordDetail(id: number) {
+  return request.get<Api.UserManage.InviteRecordItem>({
+    url: `/admin/invite-records/${id}`
+  })
+}

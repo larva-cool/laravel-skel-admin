@@ -319,7 +319,8 @@
     user: 'ri:user-3-line',
     upload: 'ri:upload-cloud-2-line',
     openai: 'ri:robot-2-line',
-    broadcast: 'ri:live-line'
+    broadcast: 'ri:live-line',
+    wallet: 'ri:wallet-3-line'
   }
 
   /** 获取分组图标（未配置时降级为通用设置图标） */

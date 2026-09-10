@@ -1165,6 +1165,38 @@ declare namespace Api {
       /** 注册结束日期 */
       register_end?: string
     }
+
+    /** 邀请记录列表（Laravel 分页） */
+    type InviteRecordList = Api.Common.PaginatedResponse<InviteRecordItem>
+
+    /** 邀请记录列表项（InviteRecordAdminResource） */
+    interface InviteRecordItem {
+      id: number
+      /** 邀请人类型：user=前台用户，admin=管理员 */
+      inviter_type: 'user' | 'admin'
+      inviter_id: number
+      inviter_name: string | null
+      /** 被邀请人类型：user=前台用户，admin=管理员 */
+      invitee_type: 'user' | 'admin'
+      invitee_id: number
+      invitee_name: string | null
+      description: string | null
+      created_at: string | null
+    }
+
+    /** 邀请记录搜索参数 */
+    interface InviteRecordSearchParams extends Api.Common.CommonSearchParams {
+      inviter_type?: 'user' | 'admin'
+      inviter_id?: number
+      invitee_type?: 'user' | 'admin'
+      invitee_id?: number
+      /** 描述关键词（模糊匹配） */
+      description?: string
+      /** 邀请开始日期 YYYY-MM-DD */
+      created_start?: string
+      /** 邀请结束日期 YYYY-MM-DD */
+      created_end?: string
+    }
   }
 
   /** AI 聊天模块 */
