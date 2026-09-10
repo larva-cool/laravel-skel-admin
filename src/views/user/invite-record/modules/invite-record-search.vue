@@ -80,7 +80,8 @@
       type: 'daterange',
       props: {
         type: 'daterange',
-        placeholder: ['开始日期', '结束日期'],
+        startPlaceholder: '开始日期',
+        endPlaceholder: '结束日期',
         clearable: true,
         format: 'YYYY-MM-DD',
         valueFormat: 'YYYY-MM-DD'

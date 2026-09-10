@@ -301,6 +301,49 @@
           />
         </div>
       </ElTabPane>
+
+      <ElTabPane label="邀请记录" name="invites" lazy>
+        <ElTable
+          v-loading="inviteLoading"
+          :data="inviteList"
+          stripe
+          border
+          size="default"
+          class="mt-4"
+          style="width: 100%"
+        >
+          <ElTableColumn prop="id" label="ID" width="80" />
+          <ElTableColumn prop="invitee_type" label="被邀请人类型" width="130">
+            <template #default="{ row }">
+              <ElTag :type="row.invitee_type === 'admin' ? 'warning' : 'info'" size="small">
+                {{ row.invitee_type === 'admin' ? '管理员' : '前台用户' }}
+              </ElTag>
+            </template>
+          </ElTableColumn>
+          <ElTableColumn prop="invitee_name" label="被邀请人" min-width="160" show-overflow-tooltip>
+            <template #default="{ row }">
+              {{ row.invitee_name || `#${row.invitee_id}` }}
+            </template>
+          </ElTableColumn>
+          <ElTableColumn prop="description" label="描述" min-width="180" show-overflow-tooltip>
+            <template #default="{ row }">{{ row.description || '—' }}</template>
+          </ElTableColumn>
+          <ElTableColumn prop="created_at" label="邀请时间" min-width="170" />
+        </ElTable>
+
+        <div class="tab-pagination">
+          <ElPagination
+            v-model:current-page="invitePage.page"
+            v-model:page-size="invitePage.per_page"
+            :page-sizes="[10, 15, 20, 30, 50]"
+            :total="inviteTotal"
+            layout="total, sizes, prev, pager, next, jumper"
+            background
+            @size-change="loadInvites"
+            @current-change="loadInvites"
+          />
+        </div>
+      </ElTabPane>
     </ElTabs>
 
     <template #footer>
@@ -313,6 +356,7 @@
   import {
     fetchExportUserCoinTrades,
     fetchExportUserPointTrades,
+    fetchGetInviteRecordList,
     fetchGetUserDetail,
     fetchUserCoinTrades,
     fetchUserLoginHistories,
@@ -329,9 +373,12 @@
   type SocialItem = Api.UserManage.SocialItem
   type PointTradeItem = Api.UserManage.PointTradeItem
   type CoinTradeItem = Api.UserManage.CoinTradeItem
+  type InviteRecordItem = Api.UserManage.InviteRecordItem
 
   const dialogVisible = ref(false)
-  const activeTab = ref<'profile' | 'histories' | 'socials' | 'points' | 'coins'>('profile')
+  const activeTab = ref<'profile' | 'histories' | 'socials' | 'points' | 'coins' | 'invites'>(
+    'profile'
+  )
 
   const user = ref<UserDetail | null>(null)
 
@@ -367,6 +414,13 @@
   const coinKeyword = ref('')
   const coinDateRange = ref<string[]>([])
   const coinPage = reactive({ page: 1, per_page: 15 })
+
+  // 邀请记录
+  const inviteList = ref<InviteRecordItem[]>([])
+  const inviteLoading = ref(false)
+  const inviteLoaded = ref(false)
+  const inviteTotal = ref(0)
+  const invitePage = reactive({ page: 1, per_page: 15 })
 
   // 导出
   const { isExporting: isPointExporting, handleExport: doPointExport } = useExport()
@@ -423,6 +477,11 @@
     coinKeyword.value = ''
     coinDateRange.value = []
 
+    invitePage.page = 1
+    inviteLoaded.value = false
+    inviteList.value = []
+    inviteTotal.value = 0
+
     // 拉取详情（含 profile）
     try {
       user.value = await fetchGetUserDetail(row.id)
@@ -442,6 +501,7 @@
     if (name === 'socials' && !socialLoaded.value) loadSocials()
     if (name === 'points' && !pointLoaded.value) loadPointTrades()
     if (name === 'coins' && !coinLoaded.value) loadCoinTrades()
+    if (name === 'invites' && !inviteLoaded.value) loadInvites()
   }
 
   const handleDateRangeChange = () => {
@@ -548,6 +608,24 @@
       coinLoaded.value = true
     } finally {
       coinLoading.value = false
+    }
+  }
+
+  const loadInvites = async () => {
+    if (!user.value) return
+    inviteLoading.value = true
+    try {
+      const res = await fetchGetInviteRecordList({
+        page: invitePage.page,
+        per_page: invitePage.per_page,
+        inviter_type: 'user',
+        inviter_id: user.value.id
+      })
+      inviteList.value = res?.data || []
+      inviteTotal.value = res?.meta?.total || 0
+      inviteLoaded.value = true
+    } finally {
+      inviteLoading.value = false
     }
   }
 
