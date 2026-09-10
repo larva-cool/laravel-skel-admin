@@ -340,8 +340,10 @@
 
   /**
    * 切换通知面板显示状态
+   * @param {Event} e - 点击事件对象，用于阻止冒泡到 document 上的 bodyCloseNotice
    */
-  const visibleNotice = (): void => {
+  const visibleNotice = (e?: Event): void => {
+    e?.stopPropagation()
     showNotice.value = !showNotice.value
   }
 
