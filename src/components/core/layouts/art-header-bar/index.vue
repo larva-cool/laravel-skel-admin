@@ -136,14 +136,16 @@
         </ArtIconButton>
 
         <!-- 设置按钮 -->
-        <div v-if="shouldShowSettings" class="relative">
+        <div v-if="shouldShowSettings" ref="settingBtnWrapRef" class="relative">
           <ArtIconButton icon="ri:settings-line" class="setting-btn" @click="openSetting" />
           <ElPopover
-            v-if="showSettingGuide"
+            v-if="showSettingGuide && settingGuideReady"
             :visible="showSettingGuide"
-            placement="bottom-start"
+            :virtual-ref="settingBtnWrapRef"
+            virtual-triggering
+            placement="bottom-end"
             :width="190"
-            :offset="0"
+            :offset="8"
             :show-arrow="true"
           >
             <template #default>
@@ -231,6 +233,11 @@
   const showNotice = ref(false)
   const notice = ref(null)
 
+  /** 设置按钮容器，作为设置引导气泡的定位锚点 */
+  const settingBtnWrapRef = ref<HTMLElement>()
+  /** 锚点挂载完成后再渲染引导气泡，避免 Popper 无参照元素时定位到页面左上角 */
+  const settingGuideReady = ref(false)
+
   // 菜单类型判断
   const isLeftMenu = computed(() => menuType.value === MenuTypeEnum.LEFT)
   const isDualMenu = computed(() => menuType.value === MenuTypeEnum.DUAL_MENU)
@@ -242,6 +249,9 @@
   onMounted(() => {
     initLanguage()
     document.addEventListener('click', bodyCloseNotice)
+    nextTick(() => {
+      settingGuideReady.value = true
+    })
   })
 
   onUnmounted(() => {
