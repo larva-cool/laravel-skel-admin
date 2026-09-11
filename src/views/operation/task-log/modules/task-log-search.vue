@@ -16,9 +16,7 @@
   const emit = defineEmits<Emits>()
 
   const searchBarRef = ref()
-  const formData = ref<Partial<Api.OperationManage.TaskLogSearchParams>>({})
-
-  const dateRange = ref<[string, string] | null>(null)
+  const formData = ref<Record<string, unknown>>({})
 
   const rewardTypeOptions = [
     { label: '金币', value: 'coin' },
@@ -60,37 +58,29 @@
       key: 'date_range',
       type: 'daterange',
       props: {
-        'range-separator': '至',
-        'start-placeholder': '开始日期',
-        'end-placeholder': '结束日期',
-        'value-format': 'YYYY-MM-DD',
-        clearable: true
+        type: 'daterange',
+        placeholder: ['开始日期', '结束日期'],
+        clearable: true,
+        format: 'YYYY-MM-DD',
+        valueFormat: 'YYYY-MM-DD'
       }
     }
   ])
 
-  watch(dateRange, (val) => {
-    if (val && val.length === 2) {
-      formData.value.start_date = val[0]
-      formData.value.end_date = val[1]
-    } else {
-      delete formData.value.start_date
-      delete formData.value.end_date
-    }
-  })
-
   function handleReset() {
     formData.value = {}
-    dateRange.value = null
     emit('resetSearchParams')
   }
 
-  async function handleSearch(params: Partial<Api.OperationManage.TaskLogSearchParams>) {
+  async function handleSearch(params: Record<string, unknown>) {
     await searchBarRef.value?.validate()
-    if (dateRange.value && dateRange.value.length === 2) {
-      params.start_date = dateRange.value[0]
-      params.end_date = dateRange.value[1]
+    // 将 date_range 数组拆分为 start_date / end_date
+    const range = params.date_range as [string, string] | undefined
+    delete params.date_range
+    if (range && range.length === 2) {
+      params.start_date = range[0]
+      params.end_date = range[1]
     }
-    emit('search', params)
+    emit('search', params as unknown as Partial<Api.OperationManage.TaskLogSearchParams>)
   }
 </script>

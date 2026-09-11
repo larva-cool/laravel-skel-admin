@@ -95,7 +95,7 @@
       columnsFactory: () => [
         { prop: 'id', label: 'ID', width: 80 },
         { prop: 'name', label: '任务名称', minWidth: 150, showOverflowTooltip: true },
-        { prop: 'code', label: '编码', width: 160, showOverflowTooltip: true },
+        { prop: 'code', label: '编码', width: 220, showOverflowTooltip: true },
         {
           prop: 'group',
           label: '所属分组',
@@ -132,12 +132,6 @@
           label: '领取方式',
           width: 100,
           formatter: (row: TaskListItem) => (row.claim_mode === 0 ? '自动发放' : '手动领取')
-        },
-        {
-          prop: 'target_value',
-          label: '目标值',
-          width: 80,
-          align: 'center'
         },
         { prop: 'sort_order', label: '排序', width: 70, align: 'center' },
         {

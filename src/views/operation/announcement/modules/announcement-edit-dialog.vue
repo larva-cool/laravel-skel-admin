@@ -28,30 +28,21 @@
         />
       </ElFormItem>
       <ElFormItem label="封面图" prop="cover_image">
-        <ElInput
-          v-model="form.cover_image"
-          placeholder="封面图 URL（可选）"
-          maxlength="500"
-          clearable
-        />
-        <div v-if="form.cover_image" class="mt-2">
-          <ElImage
-            :src="form.cover_image"
-            :preview-src-list="[form.cover_image]"
-            :hide-on-click-modal="true"
-            fit="contain"
-            style="
-              max-width: 240px;
-              max-height: 100px;
-              border: 1px solid var(--el-border-color-lighter);
-              border-radius: 4px;
-            "
-            :preview-teleported="true"
-          />
-        </div>
+        <ElUpload
+          class="cover-uploader"
+          :show-file-list="false"
+          :http-request="handleUpload"
+          :before-upload="beforeUpload"
+          accept="image/*"
+        >
+          <img v-if="form.cover_image" :src="form.cover_image" class="cover-image" />
+          <ElIcon v-else class="cover-uploader-icon"><Plus /></ElIcon>
+        </ElUpload>
+        <div class="image-tip">支持 jpg/png/gif/webp 格式，建议尺寸 750×420</div>
       </ElFormItem>
       <ElFormItem label="正文" prop="content">
         <ArtWangEditor
+          ref="editorRef"
           v-model="form.content"
           height="400px"
           placeholder="请输入公告正文"
@@ -81,13 +72,15 @@
 </template>
 
 <script setup lang="ts">
-  import type { FormInstance, FormRules } from 'element-plus'
-  import ArtWangEditor from '@/components/core/forms/art-wang-editor/index.vue'
   import {
     fetchCreateAnnouncement,
-    fetchUpdateAnnouncement,
-    fetchGetAnnouncementDetail
+    fetchGetAnnouncementDetail,
+    fetchUpdateAnnouncement
   } from '@/api/operation-manage'
+  import { fetchUploadAttachmentFile } from '@/api/system-manage'
+  import ArtWangEditor from '@/components/core/forms/art-wang-editor/index.vue'
+  import { Plus } from '@element-plus/icons-vue'
+  import type { FormInstance, FormRules, UploadRequestOptions } from 'element-plus'
 
   defineOptions({ name: 'AnnouncementEditDialog' })
 
@@ -97,6 +90,7 @@
 
   const dialogVisible = ref(false)
   const formRef = ref<FormInstance>()
+  const editorRef = ref<InstanceType<typeof ArtWangEditor>>()
   const submitting = ref(false)
   const id = ref<number | null>(null)
   const isEdit = computed(() => id.value !== null)
@@ -134,11 +128,66 @@
     sort: [{ type: 'number', min: 0, message: '排序权重不能小于 0', trigger: 'blur' }]
   }
 
+  const resetForm = () => {
+    id.value = null
+    form.title = ''
+    form.summary = null
+    form.content = ''
+    form.cover_image = null
+    form.status = 'draft'
+    form.sort = 1000
+  }
+
+  /** 等待编辑器实例就绪 */
+  const waitEditorReady = (): Promise<void> => {
+    return new Promise((resolve) => {
+      const trySet = (retry = 0) => {
+        if (editorRef.value?.getEditor()) {
+          resolve()
+          return
+        }
+        if (retry > 50) {
+          resolve()
+          return
+        }
+        setTimeout(() => trySet(retry + 1), 50)
+      }
+      trySet()
+    })
+  }
+
+  /** 上传前校验 */
+  const beforeUpload = (rawFile: File) => {
+    if (!rawFile.type.startsWith('image/')) {
+      ElMessage.error('请选择图片文件')
+      return false
+    }
+    if (rawFile.size / 1024 / 1024 > 3) {
+      ElMessage.error('图片大小不能超过 3MB')
+      return false
+    }
+    return true
+  }
+
+  /** 自定义上传 */
+  const handleUpload = async (options: UploadRequestOptions) => {
+    try {
+      const res = await fetchUploadAttachmentFile(options.file)
+      form.cover_image = res.url ?? ''
+      ElMessage.success('图片上传成功')
+      options.onSuccess?.(res)
+    } catch (e) {
+      ElMessage.error('图片上传失败，请重试')
+      options.onError?.(e as Error)
+    }
+  }
+
   const open = async (row?: Api.OperationManage.AnnouncementListItem) => {
+    resetForm()
     dialogVisible.value = true
+
     if (row) {
       id.value = row.id
-      // 编辑时拉取详情获取 content
       try {
         const detail = await fetchGetAnnouncementDetail(row.id)
         form.title = detail.title
@@ -150,21 +199,22 @@
       } catch {
         form.title = row.title
         form.summary = row.summary
-        form.content = ''
         form.cover_image = row.cover_image
         form.status = row.status
         form.sort = row.sort
+        form.content = ''
       }
-    } else {
-      id.value = null
-      form.title = ''
-      form.summary = null
-      form.content = ''
-      form.cover_image = null
-      form.status = 'draft'
-      form.sort = 1000
     }
-    nextTick(() => formRef.value?.clearValidate())
+
+    await nextTick()
+    await waitEditorReady()
+    if (form.content) {
+      editorRef.value?.setHtml(form.content)
+    } else {
+      editorRef.value?.clear()
+    }
+
+    formRef.value?.clearValidate()
   }
 
   const handleSubmit = async () => {
@@ -203,4 +253,43 @@
   defineExpose({ open })
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+  .cover-uploader {
+    :deep(.el-upload) {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 178px;
+      height: 100px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px dashed var(--el-border-color);
+      border-radius: 6px;
+      transition: var(--el-transition-duration-fast);
+    }
+
+    :deep(.el-upload:hover) {
+      border-color: var(--el-color-primary);
+    }
+
+    .cover-uploader-icon {
+      font-size: 28px;
+      color: #8c939d;
+    }
+
+    .cover-image {
+      display: block;
+      width: 178px;
+      height: 100px;
+      object-fit: cover;
+    }
+  }
+
+  .image-tip {
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--el-text-color-secondary);
+  }
+</style>
