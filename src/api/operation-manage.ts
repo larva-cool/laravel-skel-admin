@@ -65,10 +65,10 @@ export function fetchSortBanners(data: Api.OperationManage.BannerSortParams) {
   })
 }
 
-/** 获取广告位字典项（公开字典接口） */
+/** 获取可用广告位选项 */
 export function fetchGetBannerPositions() {
   return request.get<Api.OperationManage.BannerPositionOption[]>({
-    url: '/api/v1/common/dict-items/banner_positions'
+    url: '/admin/banners/positions'
   })
 }
 
