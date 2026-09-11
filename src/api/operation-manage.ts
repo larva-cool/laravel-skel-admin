@@ -129,3 +129,120 @@ export function fetchToggleAnnouncementStatus(id: number) {
     successMessage: '状态切换成功'
   })
 }
+
+// ========== 任务分组管理（运营） ==========
+
+/** 获取任务分组列表（分页） */
+export function fetchGetTaskGroupList(params: Api.OperationManage.TaskGroupSearchParams) {
+  return request.get<Api.OperationManage.TaskGroupList>({
+    url: '/admin/task-groups',
+    params
+  })
+}
+
+/** 获取任务分组详情 */
+export function fetchGetTaskGroupDetail(id: number) {
+  return request.get<Api.OperationManage.TaskGroupListItem>({
+    url: `/admin/task-groups/${id}`
+  })
+}
+
+/** 获取任务分组选项（不分页） */
+export function fetchGetTaskGroupOptions() {
+  return request.get<Api.OperationManage.TaskGroupListItem[]>({
+    url: '/admin/task-groups/options'
+  })
+}
+
+/** 创建任务分组 */
+export function fetchCreateTaskGroup(data: Api.OperationManage.TaskGroupSaveParams) {
+  return request.post<Api.OperationManage.TaskGroupListItem>({
+    url: '/admin/task-groups',
+    data,
+    showSuccessMessage: true,
+    successMessage: '创建成功'
+  })
+}
+
+/** 更新任务分组 */
+export function fetchUpdateTaskGroup(id: number, data: Api.OperationManage.TaskGroupSaveParams) {
+  return request.put<Api.OperationManage.TaskGroupListItem>({
+    url: `/admin/task-groups/${id}`,
+    data,
+    showSuccessMessage: true,
+    successMessage: '更新成功'
+  })
+}
+
+/** 删除任务分组 */
+export function fetchDeleteTaskGroup(id: number) {
+  return request.del<null>({
+    url: `/admin/task-groups/${id}`,
+    showSuccessMessage: true,
+    successMessage: '删除成功'
+  })
+}
+
+/** 切换任务分组启用状态 */
+export function fetchToggleTaskGroupStatus(id: number) {
+  return request.put<Api.OperationManage.TaskGroupListItem>({
+    url: `/admin/task-groups/${id}/toggle-status`,
+    showSuccessMessage: true,
+    successMessage: '状态切换成功'
+  })
+}
+
+// ========== 任务管理（运营） ==========
+
+/** 获取任务列表（分页） */
+export function fetchGetTaskList(params: Api.OperationManage.TaskSearchParams) {
+  return request.get<Api.OperationManage.TaskList>({
+    url: '/admin/tasks',
+    params
+  })
+}
+
+/** 获取任务详情 */
+export function fetchGetTaskDetail(id: number) {
+  return request.get<Api.OperationManage.TaskListItem>({
+    url: `/admin/tasks/${id}`
+  })
+}
+
+/** 创建任务 */
+export function fetchCreateTask(data: Api.OperationManage.TaskSaveParams) {
+  return request.post<Api.OperationManage.TaskListItem>({
+    url: '/admin/tasks',
+    data,
+    showSuccessMessage: true,
+    successMessage: '创建成功'
+  })
+}
+
+/** 更新任务 */
+export function fetchUpdateTask(id: number, data: Api.OperationManage.TaskSaveParams) {
+  return request.put<Api.OperationManage.TaskListItem>({
+    url: `/admin/tasks/${id}`,
+    data,
+    showSuccessMessage: true,
+    successMessage: '更新成功'
+  })
+}
+
+/** 删除任务 */
+export function fetchDeleteTask(id: number) {
+  return request.del<null>({
+    url: `/admin/tasks/${id}`,
+    showSuccessMessage: true,
+    successMessage: '删除成功'
+  })
+}
+
+/** 切换任务启用状态 */
+export function fetchToggleTaskStatus(id: number) {
+  return request.put<Api.OperationManage.TaskListItem>({
+    url: `/admin/tasks/${id}/toggle-status`,
+    showSuccessMessage: true,
+    successMessage: '状态切换成功'
+  })
+}

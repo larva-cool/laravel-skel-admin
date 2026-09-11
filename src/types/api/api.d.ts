@@ -848,6 +848,111 @@ declare namespace Api {
       status?: string
       sort?: number
     }
+
+    // ========== 任务分组管理（运营） ==========
+
+    /** 任务分组列表（分页） */
+    type TaskGroupList = Api.Common.PaginatedResponse<TaskGroupListItem>
+
+    /** 任务分组列表项 */
+    interface TaskGroupListItem {
+      id: number
+      name: string
+      code: string
+      type: number
+      type_label?: string
+      reset_type: number
+      reset_type_label?: string
+      sort_order: number
+      icon: string | null
+      description: string | null
+      status: boolean
+      tasks_count?: number
+      tasks?: TaskListItem[]
+      created_at: string | null
+      updated_at: string | null
+    }
+
+    /** 任务分组搜索参数 */
+    interface TaskGroupSearchParams extends Api.Common.CommonSearchParams {
+      keyword?: string
+      status?: boolean
+    }
+
+    /** 任务分组保存参数 */
+    interface TaskGroupSaveParams {
+      name: string
+      code: string
+      type: number
+      reset_type: number
+      sort_order?: number
+      icon?: string | null
+      description?: string | null
+      status?: boolean
+    }
+
+    // ========== 任务管理（运营） ==========
+
+    /** 任务列表（分页） */
+    type TaskList = Api.Common.PaginatedResponse<TaskListItem>
+
+    /** 任务列表项 */
+    interface TaskListItem {
+      id: number
+      group_id: number
+      group?: { id: number; name: string } | null
+      name: string
+      code: string
+      type: string
+      type_label?: string
+      description: string | null
+      condition: {
+        serial_days?: number
+        target_value?: number
+        completeness_threshold?: number
+      }
+      reward_type: string
+      reward_type_label?: string
+      reward_amount: number
+      claim_mode: number
+      claim_mode_label?: string
+      sort_order: number
+      target_value: number
+      start_at: string | null
+      end_at: string | null
+      status: boolean
+      created_at: string | null
+      updated_at: string | null
+    }
+
+    /** 任务搜索参数 */
+    interface TaskSearchParams extends Api.Common.CommonSearchParams {
+      keyword?: string
+      group_id?: number
+      type?: string
+      status?: boolean
+    }
+
+    /** 任务保存参数 */
+    interface TaskSaveParams {
+      group_id: number
+      name: string
+      code: string
+      type: string
+      description?: string | null
+      condition?: {
+        serial_days?: number
+        target_value?: number
+        completeness_threshold?: number
+      }
+      reward_type: string
+      reward_amount: number
+      claim_mode: number
+      sort_order?: number
+      start_at?: string | null
+      end_at?: string | null
+      status?: boolean
+    }
   }
 
   /** 用户分群管理模块（用户管理 → 分群管理） */
