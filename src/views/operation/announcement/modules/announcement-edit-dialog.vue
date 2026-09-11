@@ -162,10 +162,6 @@
       ElMessage.error('请选择图片文件')
       return false
     }
-    if (rawFile.size / 1024 / 1024 > 3) {
-      ElMessage.error('图片大小不能超过 3MB')
-      return false
-    }
     return true
   }
 
@@ -176,9 +172,8 @@
       form.cover_image = res.url ?? ''
       ElMessage.success('图片上传成功')
       options.onSuccess?.(res)
-    } catch (e) {
+    } catch {
       ElMessage.error('图片上传失败，请重试')
-      options.onError?.(e as Error)
     }
   }
 
