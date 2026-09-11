@@ -28,17 +28,41 @@
         />
       </ElFormItem>
       <ElFormItem label="封面图" prop="cover_image">
-        <ElUpload
-          class="cover-uploader"
-          :show-file-list="false"
-          :http-request="handleUpload"
-          :before-upload="beforeUpload"
-          accept="image/*"
-        >
-          <img v-if="form.cover_image" :src="form.cover_image" class="cover-image" />
-          <ElIcon v-else class="cover-uploader-icon"><Plus /></ElIcon>
-        </ElUpload>
-        <div class="image-tip">支持 jpg/png/gif/webp 格式，建议尺寸 750×420</div>
+        <div class="cover-upload-wrapper">
+          <ElUpload
+            v-model:file-list="fileList"
+            list-type="picture-card"
+            :http-request="handleUploadRequest"
+            :before-upload="beforeUpload"
+            :on-remove="handleRemove"
+            :limit="1"
+            accept="image/*"
+            class="cover-uploader"
+            :class="{ 'has-file': fileList.length > 0 }"
+          >
+            <ElIcon><Plus /></ElIcon>
+
+            <template #file="{ file }">
+              <img class="el-upload-list__item-thumbnail" :src="file.url" alt="封面" />
+              <span class="el-upload-list__item-actions">
+                <span class="el-upload-list__item-preview" @click="handlePicturePreview(file)">
+                  <ElIcon><ZoomIn /></ElIcon>
+                </span>
+                <span class="el-upload-list__item-delete" @click="handleDownload(file)">
+                  <ElIcon><Download /></ElIcon>
+                </span>
+                <span class="el-upload-list__item-delete" @click="handleRemove()">
+                  <ElIcon><Delete /></ElIcon>
+                </span>
+              </span>
+            </template>
+          </ElUpload>
+          <div class="image-tip">支持 jpg/png/gif/webp 格式，建议尺寸 750×420</div>
+
+          <ElDialog v-model="previewVisible" width="auto" append-to-body>
+            <img :src="previewUrl" alt="封面预览" class="preview-img" />
+          </ElDialog>
+        </div>
       </ElFormItem>
       <ElFormItem label="正文" prop="content">
         <ArtWangEditor
@@ -79,8 +103,14 @@
   } from '@/api/operation-manage'
   import { fetchUploadAttachmentFile } from '@/api/system-manage'
   import ArtWangEditor from '@/components/core/forms/art-wang-editor/index.vue'
-  import { Plus } from '@element-plus/icons-vue'
-  import type { FormInstance, FormRules, UploadRequestOptions } from 'element-plus'
+  import { Delete, Download, Plus, ZoomIn } from '@element-plus/icons-vue'
+  import type {
+    FormInstance,
+    FormRules,
+    UploadFile,
+    UploadRequestOptions,
+    UploadUserFile
+  } from 'element-plus'
 
   defineOptions({ name: 'AnnouncementEditDialog' })
 
@@ -95,6 +125,10 @@
   const id = ref<number | null>(null)
   const isEdit = computed(() => id.value !== null)
   const title = computed(() => (isEdit.value ? '编辑公告' : '新增公告'))
+
+  const fileList = ref<UploadUserFile[]>([])
+  const previewVisible = ref(false)
+  const previewUrl = ref('')
 
   const statusOptions = [
     { label: '草稿', value: 'draft' },
@@ -136,9 +170,9 @@
     form.cover_image = null
     form.status = 'draft'
     form.sort = 1000
+    fileList.value = []
   }
 
-  /** 等待编辑器实例就绪 */
   const waitEditorReady = (): Promise<void> => {
     return new Promise((resolve) => {
       const trySet = (retry = 0) => {
@@ -156,7 +190,6 @@
     })
   }
 
-  /** 上传前校验 */
   const beforeUpload = (rawFile: File) => {
     if (!rawFile.type.startsWith('image/')) {
       ElMessage.error('请选择图片文件')
@@ -165,16 +198,64 @@
     return true
   }
 
-  /** 自定义上传 */
-  const handleUpload = async (options: UploadRequestOptions) => {
+  /**
+   * 自定义上传：文件对象在 fileList 中一直存在（ElUpload 自动维护），
+   * 上传前立即用本地 URL 填充预览，上传成功后只更新 url 为远端地址，
+   * 不重建数组/DOM，从而消除闪烁。
+   */
+  const handleUploadRequest = async (options: UploadRequestOptions) => {
+    // 通过 uid 在 fileList 中找到 ElUpload 创建的 UploadFile 对象
+    const raw = options.file
+    const uploadFile = fileList.value.find((f) => f.raw === raw)
+    if (!uploadFile) {
+      options.onError?.(
+        new Error('文件未找到') as Error & { status: number; method: string; url: string }
+      )
+      return
+    }
+
+    // 立即生成本地预览，避免空白
+    const localUrl = URL.createObjectURL(raw)
+    uploadFile.url = localUrl
+    uploadFile.status = 'uploading'
+
     try {
-      const res = await fetchUploadAttachmentFile(options.file)
-      form.cover_image = res.url ?? ''
+      const res = await fetchUploadAttachmentFile(raw)
+      const remoteUrl = res.url ?? ''
+      URL.revokeObjectURL(localUrl)
+      uploadFile.url = remoteUrl
+      uploadFile.status = 'success'
+      form.cover_image = remoteUrl
       ElMessage.success('图片上传成功')
       options.onSuccess?.(res)
-    } catch {
+    } catch (e) {
+      URL.revokeObjectURL(localUrl)
+      uploadFile.status = 'fail'
+      form.cover_image = null
       ElMessage.error('图片上传失败，请重试')
+      options.onError?.(e as Error & { status: number; method: string; url: string })
     }
+  }
+
+  const handlePicturePreview = (file: UploadFile) => {
+    previewUrl.value = file.url ?? ''
+    previewVisible.value = true
+  }
+
+  const handleDownload = (file: UploadFile) => {
+    if (!file.url) return
+    const link = document.createElement('a')
+    link.href = file.url
+    link.download = file.name || 'cover'
+    link.target = '_blank'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  const handleRemove = () => {
+    form.cover_image = null
+    fileList.value = []
   }
 
   const open = async (row?: Api.OperationManage.AnnouncementListItem) => {
@@ -198,6 +279,16 @@
         form.status = row.status
         form.sort = row.sort
         form.content = ''
+      }
+      // 编辑已存在图片：直接放入一个已完成状态的文件项
+      if (form.cover_image) {
+        fileList.value = [
+          {
+            name: 'cover',
+            url: form.cover_image,
+            status: 'success'
+          }
+        ]
       }
     }
 
@@ -249,36 +340,9 @@
 </script>
 
 <style scoped lang="scss">
-  .cover-uploader {
-    :deep(.el-upload) {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 178px;
-      height: 100px;
-      overflow: hidden;
-      cursor: pointer;
-      border: 1px dashed var(--el-border-color);
-      border-radius: 6px;
-      transition: var(--el-transition-duration-fast);
-    }
-
-    :deep(.el-upload:hover) {
-      border-color: var(--el-color-primary);
-    }
-
-    .cover-uploader-icon {
-      font-size: 28px;
-      color: #8c939d;
-    }
-
-    .cover-image {
-      display: block;
-      width: 178px;
-      height: 100px;
-      object-fit: cover;
-    }
+  .cover-upload-wrapper {
+    display: inline-flex;
+    flex-direction: column;
   }
 
   .image-tip {
@@ -286,5 +350,23 @@
     font-size: 12px;
     line-height: 1.4;
     color: var(--el-text-color-secondary);
+  }
+
+  .preview-img {
+    display: block;
+    max-width: 80vw;
+    max-height: 80vh;
+  }
+
+  .cover-uploader {
+    :deep(.el-upload--picture-card),
+    :deep(.el-upload-list--picture-card .el-upload-list__item) {
+      width: 178px;
+      height: 100px;
+    }
+
+    &.has-file :deep(.el-upload--picture-card) {
+      display: none;
+    }
   }
 </style>
