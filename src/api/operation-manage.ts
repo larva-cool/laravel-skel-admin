@@ -246,3 +246,20 @@ export function fetchToggleTaskStatus(id: number) {
     successMessage: '状态切换成功'
   })
 }
+
+// ========== 任务记录（运营，只读） ==========
+
+/** 获取任务记录列表（分页） */
+export function fetchGetTaskLogList(params: Api.OperationManage.TaskLogSearchParams) {
+  return request.get<Api.OperationManage.TaskLogList>({
+    url: '/admin/task-logs',
+    params
+  })
+}
+
+/** 获取任务记录详情 */
+export function fetchGetTaskLogDetail(id: number) {
+  return request.get<Api.OperationManage.TaskLogListItem>({
+    url: `/admin/task-logs/${id}`
+  })
+}

@@ -953,6 +953,45 @@ declare namespace Api {
       end_at?: string | null
       status?: boolean
     }
+
+    // ========== 任务记录（运营） ==========
+
+    /** 任务记录列表（分页） */
+    type TaskLogList = Api.Common.PaginatedResponse<TaskLogListItem>
+
+    /** 任务记录列表项 */
+    interface TaskLogListItem {
+      id: number
+      user_id: number
+      user?: {
+        id: number
+        username: string | null
+        nickname: string | null
+        avatar: string | null
+      } | null
+      task_id: number
+      task?: {
+        id: number
+        name: string
+        code: string
+      } | null
+      period_key: string
+      reward_type: string
+      reward_type_label?: string
+      reward_amount: number
+      source_type: string | null
+      remark: string | null
+      created_at: string | null
+    }
+
+    /** 任务记录搜索参数 */
+    interface TaskLogSearchParams extends Api.Common.CommonSearchParams {
+      keyword?: string
+      task_id?: number
+      reward_type?: string
+      start_date?: string
+      end_date?: string
+    }
   }
 
   /** 用户分群管理模块（用户管理 → 分群管理） */
