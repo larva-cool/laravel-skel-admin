@@ -49,9 +49,9 @@
 
 <script setup lang="ts">
   import { h, ref } from 'vue'
-  import { ElTag, ElButton } from 'element-plus'
+  import { ElTag } from 'element-plus'
   import { Download } from '@element-plus/icons-vue'
-  import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { useAuth } from '@/hooks/core/useAuth'
   import { fetchGetRechargeList, fetchExportRecharges } from '@/api/wallet'
@@ -210,32 +210,24 @@
         {
           prop: 'actions',
           label: '操作',
-          width: 200,
+          width: 140,
           fixed: 'right',
           formatter: (row: RechargeItem) => {
             const canHandle = row.pay_status === 'pending' && !row.is_expired
-            return h('div', { class: 'flex items-center gap-1' }, [
-              h(
-                ElButton,
-                {
-                  type: 'primary',
-                  link: true,
-                  size: 'small',
-                  onClick: () => viewDetail(row)
-                },
-                () => [h(ArtSvgIcon, { icon: 'ri:eye-line', class: 'mr-0.5' }), '详情']
-              ),
+            return h('div', { class: 'flex items-center' }, [
+              h(ArtButtonTable, {
+                type: 'view',
+                title: '详情',
+                onClick: () => viewDetail(row)
+              }),
               hasAuth('wallet.orders') && canHandle
-                ? h(
-                    ElButton,
-                    {
-                      type: 'success',
-                      link: true,
-                      size: 'small',
-                      onClick: () => openHandleDialog(row)
-                    },
-                    () => [h(ArtSvgIcon, { icon: 'ri:check-double-line', class: 'mr-0.5' }), '处理']
-                  )
+                ? h(ArtButtonTable, {
+                    icon: 'ri:check-double-line',
+                    iconColor: 'var(--el-color-success)',
+                    buttonBgColor: 'rgba(103,194,58,0.12)',
+                    title: '处理',
+                    onClick: () => openHandleDialog(row)
+                  })
                 : null
             ])
           }

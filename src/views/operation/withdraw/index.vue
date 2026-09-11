@@ -62,9 +62,10 @@
 
 <script setup lang="ts">
   import { h, ref } from 'vue'
-  import { ElTag, ElButton } from 'element-plus'
+  import { ElTag } from 'element-plus'
   import { Download } from '@element-plus/icons-vue'
-  import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
+  import ArtButtonMore, { ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { useAuth } from '@/hooks/core/useAuth'
   import { fetchGetWithdrawList, fetchExportWithdraws } from '@/api/wallet'
@@ -251,80 +252,67 @@
         {
           prop: 'actions',
           label: '操作',
-          width: 240,
+          width: 160,
           fixed: 'right',
           formatter: (row: WithdrawItem) => {
             const buttons: any[] = [
-              h(
-                ElButton,
-                {
-                  type: 'primary',
-                  link: true,
-                  size: 'small',
-                  onClick: () => viewDetail(row)
-                },
-                () => [h(ArtSvgIcon, { icon: 'ri:eye-line', class: 'mr-0.5' }), '详情']
-              )
+              h(ArtButtonTable, {
+                type: 'view',
+                title: '详情',
+                onClick: () => handleAction({ key: 'view' } as ButtonMoreItem, row)
+              })
             ]
+
+            const moreList: ButtonMoreItem[] = []
 
             if (hasAuth('wallet.withdraws')) {
               if (row.status === 'pending') {
+                // 常用操作「通过」内联展示，「驳回」收入更多菜单
                 buttons.push(
-                  h(
-                    ElButton,
-                    {
-                      type: 'success',
-                      link: true,
-                      size: 'small',
-                      onClick: () => openApprove(row)
-                    },
-                    () => [h(ArtSvgIcon, { icon: 'ri:check-line', class: 'mr-0.5' }), '通过']
-                  )
+                  h(ArtButtonTable, {
+                    icon: 'ri:check-line',
+                    iconColor: 'var(--el-color-success)',
+                    buttonBgColor: 'rgba(103,194,58,0.12)',
+                    title: '通过',
+                    onClick: () => handleAction({ key: 'approve' } as ButtonMoreItem, row)
+                  })
                 )
-                buttons.push(
-                  h(
-                    ElButton,
-                    {
-                      type: 'danger',
-                      link: true,
-                      size: 'small',
-                      onClick: () => openReject(row)
-                    },
-                    () => [h(ArtSvgIcon, { icon: 'ri:close-line', class: 'mr-0.5' }), '驳回']
-                  )
-                )
+                moreList.push({
+                  key: 'reject',
+                  label: '驳回',
+                  icon: 'ri:close-line',
+                  color: '#f56c6c'
+                })
               } else if (row.status === 'approved') {
+                // 常用操作「已打款」内联展示，「打款失败」收入更多菜单
                 buttons.push(
-                  h(
-                    ElButton,
-                    {
-                      type: 'success',
-                      link: true,
-                      size: 'small',
-                      onClick: () => openTransfer(row)
-                    },
-                    () => [h(ArtSvgIcon, { icon: 'ri:bank-line', class: 'mr-0.5' }), '已打款']
-                  )
+                  h(ArtButtonTable, {
+                    icon: 'ri:bank-line',
+                    iconColor: 'var(--el-color-success)',
+                    buttonBgColor: 'rgba(103,194,58,0.12)',
+                    title: '标记已打款',
+                    onClick: () => handleAction({ key: 'transfer' } as ButtonMoreItem, row)
+                  })
                 )
-                buttons.push(
-                  h(
-                    ElButton,
-                    {
-                      type: 'danger',
-                      link: true,
-                      size: 'small',
-                      onClick: () => openFail(row)
-                    },
-                    () => [
-                      h(ArtSvgIcon, { icon: 'ri:close-circle-line', class: 'mr-0.5' }),
-                      '打款失败'
-                    ]
-                  )
-                )
+                moreList.push({
+                  key: 'fail',
+                  label: '打款失败',
+                  icon: 'ri:close-circle-line',
+                  color: '#f56c6c'
+                })
               }
             }
 
-            return h('div', { class: 'flex items-center gap-1 flex-wrap' }, buttons)
+            if (moreList.length > 0) {
+              buttons.push(
+                h(ArtButtonMore, {
+                  list: moreList,
+                  onClick: (item: ButtonMoreItem) => handleAction(item, row)
+                })
+              )
+            }
+
+            return h('div', { class: 'flex items-center' }, buttons)
           }
         }
       ]
@@ -345,6 +333,26 @@
 
   const viewDetail = (row: WithdrawItem) => {
     detailDialogRef.value?.open(row)
+  }
+
+  const handleAction = (item: ButtonMoreItem, row: WithdrawItem) => {
+    switch (item.key) {
+      case 'view':
+        viewDetail(row)
+        break
+      case 'approve':
+        openApprove(row)
+        break
+      case 'reject':
+        openReject(row)
+        break
+      case 'transfer':
+        openTransfer(row)
+        break
+      case 'fail':
+        openFail(row)
+        break
+    }
   }
 
   const openApprove = (row: WithdrawItem) => {

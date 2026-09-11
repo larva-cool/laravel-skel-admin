@@ -32,7 +32,7 @@
 
 - 必须遵循项目中已有的代码约定。创建或编辑文件时，参考同级文件的结构、方式和命名。
 - 变量和函数使用描述性名称，例如 `handleUserSubmit`，而不是 `submit`。
-- 编写新组件前先检查是否已有可复用的组件。`src/components/core/` 中 `art-` 前缀的组件为全局可用组件。
+- **优先使用 `art-` 前缀全局组件**：编写新组件或搭建页面之前，必须先检查 `src/components/core/` 中是否已有可复用的 `art-` 前缀组件。仅当现有组件确实无法满足需求时，才允许自定义组件。详见 [art- 前缀全局组件使用规范](#art-前缀全局组件使用规范)。
 - 所有新 Vue 组件使用 Composition API + `<script setup lang="ts">` 语法。
 
 ## 验证脚本
@@ -46,6 +46,46 @@
 - 未经批准不要更改项目依赖。
 - 新业务页面放在 `src/views/{模块名}/` 下，包含 `index.vue` 入口文件和 `modules/` 子组件目录。
 - 新 API 文件放在 `src/api/` 下，遵循现有命名约定（`模块名.ts`）。
+
+## 页面组织规范
+
+每个业务页面遵循统一的目录结构和组件组装方式，确保代码一致性和可维护性。
+
+### 目录结构
+
+```
+src/views/{模块名}/
+├── index.vue              # 页面入口（组合 useTable + ArtTable + dialog 组件）
+└── modules/               # 页面私有子组件（仅当前页面使用）
+    ├── xxx-search.vue     # 搜索栏（基于 ArtSearchBar）
+    ├── xxx-dialog.vue     # 新建/编辑弹窗
+    └── xxx-detail-dialog.vue  # 详情弹窗
+```
+
+### 页面组装原则
+
+1. **入口文件职责单一**：`index.vue` 只负责数据管理（useTable、API 调用）和组件编排，不编写复杂模板片段。
+2. **搜索区**：使用 `ArtSearchBar`，搜索项通过 `schema` 配置声明，不手写表单结构。
+3. **表格区**：使用 `ArtTable` + `ArtTableHeader` 组合，列配置通过 `columnsFactory` 生成。
+4. **操作按钮**：表格行操作采用 `ArtButtonTable`（图标按钮，常用操作内联）+ `ArtButtonMore`（更多下拉菜单，收纳次要/危险操作）组合；批量操作按钮放 `ArtTableHeader`。操作列按钮折叠规则见下方「操作列折叠规范」。
+5. **弹窗区**：新建/编辑弹窗放在 `modules/` 目录，通过 `ref` 调用 `handleOpen()`。
+6. **优先复用 art- 全局组件**：凡是 `components/core/` 中已有对应功能的 `art-` 组件，直接使用，不要在页面中重复实现。
+
+### 模板骨架
+
+```vue
+<template>
+  <div class="art-container">
+    <!-- 搜索区 -->
+    <xxx-search @search="handleSearch" @reset="handleReset" />
+    <!-- 表格区 -->
+    <ArtTableHeader :buttons="headerButtons" @refresh="refreshData()" />
+    <ArtTable :data="tableData" :columns="columns" :loading="loading" />
+    <!-- 弹窗区 -->
+    <xxx-dialog ref="dialogRef" @success="refreshData()" />
+  </div>
+</template>
+```
 
 ## 文档文件
 
@@ -142,15 +182,62 @@
 - 暗色模式通过 Tailwind 的 `dark:` 前缀 + Element Plus 暗色主题实现。
 - 主题色使用 CSS 变量实现动态切换。
 
+### 操作列折叠规范
+
+表格行操作列的按钮排列遵循以下折叠规则：
+
+1. **不足 3 个按钮不折叠**：当行操作项总数（含权限过滤后可见项）少于 3 个时，所有按钮一律通过 `ArtButtonTable` 以图标按钮形式直接内联展示，**不使用** `ArtButtonMore` 下拉折叠。
+2. **3 个及以上按钮部分折叠**：最常用的 1-2 个操作（如「编辑」）使用 `ArtButtonTable` 内联图标按钮，其余操作（如状态切换、重置密码、删除等次要或危险操作）收入 `ArtButtonMore` 下拉菜单。
+3. **业务明确指定不折叠的场景**：特定业务页面（如公告管理）若产品/交互上要求全部按钮始终可见，则全部使用 `ArtButtonTable` 内联展示，不使用下拉折叠，但需自行控制列宽与响应式表现。
+
+#### 内联按钮图标与配色约定
+
+| 操作 | type | 图标 | 配色 |
+| --- | --- | --- | --- |
+| 查看 | `view` | `ri:eye-line` | 信息蓝 `bg-info/12 text-info` |
+| 编辑 | `edit` | `ri:pencil-line` | 次要灰 `bg-secondary/12 text-secondary` |
+| 删除 | `delete` | `ri:delete-bin-5-line` | 错误红 `bg-error/12 text-error` |
+| 自定义操作 | 不传 type，通过 `icon`/`iconColor`/`buttonBgColor` 自定义 | 根据语义选择 | 建议使用业务主题色或警告色浅底 |
+
 ### ArtButtonMore 使用模式
 
-表格操作按钮使用 `ArtButtonMore` 的 `list` 属性：
+表格操作按钮使用 `ArtButtonMore` 的 `list` 属性，每个菜单项包含 `key`、`label`、`icon`、`auth`（权限key）、`color`（可选，危险操作用红色）：
 
 ```ts
-const actionList = (row: Api.SystemManage.User) => [
-  { text: '编辑', auth: 'users.edit', onClick: () => handleEdit(row) },
-  { text: '删除', auth: 'users.delete', type: 'danger', onClick: () => handleDelete(row) }
-]
+const columns = columnsFactory([
+  // ... 其他列
+  {
+    prop: 'operation',
+    label: '操作',
+    width: 200,
+    fixed: 'right',
+    formatter: (row: Api.User.Item) =>
+      h('div', { class: 'flex items-center' }, [
+        // 常用操作内联展示
+        hasAuth('users.edit')
+          ? h(ArtButtonTable, {
+              type: 'edit',
+              title: '编辑',
+              onClick: () => handleAction({ key: 'edit' } as ButtonMoreItem, row)
+            })
+          : null,
+        // 次要/危险操作收入更多下拉
+        h(ArtButtonMore, {
+          list: [
+            { key: 'toggle', label: '冻结/启用', icon: 'ri:forbid-line', auth: 'users.edit' },
+            {
+              key: 'delete',
+              label: '删除',
+              icon: 'ri:delete-bin-4-line',
+              color: '#f56c6c',
+              auth: 'users.delete'
+            }
+          ] as ButtonMoreItem[],
+          onClick: (item: ButtonMoreItem) => handleAction(item, row)
+        })
+      ])
+  }
+])
 ```
 
 ## 权限控制
@@ -254,6 +341,247 @@ src/
 - 添加新组件或功能后，通过运行开发服务器验证效果。
 - UI 交互和端到端流程使用 Playwright 测试。
 - 开发期间可用浏览器开发者工具和 Vue DevTools（vite-plugin-vue-devtools）调试。
+
+=== art-components rules ===
+
+# art- 前缀全局组件使用规范
+
+`src/components/core/` 目录下以 `art-` 为前缀的组件是项目级通用组件，通过自动注册机制在所有页面中**无需 import 即可直接使用**。开发新功能或重构现有页面时，必须优先复用这些组件。
+
+## 使用 art- 组件的收益
+
+| 维度           | 说明                                                                     |
+| -------------- | ------------------------------------------------------------------------ |
+| **视觉一致性** | 统一设计语言，避免不同页面出现样式差异（间距、颜色、尺寸、交互反馈一致） |
+| **开发效率**   | 无需从零编写表格、表单、搜索栏等常见模式，通过 schema 配置即可完成       |
+| **可维护性**   | 组件 bug 修复和功能增强在一处完成，所有引用页面自动受益                  |
+| **主题适配**   | 内置暗色模式和主题色切换支持，自定义组件需额外处理                       |
+| **权限集成**   | 表格操作按钮等组件已内置权限指令（`auth` 属性），无需手动编写 v-auth     |
+| **类型安全**   | 全局组件经过完整 TypeScript 类型声明，IDE 可提供完整的补全和类型校验     |
+| **响应式兼容** | 已处理移动端/小屏幕适配，自定义组件需要额外处理                          |
+
+## 组件清单与适用场景
+
+以下为各分类下的 art- 组件及典型使用场景。开发前请查阅此清单确认是否有可复用组件。
+
+### 基础组件（base/）
+
+| 组件 | 适用场景 | 使用示例 |
+| --- | --- | --- |
+| `art-svg-icon` | 显示 SVG 图标，替代手动 `<svg>` 标签 | `<art-svg-icon name="user" :size="16" />` |
+| `art-logo` | 侧边栏/登录页 Logo 展示 | `<art-logo :collapse="isCollapse" />` |
+| `art-back-to-top` | 页面右下角返回顶部按钮 | `<art-back-to-top />` |
+
+### 布局组件（layouts/）
+
+| 组件 | 适用场景 | 使用示例 |
+| --- | --- | --- |
+| `art-page-content` | 页面内容容器，提供统一内边距和滚动区域 | `<art-page-content>...</art-page-content>` |
+| `art-breadcrumb` | 面包屑导航（由 RouteRegistry 自动生成） | 布局中自动渲染，一般无需手动使用 |
+| `art-header-bar` | 顶部导航栏 | 布局组件内部使用 |
+| `art-menus`（art-sidebar-menu 等） | 侧边栏/顶部/混合菜单 | 布局组件内部使用 |
+| `art-work-tab` | 标签页（多标签页导航） | 布局组件内部使用 |
+| `art-notification` | 通知中心入口 | 布局组件内部使用 |
+| `art-global-search` | 全局搜索菜单 | 布局组件内部使用 |
+
+### 表格组件（tables/）
+
+| 组件 | 适用场景 | 使用示例 |
+| --- | --- | --- |
+| `art-table` | **所有数据列表页**，基于 ElTable 封装，支持分页、选择、树形、虚拟滚动等 | `<art-table :data="data" :columns="columns" />` |
+| `art-table-header` | 表格上方标题栏，包含标题描述、批量操作按钮、刷新、密度、列设置等 | `<art-table-header title="用户管理" :buttons="buttons" />` |
+
+### 表单组件（forms/）
+
+| 组件 | 适用场景 | 使用示例 |
+| --- | --- | --- |
+| `art-search-bar` | **所有列表页的搜索区域**，通过 schema 配置搜索项，支持展开/收起 | `<art-search-bar :schemas="searchSchemas" @search="handleSearch" />` |
+| `art-form` | 新建/编辑弹窗中的表单，通过 schema 配置表单项，内置校验和提交逻辑 | `<art-form :schemas="formSchemas" v-model="formData" />` |
+| `art-button-more` | 表格行操作的更多按钮下拉菜单，内置权限控制 | 见下方示例 |
+| `art-button-table` | 表格顶部批量操作按钮组 | `<art-button-table :buttons="tableButtons" />` |
+| `art-wang-editor` | 富文本编辑器（基于 wangEditor） | `<art-wang-editor v-model="content" />` |
+| `art-drag-verify` | 拖拽验证滑块（登录/敏感操作） | `<art-drag-verify @success="handleVerify" />` |
+| `art-excel-import` | Excel 文件导入按钮 | `<art-excel-import :api="importApi" @success="refresh" />` |
+| `art-excel-export` | Excel 文件导出按钮 | `<art-excel-export :api="exportApi" />` |
+
+### 卡片组件（cards/）— 仪表盘/统计页使用
+
+| 组件                     | 适用场景         |
+| ------------------------ | ---------------- |
+| `art-stats-card`         | KPI 统计数字卡片 |
+| `art-line-chart-card`    | 折线图卡片       |
+| `art-bar-chart-card`     | 柱状图卡片       |
+| `art-donut-chart-card`   | 环形图卡片       |
+| `art-progress-card`      | 进度条卡片       |
+| `art-data-list-card`     | 数据列表卡片     |
+| `art-timeline-list-card` | 时间线列表卡片   |
+| `art-image-card`         | 图片展示卡片     |
+
+### 图表组件（charts/）— 直接 ECharts 封装
+
+| 组件                                                   | 适用场景         |
+| ------------------------------------------------------ | ---------------- |
+| `art-line-chart` / `art-bar-chart` / `art-h-bar-chart` | 折线/柱状/条形图 |
+| `art-ring-chart` / `art-radar-chart`                   | 环形/雷达图      |
+| `art-scatter-chart` / `art-k-line-chart`               | 散点/K线图       |
+| `art-dual-bar-compare-chart`                           | 双柱状对比图     |
+
+### 媒体组件（media/）
+
+| 组件               | 适用场景     |
+| ------------------ | ------------ |
+| `art-cutter-img`   | 图片裁剪上传 |
+| `art-video-player` | 视频播放器   |
+
+### 其他组件（others/、banners/、text-effect/、widget/）
+
+| 组件                                           | 适用场景        |
+| ---------------------------------------------- | --------------- |
+| `art-watermark`                                | 页面水印        |
+| `art-basic-banner` / `art-card-banner`         | 横幅展示        |
+| `art-count-to`                                 | 数字滚动动画    |
+| `art-text-scroll` / `art-festival-text-scroll` | 文字滚动/跑马灯 |
+| `art-icon-button`                              | 图标按钮        |
+
+### 结果页/异常页（views/）
+
+| 组件            | 适用场景               |
+| --------------- | ---------------------- |
+| `ArtException`  | 403/404/500 等异常页面 |
+| `ArtResultPage` | 操作成功/失败结果页    |
+
+## 典型使用示例
+
+### 列表页标准组合（必须遵循）
+
+```vue
+<template>
+  <div class="art-container p-4">
+    <!-- 搜索：使用 ArtSearchBar，不手写 el-form -->
+    <user-search ref="searchRef" @search="handleSearch" @reset="handleReset" />
+    <!-- 表格标题 + 操作按钮 -->
+    <ArtTableHeader title="用户管理" :buttons="headerButtons" @refresh="refreshData()" />
+    <!-- 数据表格：使用 ArtTable，不手写 el-table -->
+    <ArtTable
+      :data="data"
+      :columns="columns"
+      :loading="loading"
+      :pagination="pagination"
+      @pagination-change="handlePageChange"
+    />
+    <!-- 新建/编辑弹窗 -->
+    <user-dialog ref="dialogRef" @success="refreshData()" />
+  </div>
+</template>
+```
+
+### 搜索栏（xxx-search.vue）
+
+使用 `ArtSearchBar` 的 `schemas` 配置声明搜索项，**禁止**在搜索栏中手动堆砌 `el-form-item`：
+
+```vue
+<template>
+  <ArtSearchBar :schemas="searchSchemas" @search="emit('search', $event)" @reset="emit('reset')" />
+</template>
+
+<script setup lang="ts">
+  const searchSchemas = computed(() => [
+    { field: 'keyword', label: '关键词', type: 'input', placeholder: '请输入用户名/邮箱' },
+    { field: 'status', label: '状态', type: 'select', options: statusOptions },
+    { field: 'created_at', label: '注册时间', type: 'daterange' }
+  ])
+</script>
+```
+
+### 行操作按钮（ArtButtonTable + ArtButtonMore）
+
+表格行操作遵循「操作列折叠规范」：常用操作内联为图标按钮（`ArtButtonTable`），次要/危险操作收入下拉菜单（`ArtButtonMore`）。按钮自动遵循权限、样式规范，统一通过 `handleAction(item, row)` switch-case 分发事件。
+
+**不足 3 个按钮示例（全部内联，如公告管理）：**
+
+```ts
+{
+  prop: 'actions',
+  label: '操作',
+  width: 220,
+  fixed: 'right',
+  formatter: (row: Item) =>
+    h('div', { class: 'flex items-center' }, [
+      hasAuth('xxx.edit')
+        ? h(ArtButtonTable, { type: 'edit', title: '编辑', onClick: () => handleAction({ key: 'edit' }, row) })
+        : null,
+      hasAuth('xxx.edit')
+        ? h(ArtButtonTable, {
+            icon: 'ri:send-plane-line',
+            iconColor: 'var(--el-color-warning)',
+            buttonBgColor: 'rgba(230,162,60,0.12)',
+            title: '发布',
+            onClick: () => handleAction({ key: 'toggle' }, row)
+          })
+        : null,
+      hasAuth('xxx.delete')
+        ? h(ArtButtonTable, { type: 'delete', title: '删除', onClick: () => handleAction({ key: 'delete' }, row) })
+        : null
+    ])
+}
+```
+
+**3 个及以上按钮示例（常用内联 + 更多下拉，如用户管理）：**
+
+```ts
+{
+  prop: 'operation',
+  label: '操作',
+  width: 200,
+  fixed: 'right',
+  formatter: (row: Item) =>
+    h('div', { class: 'flex items-center' }, [
+      h(ArtButtonTable, { type: 'view', title: '查看', onClick: () => handleAction({ key: 'view' }, row) }),
+      hasAuth('xxx.edit')
+        ? h(ArtButtonTable, { type: 'edit', title: '编辑', onClick: () => handleAction({ key: 'edit' }, row) })
+        : null,
+      h(ArtButtonMore, {
+        list: [
+          { key: 'toggle', label: '冻结', icon: 'ri:forbid-line', auth: 'xxx.edit' },
+          { key: 'delete', label: '删除', icon: 'ri:delete-bin-4-line', color: '#f56c6c', auth: 'xxx.delete' }
+        ] as ButtonMoreItem[],
+        onClick: (item: ButtonMoreItem) => handleAction(item, row)
+      })
+    ])
+}
+```
+
+## 何时允许自定义组件
+
+虽然优先使用 art- 组件，但以下情况可以且应当创建自定义组件：
+
+1. **art- 组件不支持的特殊交互**：例如特定业务流程的多步骤向导、复杂的拖拽排序界面、流程图/画布类交互，现有组件无法通过 props/slots 扩展实现。
+2. **页面专属展示组件**：仅在单个页面使用且具有明显业务特征的 UI，如订单状态流转时间线、特定商品的预览卡片。这类组件应放在页面的 `modules/` 目录下，而非 `components/core/`。
+3. **需要复杂内部状态管理的复合组件**：包含多个互斥状态、内部动画循环、第三方库深度集成（如地图、3D 渲染、代码编辑器）且无法通过简单封装适配 art- 组件模式。
+4. **新组件的贡献路径**：当自定义组件在 3 个及以上页面被复用时，应将其重构为新的 `art-` 前缀全局组件，放入 `components/core/` 对应子目录，并补充类型声明和使用文档。
+
+### 判断流程
+
+```
+需要一个新 UI 元素
+    │
+    ├─→ components/core/ 中是否已有 art- 组件可直接使用？
+    │       ├─ 是 → 直接使用（通过 props/slots 定制）
+    │       └─ 否 ↓
+    │
+    ├─→ 现有 art- 组件是否可通过扩展（插槽、组合）满足？
+    │       ├─ 是 → 在现有组件基础上扩展，不创建新组件
+    │       └─ 否 ↓
+    │
+    ├─→ 是否仅在当前页面使用？
+    │       ├─ 是 → 在 views/{模块}/modules/ 下创建页面私有组件
+    │       └─ 否（可复用）→ 创建为新的 art- 全局组件，放入 components/core/
+```
+
+### 自定义组件命名规范
+
+- 页面私有组件：kebab-case 文件名，组件名无 art- 前缀（如 `user-status-tag.vue`）
+- 新全局组件：必须加 `art-` 前缀，放入对应分类子目录（如 `forms/art-cascader-area/index.vue`），组件名使用 `defineOptions({ name: 'ArtCascaderArea' })`
 
 === common-patterns rules ===
 

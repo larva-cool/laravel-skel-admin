@@ -1,7 +1,6 @@
 # Frontend Architecture Context (记忆文件)
 
-> 自动生成于代码调研阶段，供 AI/开发者快速理解前端架构。
-> 前端项目路径：`/Users/xutongle/Skel/laravel-skel-admin`（独立 Vue SPA，与 laravel-skel-forge 后端分离）
+> 自动生成于代码调研阶段，供 AI/开发者快速理解前端架构。前端项目路径：`/Users/xutongle/Skel/laravel-skel-admin`（独立 Vue SPA，与 laravel-skel-forge 后端分离）
 
 ---
 
@@ -19,7 +18,7 @@
 ## 二、技术栈
 
 | 类别 | 技术 | 版本 |
-|---|---|---|
+| --- | --- | --- |
 | 框架 | Vue 3 | ^3.5.41 |
 | 语言 | TypeScript | ~5.6.3 |
 | 构建 | Vite | ^7.3.6 |
@@ -94,6 +93,7 @@ src/
 ## 四、核心架构设计
 
 ### 4.1 路由
+
 - Hash 模式；静态路由：Login、403、404、500、Outside/Iframe
 - 登录后后端 `fetchGetMenuList()` 返回 `AppRouteRecord[]`，`RouteRegistry.register()` 动态 addRoute
 - **双权限模式**：`VITE_ACCESS_MODE` 切换
@@ -110,10 +110,11 @@ src/
   8. 401 由 axios 拦截器防抖自动 logOut
 
 ### 4.2 状态管理（Pinia）
+
 全部使用 Composition API（defineStore + ref/computed），pinia-plugin-persistedstate 持久化到 localStorage，key 通过 StorageKeyManager 版本化：
 
 | Store | key | 核心状态 |
-|---|---|---|
+| --- | --- | --- |
 | user | userStore | accessToken、adminInfo(含buttons)、isLogin、isLock、lockPassword、language、searchHistory |
 | setting | settingStore | 29项UI设置(菜单类型/宽度/主题/主色/圆角/容器/各开关/过渡) |
 | menu | menuStore | menuList、折叠/激活、homePath、动态路由 remove fns |
@@ -121,6 +122,7 @@ src/
 | table | tableStore | 边框/斑马纹/尺寸/全屏/表头背景 |
 
 ### 4.3 HTTP 层（适配 Laravel 原生响应，不使用统一 code/msg/data 包装）
+
 - 请求拦截：注入 `Authorization: Bearer ***`（userStore.accessToken）；非 FormData 自动 JSON 序列化
 - 响应拦截：成功直接 return；401 防抖（3秒一次）+ logOut + ElMessage
 - 204 No Content → null；422 验证错误优先取 errors[field][0]；showSuccessMessage 由前端传入
@@ -128,6 +130,7 @@ src/
 - 错误类 HttpError（code/data/timestamp/url/method）
 
 ### 4.4 useTable（企业级，hooks/core/useTable.ts ~730行）
+
 - 泛型自动推导 API 参数/响应类型
 - 4配置块：core(apiFn/columnsFactory/pagination)/transform(数据转换)/performance(缓存/防抖)/hooks(回调)
 - 5种刷新策略：refreshCreate/refreshUpdate/refreshRemove/refreshData/refreshSoft
@@ -135,28 +138,34 @@ src/
 - 移动端分页适配、列配置（useTableColumns）、防抖搜索
 
 ### 4.5 AI 聊天（api/chat.ts）
+
 - 原生 fetch + ReadableStream 解析 SSE（绕过 axios）
 - 13种事件：stream_start/text_start/text_delta/text_end/reasoning_start/delta/end/tool_call/tool_result/tool_approval_request/citation/error/stream_end
 - 支持 reasoning 思考流、tool_call 可视化、**tool_approval_request 人工审批按钮**→ POST /admin/chat/approve 继续流
 - 会话 CRUD 走 axios
 
 ### 4.6 实时通信
+
 - utils/echo：Laravel Echo + Reverb 单例；自定义 authorizer fetch 带 Bearer + X-Socket-ID；登出 destroyEcho
 
 ### 4.7 主题
+
 - LIGHT/DARK/AUTO（usePreferredDark 跟随系统）
 - 9级主色阶 CSS 变量动态生成；切换时临时禁用 transition 防闪烁；Element Plus 主题同步
 - 配套色弱、水印、圆角、容器宽度、页面过渡全套配置；ArtSettingsPanel 独立 composables
 
 ### 4.8 组件自动注册
+
 - unplugin-vue-components 自动扫描；components.d.ts 生成类型（含 Element Plus 组件如 ElTreeSelect）
 - 业务组件 `defineOptions({ name: 'ArtXxx' })`，以 `art-` 前缀在模板使用
 
 ### 4.9 配置驱动表单
+
 - ArtForm：JSON schema 配置（type=input/select/checkboxgroup/radiogroup…），component :is 动态渲染，响应式栅格，自定义slot
 - ArtSearchBar：继承 ArtForm，折叠/展开
 
 ### 4.10 跨组件通信
+
 - mitt 事件总线（utils/sys/mittBus.ts）：triggerFireworks / openSetting / openSearchDialog / openChat / openLockScreen
 
 ---
@@ -164,7 +173,7 @@ src/
 ## 五、API 接口清单（对接后端 /admin 前缀）
 
 | 文件 | 前缀 | 功能 |
-|---|---|---|
+| --- | --- | --- |
 | api/auth.ts | `/admin/auth` | login(POST)、info(GET)、logout(POST) |
 | api/system-manage.ts | `/admin/admins` `/admin/roles` `/admin/menus` `/admin/routes` `/admin/settings` `/admin/areas` `/admin/phone-codes` `/admin/mail-codes` | 管理员CRUD+角色分配+状态+重置密码+登录历史；角色CRUD+权限树分配；菜单树CRUD+路由列表；设置CRUD+分组+批量保存；地区树CRUD；验证码只读列表 |
 | api/user-manage.ts | `/admin/users` | 前台用户：列表/详情/更新/软删除/冻结启用/重置密码/重置邮箱手机/调整余额(积分金币)/延长VIP/登录历史 |
@@ -176,22 +185,22 @@ src/
 
 ## 六、环境变量
 
-| 变量 | dev | prod |
-|---|---|---|
-| VITE_BASE_URL | `/` | 按部署子目录 |
-| VITE_API_URL | `/`（走代理） | 完整后端地址 |
-| VITE_API_PROXY_URL | `http://laravel-skel-forge.test` | — |
-| VITE_REVERB_HOST | `laravel-skel-forge.test` | 生产主机 |
-| VITE_REVERB_PORT | `8080` | — |
-| VITE_REVERB_SCHEME | `http` | — |
-| VITE_ACCESS_MODE | （前端/后端权限模式） | — |
+| 变量               | dev                              | prod         |
+| ------------------ | -------------------------------- | ------------ |
+| VITE_BASE_URL      | `/`                              | 按部署子目录 |
+| VITE_API_URL       | `/`（走代理）                    | 完整后端地址 |
+| VITE_API_PROXY_URL | `http://laravel-skel-forge.test` | —            |
+| VITE_REVERB_HOST   | `laravel-skel-forge.test`        | 生产主机     |
+| VITE_REVERB_PORT   | `8080`                           | —            |
+| VITE_REVERB_SCHEME | `http`                           | —            |
+| VITE_ACCESS_MODE   | （前端/后端权限模式）            | —            |
 
 ---
 
 ## 七、业务视图模块（views/）
 
 | 模块 | 路径 | 功能 |
-|---|---|---|
+| --- | --- | --- |
 | 登录 | auth/login | 登录（拖拽验证/主题/语言切换） |
 | 工作台 | dashboard/console | 仪表盘（7个子模块组件） |
 | 异常 | exception/403,404,500 | 复用 ArtException |

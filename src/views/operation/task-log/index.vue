@@ -30,8 +30,8 @@
 
 <script setup lang="ts">
   import { h, ref } from 'vue'
-  import { ElTag, ElButton, ElAvatar } from 'element-plus'
-  import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
+  import { ElTag, ElAvatar } from 'element-plus'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { fetchGetTaskLogList } from '@/api/operation-manage'
   import TaskLogSearch from './modules/task-log-search.vue'
@@ -130,14 +130,14 @@
         {
           prop: 'actions',
           label: '操作',
-          width: 90,
+          width: 80,
           fixed: 'right',
           formatter: (row: TaskLogListItem) =>
-            h(
-              ElButton,
-              { type: 'primary', link: true, size: 'small', onClick: () => openDetail(row) },
-              () => [h(ArtSvgIcon, { icon: 'ri:eye-line', class: 'mr-0.5' }), '详情']
-            )
+            h(ArtButtonTable, {
+              type: 'view',
+              title: '详情',
+              onClick: () => openDetail(row)
+            })
         }
       ]
     }

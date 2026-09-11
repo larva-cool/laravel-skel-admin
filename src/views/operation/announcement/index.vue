@@ -42,9 +42,9 @@
 
 <script setup lang="ts">
   import { h, ref } from 'vue'
-  import { ElTag, ElButton, ElMessageBox } from 'element-plus'
+  import { ElTag, ElMessageBox } from 'element-plus'
   import { Plus } from '@element-plus/icons-vue'
-  import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { useAuth } from '@/hooks/core/useAuth'
   import {
@@ -122,46 +122,29 @@
           width: 220,
           fixed: 'right',
           formatter: (row: AnnouncementListItem) =>
-            h('div', { class: 'flex items-center gap-1' }, [
+            h('div', { class: 'flex items-center' }, [
               hasAuth('announcements.edit')
-                ? h(
-                    ElButton,
-                    {
-                      type: 'primary',
-                      link: true,
-                      size: 'small',
-                      loading: toggleLoading.value.get(row.id) ?? false,
-                      onClick: () => handleToggleStatus(row)
-                    },
-                    () => [
-                      h(ArtSvgIcon, { icon: 'ri:exchange-line', class: 'mr-0.5' }),
-                      getToggleLabel(row.status)
-                    ]
-                  )
+                ? h(ArtButtonTable, {
+                    type: 'edit',
+                    title: '编辑',
+                    onClick: () => handleAction({ key: 'edit' }, row)
+                  })
                 : null,
               hasAuth('announcements.edit')
-                ? h(
-                    ElButton,
-                    {
-                      type: 'primary',
-                      link: true,
-                      size: 'small',
-                      onClick: () => openEditDialog(row)
-                    },
-                    () => [h(ArtSvgIcon, { icon: 'ri:edit-line', class: 'mr-0.5' }), '编辑']
-                  )
+                ? h(ArtButtonTable, {
+                    icon: getToggleIcon(row.status),
+                    iconColor: 'var(--el-color-warning)',
+                    buttonBgColor: 'rgba(230,162,60,0.12)',
+                    title: getToggleLabel(row.status),
+                    onClick: () => handleAction({ key: 'toggle' }, row)
+                  })
                 : null,
               hasAuth('announcements.delete')
-                ? h(
-                    ElButton,
-                    {
-                      type: 'danger',
-                      link: true,
-                      size: 'small',
-                      onClick: () => handleDelete(row)
-                    },
-                    () => [h(ArtSvgIcon, { icon: 'ri:delete-bin-line', class: 'mr-0.5' }), '删除']
-                  )
+                ? h(ArtButtonTable, {
+                    type: 'delete',
+                    title: '删除',
+                    onClick: () => handleAction({ key: 'delete' }, row)
+                  })
                 : null
             ])
         }
@@ -182,6 +165,19 @@
     }
   }
 
+  const getToggleIcon = (status: string): string => {
+    switch (status) {
+      case 'draft':
+        return 'ri:send-plane-line'
+      case 'published':
+        return 'ri:archive-line'
+      case 'archived':
+        return 'ri:refresh-line'
+      default:
+        return 'ri:exchange-line'
+    }
+  }
+
   const openCreateDialog = () => {
     editDialogRef.value?.open()
   }
@@ -192,6 +188,22 @@
 
   const onEditSuccess = () => {
     refreshData()
+  }
+
+  type ActionKey = 'edit' | 'toggle' | 'delete'
+
+  const handleAction = (item: { key: ActionKey }, row: AnnouncementListItem) => {
+    switch (item.key) {
+      case 'edit':
+        openEditDialog(row)
+        break
+      case 'toggle':
+        handleToggleStatus(row)
+        break
+      case 'delete':
+        handleDelete(row)
+        break
+    }
   }
 
   const handleDelete = (row: AnnouncementListItem) => {

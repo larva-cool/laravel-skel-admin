@@ -47,9 +47,12 @@
 
 <script setup lang="ts">
   import { h, ref } from 'vue'
-  import { ElTag, ElButton, ElMessageBox, ElSwitch, ElMessage, ElImage } from 'element-plus'
+  import { ElTag, ElMessageBox, ElSwitch, ElMessage, ElImage } from 'element-plus'
   import { Plus } from '@element-plus/icons-vue'
-  import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
+  import ArtButtonMore, {
+    type ButtonMoreItem
+  } from '@/components/core/forms/art-button-more/index.vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { useAuth } from '@/hooks/core/useAuth'
   import {
@@ -176,53 +179,40 @@
           width: 200,
           fixed: 'right',
           formatter: (row: BannerListItem) =>
-            h('div', { class: 'flex items-center gap-1' }, [
-              h(
-                ElButton,
-                {
-                  type: 'primary',
-                  link: true,
-                  size: 'small',
-                  disabled: !hasAuth('banners.edit'),
-                  onClick: () => moveUp(row)
-                },
-                () => [h(ArtSvgIcon, { icon: 'ri:arrow-up-line', class: 'mr-0.5' }), '上移']
-              ),
-              h(
-                ElButton,
-                {
-                  type: 'primary',
-                  link: true,
-                  size: 'small',
-                  disabled: !hasAuth('banners.edit'),
-                  onClick: () => moveDown(row)
-                },
-                () => [h(ArtSvgIcon, { icon: 'ri:arrow-down-line', class: 'mr-0.5' }), '下移']
-              ),
+            h('div', { class: 'flex items-center' }, [
               hasAuth('banners.edit')
-                ? h(
-                    ElButton,
-                    {
-                      type: 'primary',
-                      link: true,
-                      size: 'small',
-                      onClick: () => openEditDialog(row)
-                    },
-                    () => [h(ArtSvgIcon, { icon: 'ri:edit-line', class: 'mr-0.5' }), '编辑']
-                  )
+                ? h(ArtButtonTable, {
+                    type: 'edit',
+                    title: '编辑',
+                    onClick: () => handleAction({ key: 'edit' } as ButtonMoreItem, row)
+                  })
                 : null,
-              hasAuth('banners.delete')
-                ? h(
-                    ElButton,
-                    {
-                      type: 'danger',
-                      link: true,
-                      size: 'small',
-                      onClick: () => handleDelete(row)
-                    },
-                    () => [h(ArtSvgIcon, { icon: 'ri:delete-bin-line', class: 'mr-0.5' }), '删除']
-                  )
-                : null
+              h(ArtButtonMore, {
+                list: [
+                  {
+                    key: 'move-up',
+                    label: '上移',
+                    icon: 'ri:arrow-up-line',
+                    disabled: isFirstInPosition(row),
+                    auth: 'banners.edit'
+                  },
+                  {
+                    key: 'move-down',
+                    label: '下移',
+                    icon: 'ri:arrow-down-line',
+                    disabled: isLastInPosition(row),
+                    auth: 'banners.edit'
+                  },
+                  {
+                    key: 'delete',
+                    label: '删除',
+                    icon: 'ri:delete-bin-4-line',
+                    color: '#f56c6c',
+                    auth: 'banners.delete'
+                  }
+                ] as ButtonMoreItem[],
+                onClick: (item: ButtonMoreItem) => handleAction(item, row)
+              })
             ])
         }
       ]
@@ -239,6 +229,38 @@
 
   const onEditSuccess = () => {
     refreshData()
+  }
+
+  // 计算同广告位按 sort 排序后的有序列表
+  const sortedByPosition = (position: string | number) => {
+    return data.value.filter((r) => r.position === position).sort((a, b) => a.sort - b.sort)
+  }
+
+  const isFirstInPosition = (row: BannerListItem) => {
+    const list = sortedByPosition(row.position)
+    return list.length === 0 || list[0].id === row.id
+  }
+
+  const isLastInPosition = (row: BannerListItem) => {
+    const list = sortedByPosition(row.position)
+    return list.length === 0 || list[list.length - 1].id === row.id
+  }
+
+  const handleAction = (item: ButtonMoreItem, row: BannerListItem) => {
+    switch (item.key) {
+      case 'edit':
+        openEditDialog(row)
+        break
+      case 'move-up':
+        moveUp(row)
+        break
+      case 'move-down':
+        moveDown(row)
+        break
+      case 'delete':
+        handleDelete(row)
+        break
+    }
   }
 
   const handleDelete = (row: BannerListItem) => {
@@ -272,9 +294,7 @@
 
   // 计算当前同广告位中所有 Banner 的 ID（按当前 sort 升序），交换相邻两项后整体回写
   const moveUp = async (row: BannerListItem) => {
-    const samePos = data.value
-      .filter((r) => r.position === row.position)
-      .sort((a, b) => a.sort - b.sort)
+    const samePos = sortedByPosition(row.position)
     const idx = samePos.findIndex((r) => r.id === row.id)
     if (idx <= 0) {
       ElMessage.warning('已经是第一位')
@@ -287,9 +307,7 @@
   }
 
   const moveDown = async (row: BannerListItem) => {
-    const samePos = data.value
-      .filter((r) => r.position === row.position)
-      .sort((a, b) => a.sort - b.sort)
+    const samePos = sortedByPosition(row.position)
     const idx = samePos.findIndex((r) => r.id === row.id)
     if (idx < 0 || idx >= samePos.length - 1) {
       ElMessage.warning('已经是最后一位')

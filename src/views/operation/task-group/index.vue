@@ -41,7 +41,7 @@
   import { h, ref } from 'vue'
   import { ElTag, ElButton, ElMessageBox, ElSwitch } from 'element-plus'
   import { Plus } from '@element-plus/icons-vue'
-  import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { useAuth } from '@/hooks/core/useAuth'
   import {
@@ -144,28 +144,23 @@
         {
           prop: 'actions',
           label: '操作',
-          width: 170,
+          width: 140,
           fixed: 'right',
           formatter: (row: TaskGroupListItem) =>
-            h('div', { class: 'flex items-center gap-1' }, [
+            h('div', { class: 'flex items-center' }, [
               hasAuth('task-groups.edit')
-                ? h(
-                    ElButton,
-                    {
-                      type: 'primary',
-                      link: true,
-                      size: 'small',
-                      onClick: () => openEditDialog(row)
-                    },
-                    () => [h(ArtSvgIcon, { icon: 'ri:edit-line', class: 'mr-0.5' }), '编辑']
-                  )
+                ? h(ArtButtonTable, {
+                    type: 'edit',
+                    title: '编辑',
+                    onClick: () => openEditDialog(row)
+                  })
                 : null,
               hasAuth('task-groups.delete')
-                ? h(
-                    ElButton,
-                    { type: 'danger', link: true, size: 'small', onClick: () => handleDelete(row) },
-                    () => [h(ArtSvgIcon, { icon: 'ri:delete-bin-line', class: 'mr-0.5' }), '删除']
-                  )
+                ? h(ArtButtonTable, {
+                    type: 'delete',
+                    title: '删除',
+                    onClick: () => handleDelete(row)
+                  })
                 : null
             ])
         }

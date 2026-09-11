@@ -1,6 +1,58 @@
 import type { AxiosResponse } from 'axios'
 import request from '@/utils/http'
 
+// ========== 钱包流水 ==========
+
+/** 获取钱包流水列表（分页） */
+export function fetchGetWalletTradeList(params: Api.WalletManage.WalletTradeSearchParams) {
+  return request.get<Api.WalletManage.WalletTradeList>({
+    url: '/admin/wallet/trades',
+    params
+  })
+}
+
+/** 获取钱包流水详情 */
+export function fetchGetWalletTradeDetail(id: number) {
+  return request.get<Api.WalletManage.WalletTrade>({
+    url: `/admin/wallet/trades/${id}`
+  })
+}
+
+/** 获取钱包全局统计 */
+export function fetchGetWalletStats() {
+  return request.get<Api.WalletManage.WalletStats>({
+    url: '/admin/wallet/stats'
+  })
+}
+
+/** 导出钱包流水 */
+export function fetchExportWalletTrades(params?: Api.WalletManage.WalletTradeSearchParams) {
+  return request.get<AxiosResponse>({
+    url: '/admin/wallet/trades/export',
+    params,
+    responseType: 'blob',
+    returnRawResponse: true,
+    showErrorMessage: true
+  })
+}
+
+/** 获取指定用户钱包概览 */
+export function fetchGetUserWallet(userId: number) {
+  return request.get<Api.WalletManage.UserWallet>({
+    url: `/admin/users/${userId}/wallet`
+  })
+}
+
+/** 调整指定用户余额（正数充正，负数扣减） */
+export function fetchAdjustUserWallet(userId: number, data: Api.WalletManage.WalletAdjustParams) {
+  return request.put<Api.WalletManage.UserWallet>({
+    url: `/admin/users/${userId}/adjust-wallet`,
+    data,
+    showSuccessMessage: true,
+    successMessage: '调账成功'
+  })
+}
+
 // ========== 充值订单 ==========
 
 /** 获取充值订单列表（分页） */
