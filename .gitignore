@@ -5,6 +5,7 @@ dist-ssr
 *.local
 .cursorrules
 .idea
+default.profraw
 
 # Auto-generated files
 .auto-import.json
