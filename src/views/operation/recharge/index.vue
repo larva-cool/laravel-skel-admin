@@ -189,7 +189,7 @@
         {
           prop: 'transaction_id',
           label: '交易号',
-          width: 180,
+          minWidth: 180,
           showOverflowTooltip: true,
           formatter: (row: RechargeItem) =>
             h('span', { class: 'font-mono text-xs' }, row.transaction_id || '—')
