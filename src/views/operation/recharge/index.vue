@@ -77,27 +77,6 @@
     return t as 'primary' | 'success' | 'warning' | 'danger' | 'info'
   }
 
-  const payChannelLabel = (v?: string) => {
-    const map: Record<string, string> = {
-      manual: '人工充值',
-      wechat: '微信支付',
-      alipay: '支付宝',
-      apple: 'Apple Pay'
-    }
-    return (v && map[v]) || v || '-'
-  }
-
-  const payStatusLabel = (v?: string) => {
-    const map: Record<string, string> = {
-      pending: '待支付',
-      success: '支付成功',
-      failed: '支付失败',
-      expired: '已过期',
-      closed: '已关闭'
-    }
-    return (v && map[v]) || v || '-'
-  }
-
   function formatMoney(v: number | string | null | undefined): string {
     if (v == null) return '0.00'
     const n = typeof v === 'number' ? v : Number(v)
@@ -121,12 +100,20 @@
       apiFn: fetchGetRechargeList,
       apiParams: { page: 1, per_page: 20 },
       columnsFactory: () => [
-        { prop: 'id', label: 'ID', width: 80 },
-        { prop: 'order_no', label: '订单号', width: 200, showOverflowTooltip: true, fixed: 'left' },
+        { prop: 'id', label: 'ID', width: 110 },
+        {
+          prop: 'order_no',
+          label: '订单号',
+          width: 220,
+          showOverflowTooltip: true,
+          fixed: 'left',
+          formatter: (row: RechargeItem) =>
+            h('span', { class: 'font-mono text-xs' }, row.order_no || '—')
+        },
         {
           prop: 'owner',
           label: '用户',
-          width: 160,
+          width: 200,
           showOverflowTooltip: true,
           formatter: (row: RechargeItem) => {
             if (!row.owner) return '—'
@@ -180,7 +167,7 @@
             h(
               ElTag,
               { type: mapTagType(row.pay_channel_label_type), size: 'small', effect: 'plain' },
-              () => payChannelLabel(row.pay_channel)
+              () => row.pay_channel?.label || '—'
             )
         },
         {
@@ -189,8 +176,10 @@
           width: 110,
           formatter: (row: RechargeItem) =>
             h('span', { class: 'inline-flex items-center gap-1' }, [
-              h(ElTag, { type: mapTagType(row.pay_status_label_type), size: 'small' }, () =>
-                payStatusLabel(row.pay_status)
+              h(
+                ElTag,
+                { type: mapTagType(row.pay_status_label_type), size: 'small' },
+                () => row.pay_status?.label || '—'
               ),
               row.is_expired
                 ? h(ElTag, { size: 'small', type: 'info', effect: 'plain' }, () => '过期')
@@ -213,7 +202,7 @@
           width: 140,
           fixed: 'right',
           formatter: (row: RechargeItem) => {
-            const canHandle = row.pay_status === 'pending' && !row.is_expired
+            const canHandle = row.pay_status?.value === 'pending' && !row.is_expired
             return h('div', { class: 'flex items-center' }, [
               h(ArtButtonTable, {
                 type: 'view',

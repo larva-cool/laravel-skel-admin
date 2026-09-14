@@ -19,7 +19,7 @@
       </ElDescriptionsItem>
       <ElDescriptionsItem label="账户类型" :span="1">
         <ElTag size="small" :type="mapTagType(detail.account_type_label_type)" effect="plain">
-          {{ accountTypeLabel(detail.account_type) }}
+          {{ detail.account_type?.label || '—' }}
         </ElTag>
       </ElDescriptionsItem>
       <ElDescriptionsItem label="提现金额" :span="1">
@@ -35,7 +35,7 @@
       </ElDescriptionsItem>
       <ElDescriptionsItem label="状态" :span="1">
         <ElTag size="small" :type="mapTagType(detail.status_label_type)">
-          {{ statusLabel(detail.status) }}
+          {{ detail.status?.label || '—' }}
         </ElTag>
       </ElDescriptionsItem>
 
@@ -46,7 +46,7 @@
       <ElDescriptionsItem label="真实姓名" :span="1">{{
         detail.account_info?.real_name || '—'
       }}</ElDescriptionsItem>
-      <ElDescriptionsItem v-if="detail.account_type === 'bank'" label="开户银行" :span="2">
+      <ElDescriptionsItem v-if="detail.account_type?.value === 'bank'" label="开户银行" :span="2">
         {{ detail.account_info?.bank_name || '—' }}
       </ElDescriptionsItem>
 
@@ -94,26 +94,6 @@
   const mapTagType = (t?: string) => {
     if (!t || t === 'default') return undefined
     return t as 'primary' | 'success' | 'warning' | 'danger' | 'info'
-  }
-
-  const accountTypeLabel = (v?: string) => {
-    const map: Record<string, string> = {
-      wechat: '微信',
-      alipay: '支付宝',
-      bank: '银行卡'
-    }
-    return (v && map[v]) || v || '—'
-  }
-
-  const statusLabel = (v?: string) => {
-    const map: Record<string, string> = {
-      pending: '待审核',
-      approved: '已通过',
-      rejected: '已驳回',
-      success: '已打款',
-      failed: '打款失败'
-    }
-    return (v && map[v]) || v || '—'
   }
 
   function formatMoney(v: number | string | null | undefined): string {

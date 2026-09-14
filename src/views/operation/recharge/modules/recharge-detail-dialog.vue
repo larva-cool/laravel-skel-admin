@@ -24,7 +24,7 @@
           :type="mapTagType(detail.pay_channel_label_type)"
           effect="plain"
         >
-          {{ payChannelLabel(detail.pay_channel) }}
+          {{ detail.pay_channel?.label || '—' }}
         </ElTag>
         <span v-else>—</span>
       </ElDescriptionsItem>
@@ -43,7 +43,7 @@
       </ElDescriptionsItem>
       <ElDescriptionsItem label="支付状态" :span="1">
         <ElTag size="small" :type="mapTagType(detail.pay_status_label_type)">
-          {{ payStatusLabel(detail.pay_status) }}
+          {{ detail.pay_status?.label || '—' }}
         </ElTag>
         <ElTag v-if="detail.is_expired" size="small" type="info" effect="plain" class="ml-2"
           >已过期</ElTag
@@ -101,27 +101,6 @@
   const mapTagType = (t?: string) => {
     if (!t || t === 'default') return undefined
     return t as 'primary' | 'success' | 'warning' | 'danger' | 'info'
-  }
-
-  const payChannelLabel = (v?: string) => {
-    const map: Record<string, string> = {
-      manual: '人工充值',
-      wechat: '微信支付',
-      alipay: '支付宝',
-      apple: 'Apple Pay'
-    }
-    return (v && map[v]) || v || '—'
-  }
-
-  const payStatusLabel = (v?: string) => {
-    const map: Record<string, string> = {
-      pending: '待支付',
-      success: '支付成功',
-      failed: '支付失败',
-      expired: '已过期',
-      closed: '已关闭'
-    }
-    return (v && map[v]) || v || '—'
   }
 
   function formatMoney(v: number | string | null | undefined): string {

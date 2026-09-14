@@ -96,26 +96,6 @@
     return t as 'primary' | 'success' | 'warning' | 'danger' | 'info'
   }
 
-  const accountTypeLabel = (v?: string) => {
-    const map: Record<string, string> = {
-      wechat: '微信',
-      alipay: '支付宝',
-      bank: '银行卡'
-    }
-    return (v && map[v]) || v || '-'
-  }
-
-  const statusLabel = (v?: string) => {
-    const map: Record<string, string> = {
-      pending: '待审核',
-      approved: '已通过',
-      rejected: '已驳回',
-      success: '已打款',
-      failed: '打款失败'
-    }
-    return (v && map[v]) || v || '-'
-  }
-
   function formatMoney(v: number | string | null | undefined): string {
     if (v == null) return '0.00'
     const n = typeof v === 'number' ? v : Number(v)
@@ -139,18 +119,20 @@
       apiFn: fetchGetWithdrawList,
       apiParams: { page: 1, per_page: 20 },
       columnsFactory: () => [
-        { prop: 'id', label: 'ID', width: 80 },
+        { prop: 'id', label: 'ID', width: 110 },
         {
           prop: 'order_no',
           label: '提现单号',
-          width: 200,
+          width: 220,
           showOverflowTooltip: true,
-          fixed: 'left'
+          fixed: 'left',
+          formatter: (row: WithdrawItem) =>
+            h('span', { class: 'font-mono text-xs' }, row.order_no || '—')
         },
         {
           prop: 'owner',
           label: '用户',
-          width: 160,
+          width: 200,
           showOverflowTooltip: true,
           formatter: (row: WithdrawItem) => {
             if (!row.owner) return '—'
@@ -204,7 +186,7 @@
             h(
               ElTag,
               { type: mapTagType(row.account_type_label_type), size: 'small', effect: 'plain' },
-              () => accountTypeLabel(row.account_type)
+              () => row.account_type?.label || '—'
             )
         },
         {
@@ -227,8 +209,10 @@
           label: '状态',
           width: 110,
           formatter: (row: WithdrawItem) =>
-            h(ElTag, { type: mapTagType(row.status_label_type), size: 'small' }, () =>
-              statusLabel(row.status)
+            h(
+              ElTag,
+              { type: mapTagType(row.status_label_type), size: 'small' },
+              () => row.status?.label || '—'
             )
         },
         {
@@ -266,7 +250,9 @@
             const moreList: ButtonMoreItem[] = []
 
             if (hasAuth('wallet.withdraws')) {
-              if (row.status === 'pending') {
+              const status = row.status?.value
+
+              if (status === 'pending') {
                 // 常用操作「通过」内联展示，「驳回」收入更多菜单
                 buttons.push(
                   h(ArtButtonTable, {
@@ -283,7 +269,7 @@
                   icon: 'ri:close-line',
                   color: '#f56c6c'
                 })
-              } else if (row.status === 'approved') {
+              } else if (status === 'approved') {
                 // 常用操作「已打款」内联展示，「打款失败」收入更多菜单
                 buttons.push(
                   h(ArtButtonTable, {

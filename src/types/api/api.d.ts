@@ -1747,6 +1747,12 @@ declare namespace Api {
 
     // ========== 充值订单 ==========
 
+    /** 支付渠道 */
+    type PayChannelValue = 'manual' | 'wechat' | 'alipay' | 'apple'
+
+    /** 充值支付状态 */
+    type RechargeStatusValue = 'pending' | 'success' | 'failed' | 'expired' | 'closed'
+
     /** 充值列表项 */
     interface Recharge {
       id: number
@@ -1754,10 +1760,12 @@ declare namespace Api {
       amount: number | string
       bonus_amount: number | string
       total_amount: number | string
-      pay_channel: string
-      pay_channel_label_type?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | string
-      pay_status: 'pending' | 'success' | 'failed' | 'expired' | 'closed' | string
-      pay_status_label_type?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | string
+      /** 支付渠道枚举 { value, label } */
+      pay_channel: { value: PayChannelValue | string; label: string }
+      pay_channel_label_type?: TagType
+      /** 支付状态枚举 { value, label } */
+      pay_status: { value: RechargeStatusValue | string; label: string }
+      pay_status_label_type?: TagType
       transaction_id: string | null
       confirmed_by: number | null
       client_ip: string | null
@@ -1809,6 +1817,12 @@ declare namespace Api {
       [key: string]: any
     }
 
+    /** 提现账户类型 */
+    type WithdrawAccountTypeValue = 'wechat' | 'alipay' | 'bank'
+
+    /** 提现状态 */
+    type WithdrawStatusValue = 'pending' | 'approved' | 'rejected' | 'success' | 'failed'
+
     /** 提现列表项 */
     interface Withdraw {
       id: number
@@ -1816,11 +1830,13 @@ declare namespace Api {
       amount: number | string
       fee: number | string
       actual_amount: number | string
-      account_type: 'wechat' | 'alipay' | 'bank' | string
-      account_type_label_type?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | string
+      /** 账户类型枚举 { value, label } */
+      account_type: { value: WithdrawAccountTypeValue | string; label: string }
+      account_type_label_type?: TagType
       account_info: WithdrawAccountInfo | null
-      status: 'pending' | 'approved' | 'rejected' | 'success' | 'failed' | string
-      status_label_type?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | string
+      /** 提现状态枚举 { value, label } */
+      status: { value: WithdrawStatusValue | string; label: string }
+      status_label_type?: TagType
       reviewed_by: number | null
       reject_reason: string | null
       fail_reason: string | null
