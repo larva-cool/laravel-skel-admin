@@ -263,3 +263,87 @@ export function fetchGetTaskLogDetail(id: number) {
     url: `/admin/task-logs/${id}`
   })
 }
+
+// ========== 敏感词管理（运营） ==========
+
+/** 获取敏感词列表（分页） */
+export function fetchGetSensitiveWordList(params: Api.OperationManage.SensitiveWordSearchParams) {
+  return request.get<Api.OperationManage.SensitiveWordList>({
+    url: '/admin/sensitive-words',
+    params
+  })
+}
+
+/** 获取敏感词详情 */
+export function fetchGetSensitiveWordDetail(id: number) {
+  return request.get<Api.OperationManage.SensitiveWordListItem>({
+    url: `/admin/sensitive-words/${id}`
+  })
+}
+
+/** 创建敏感词 */
+export function fetchCreateSensitiveWord(data: Api.OperationManage.SensitiveWordSaveParams) {
+  return request.post<Api.OperationManage.SensitiveWordListItem>({
+    url: '/admin/sensitive-words',
+    data,
+    showSuccessMessage: true,
+    successMessage: '创建成功'
+  })
+}
+
+/** 更新敏感词 */
+export function fetchUpdateSensitiveWord(
+  id: number,
+  data: Api.OperationManage.SensitiveWordSaveParams
+) {
+  return request.put<Api.OperationManage.SensitiveWordListItem>({
+    url: `/admin/sensitive-words/${id}`,
+    data,
+    showSuccessMessage: true,
+    successMessage: '更新成功'
+  })
+}
+
+/** 删除敏感词 */
+export function fetchDeleteSensitiveWord(id: number) {
+  return request.del<null>({
+    url: `/admin/sensitive-words/${id}`,
+    showSuccessMessage: true,
+    successMessage: '删除成功'
+  })
+}
+
+/** 切换敏感词启用状态 */
+export function fetchToggleSensitiveWordStatus(id: number) {
+  return request.put<Api.OperationManage.SensitiveWordListItem>({
+    url: `/admin/sensitive-words/${id}/toggle-status`,
+    showSuccessMessage: true,
+    successMessage: '状态切换成功'
+  })
+}
+
+/** 批量导入敏感词 */
+export function fetchImportSensitiveWords(data: Api.OperationManage.SensitiveWordImportParams) {
+  return request.post<Api.OperationManage.SensitiveWordImportResult>({
+    url: '/admin/sensitive-words/import',
+    data,
+    showSuccessMessage: true,
+    successMessage: '导入完成'
+  })
+}
+
+/** 手动刷新 DFA 字典缓存 */
+export function fetchRefreshSensitiveDict() {
+  return request.post<Api.OperationManage.SensitiveWordRefreshResult>({
+    url: '/admin/sensitive-words/refresh',
+    showSuccessMessage: true,
+    successMessage: '字典已刷新'
+  })
+}
+
+/** 获取分类与级别选项 */
+export function fetchGetSensitiveWordOptions() {
+  return request.get<Api.OperationManage.SensitiveWordOptions>({
+    url: '/admin/sensitive-words/options'
+  })
+}

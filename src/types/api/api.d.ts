@@ -992,6 +992,78 @@ declare namespace Api {
       start_date?: string
       end_date?: string
     }
+
+    // ========== 敏感词管理 ==========
+    /** 敏感词列表（分页） */
+    type SensitiveWordList = Api.Common.PaginatedResponse<SensitiveWordListItem>
+
+    /** 敏感词列表项 */
+    interface SensitiveWordListItem {
+      id: number
+      word: string
+      category: string
+      category_label?: string
+      level: 'replace' | 'review' | 'block'
+      level_label?: string
+      replacement: string
+      hit_count: number
+      status: boolean
+      created_at: string | null
+      updated_at: string | null
+    }
+
+    /** 敏感词搜索参数 */
+    interface SensitiveWordSearchParams extends Api.Common.CommonSearchParams {
+      keyword?: string
+      category?: string
+      level?: 'replace' | 'review' | 'block'
+      status?: boolean
+    }
+
+    /** 敏感词保存参数 */
+    interface SensitiveWordSaveParams {
+      word: string
+      category?: string
+      level?: 'replace' | 'review' | 'block'
+      replacement?: string
+      status?: boolean
+    }
+
+    /** 批量导入项 */
+    interface SensitiveWordImportItem {
+      word: string
+      category?: string
+      level?: 'replace' | 'review' | 'block'
+    }
+
+    /** 批量导入参数 */
+    interface SensitiveWordImportParams {
+      words: SensitiveWordImportItem[]
+    }
+
+    /** 批量导入结果 */
+    interface SensitiveWordImportResult {
+      created: number
+      skipped: string[]
+    }
+
+    /** 字典刷新结果 */
+    interface SensitiveWordRefreshResult {
+      message: string
+      total: number
+    }
+
+    /** 选项项 */
+    interface OptionItem {
+      label: string
+      value: string
+    }
+
+    /** 分类/级别选项 */
+    interface SensitiveWordOptions {
+      categories: OptionItem[]
+      levels: OptionItem[]
+    }
   }
 
   /** 用户分群管理模块（用户管理 → 分群管理） */
