@@ -39,8 +39,9 @@
 
 <script setup lang="ts">
   import { fetchDeleteRole, fetchGetRoleList } from '@/api/system-manage'
-  import ArtButtonMore, { ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
+  import { useAuth } from '@/hooks/core/useAuth'
   import { ElMessageBox } from 'element-plus'
   import RoleEditDialog from './modules/role-edit-dialog.vue'
   import RolePermissionDialog from './modules/role-permission-dialog.vue'
@@ -53,6 +54,7 @@
   const showSearchBar = ref(true)
   const editDialogRef = ref<InstanceType<typeof RoleEditDialog>>()
   const permissionDialogRef = ref<InstanceType<typeof RolePermissionDialog>>()
+  const { hasAuth } = useAuth()
 
   const {
     columns,
@@ -83,48 +85,37 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 120,
+          width: 150,
           fixed: 'right',
           formatter: (row: RoleListItem) =>
-            h('div', [
-              h(ArtButtonMore, {
-                list: [
-                  {
-                    key: 'permission',
-                    label: '分配权限',
+            h('div', { class: 'flex items-center' }, [
+              hasAuth('roles.edit')
+                ? h(ArtButtonTable, {
                     icon: 'ri:shield-keyhole-line',
-                    auth: 'roles.edit'
-                  },
-                  { key: 'edit', label: '编辑', icon: 'ri:edit-2-line', auth: 'roles.edit' },
-                  {
-                    key: 'delete',
-                    label: '删除',
-                    icon: 'ri:delete-bin-4-line',
-                    color: '#f56c6c',
-                    auth: 'roles.delete'
-                  }
-                ],
-                onClick: (item: ButtonMoreItem) => handleAction(item, row)
-              })
+                    iconClass: 'bg-info/12 text-info',
+                    title: '分配权限',
+                    onClick: () => permissionDialogRef.value?.open(row)
+                  })
+                : null,
+              hasAuth('roles.edit')
+                ? h(ArtButtonTable, {
+                    type: 'edit',
+                    title: '编辑',
+                    onClick: () => editDialogRef.value?.open(row)
+                  })
+                : null,
+              hasAuth('roles.delete')
+                ? h(ArtButtonTable, {
+                    type: 'delete',
+                    title: '删除',
+                    onClick: () => handleDelete(row)
+                  })
+                : null
             ])
         }
       ]
     }
   })
-
-  const handleAction = (item: ButtonMoreItem, row: RoleListItem) => {
-    switch (item.key) {
-      case 'permission':
-        permissionDialogRef.value?.open(row)
-        break
-      case 'edit':
-        editDialogRef.value?.open(row)
-        break
-      case 'delete':
-        handleDelete(row)
-        break
-    }
-  }
 
   const handleSearch = (params: Partial<Api.SystemManage.RoleSearchParams>) => {
     const paramsRecord = searchParams as Record<string, unknown>

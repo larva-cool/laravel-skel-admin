@@ -38,9 +38,10 @@
 
 <script setup lang="ts">
   import { fetchDeleteApp, fetchGetAppList } from '@/api/app-manage'
-  import ArtButtonMore, { ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import ArtIconButton from '@/components/core/widget/art-icon-button/index.vue'
   import { useTable } from '@/hooks/core/useTable'
+  import { useAuth } from '@/hooks/core/useAuth'
   import { mittBus } from '@/utils/sys'
   import { ElMessageBox, ElTag, ElTooltip } from 'element-plus'
   import AppDialog from './modules/app-dialog.vue'
@@ -57,6 +58,7 @@
 
   const showSearchBar = ref(true)
   const dialogRef = ref<InstanceType<typeof AppDialog>>()
+  const { hasAuth } = useAuth()
 
   const formFilters = reactive({ keyword: '' })
 
@@ -140,29 +142,27 @@
           width: 220,
           align: 'right',
           formatter: (row: AppListItem) => {
-            return h('div', { class: 'flex items-center justify-end gap-2' }, [
+            return h('div', { class: 'flex items-center justify-end' }, [
               h(ArtIconButton, {
                 icon: 'ri:git-branch-line',
                 title: '版本管理',
-                class: '!size-8 bg-g-200 dark:bg-g-300/45 text-sm',
+                class: '!size-8 bg-g-200 dark:bg-g-300/45 text-sm mr-2.5',
                 onClick: () => handleVersions(row)
               }),
-              h(ArtButtonMore, {
-                list: [
-                  { key: 'edit', label: '编辑', icon: 'ri:edit-2-line', auth: 'apps.edit' },
-                  {
-                    key: 'delete',
-                    label: '删除',
-                    icon: 'ri:delete-bin-4-line',
-                    color: '#f56c6c',
-                    auth: 'apps.delete'
-                  }
-                ],
-                onClick: (item: ButtonMoreItem) => {
-                  if (item.key === 'edit') handleEdit(row)
-                  else if (item.key === 'delete') handleDelete(row)
-                }
-              })
+              hasAuth('apps.edit')
+                ? h(ArtButtonTable, {
+                    type: 'edit',
+                    title: '编辑',
+                    onClick: () => handleEdit(row)
+                  })
+                : null,
+              hasAuth('apps.delete')
+                ? h(ArtButtonTable, {
+                    type: 'delete',
+                    title: '删除',
+                    onClick: () => handleDelete(row)
+                  })
+                : null
             ])
           }
         }

@@ -196,6 +196,9 @@
     fetchUploadAttachmentFile
   } from '@/api/system-manage'
   import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
+  import ArtButtonMore, {
+    type ButtonMoreItem
+  } from '@/components/core/forms/art-button-more/index.vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useAuth } from '@/hooks/core/useAuth'
   import { useTable } from '@/hooks/core/useTable'
@@ -323,42 +326,61 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 270,
+          width: 150,
           fixed: 'right',
-          formatter: (row: AttachmentListItem) =>
-            h('div', { class: 'flex items-center' }, [
+          formatter: (row: AttachmentListItem) => {
+            const moreList: ButtonMoreItem[] = [
+              {
+                key: 'copy-link',
+                label: '复制链接',
+                icon: 'ri:link'
+              }
+            ]
+            if (hasAuth('attachments.edit')) {
+              moreList.push({
+                key: 'rename',
+                label: '重命名',
+                icon: 'ri:edit-2-line'
+              })
+              moreList.push({
+                key: 'move',
+                label: '移动',
+                icon: 'ri:folder-transfer-line'
+              })
+            }
+            if (hasAuth('attachments.delete')) {
+              moreList.push({
+                key: 'delete',
+                label: '删除',
+                icon: 'ri:delete-bin-4-line',
+                color: '#f56c6c'
+              })
+            }
+
+            return h('div', { class: 'flex items-center' }, [
               h(ArtButtonTable, {
                 type: 'view',
+                title: '查看',
                 iconClass: 'bg-g-200 text-g-600',
                 onClick: () => handleView(row)
               }),
               h(ArtButtonTable, {
                 icon: 'ri:download-line',
                 iconClass: 'bg-info/12 text-info',
+                title: '下载',
                 onClick: () => handleDownload(row)
               }),
-              h(ArtButtonTable, {
-                icon: 'ri:link',
-                iconClass: 'bg-success/12 text-success',
-                onClick: () => handleCopyLink(row)
-              }),
-              hasAuth('attachments.edit')
-                ? h(ArtButtonTable, {
-                    type: 'edit',
-                    onClick: () => renameDialogRef.value?.open(row)
-                  })
-                : null,
-              hasAuth('attachments.edit')
-                ? h(ArtButtonTable, {
-                    icon: 'ri:folder-transfer-line',
-                    iconClass: 'bg-warning/12 text-warning',
-                    onClick: () => moveDialogRef.value?.open(row)
-                  })
-                : null,
-              hasAuth('attachments.delete')
-                ? h(ArtButtonTable, { type: 'delete', onClick: () => handleDelete(row) })
-                : null
+              h(ArtButtonMore, {
+                list: moreList,
+                onClick: (item: ButtonMoreItem) => {
+                  if (item.key === 'copy-link') handleCopyLink(row)
+                  else if (item.key === 'rename') renameDialogRef.value?.open(row)
+                  else if (item.key === 'move') moveDialogRef.value?.open(row)
+                  else if (item.key === 'delete') handleDelete(row)
+                }
+              })
             ])
+          }
         }
       ]
     }

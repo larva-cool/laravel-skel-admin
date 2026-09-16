@@ -64,7 +64,7 @@
   import { h, ref } from 'vue'
   import { ElTag } from 'element-plus'
   import { Download } from '@element-plus/icons-vue'
-  import ArtButtonMore, { ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
+  import { type ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { useAuth } from '@/hooks/core/useAuth'
@@ -236,7 +236,7 @@
         {
           prop: 'actions',
           label: '操作',
-          width: 160,
+          width: 150,
           fixed: 'right',
           formatter: (row: WithdrawItem) => {
             const buttons: any[] = [
@@ -247,13 +247,11 @@
               })
             ]
 
-            const moreList: ButtonMoreItem[] = []
-
             if (hasAuth('wallet.withdraws')) {
               const status = row.status?.value
 
               if (status === 'pending') {
-                // 常用操作「通过」内联展示，「驳回」收入更多菜单
+                // 通过、驳回均内联展示
                 buttons.push(
                   h(ArtButtonTable, {
                     icon: 'ri:check-line',
@@ -263,14 +261,17 @@
                     onClick: () => handleAction({ key: 'approve' } as ButtonMoreItem, row)
                   })
                 )
-                moreList.push({
-                  key: 'reject',
-                  label: '驳回',
-                  icon: 'ri:close-line',
-                  color: '#f56c6c'
-                })
+                buttons.push(
+                  h(ArtButtonTable, {
+                    icon: 'ri:close-line',
+                    iconColor: 'var(--el-color-danger)',
+                    buttonBgColor: 'rgba(245,108,108,0.12)',
+                    title: '驳回',
+                    onClick: () => handleAction({ key: 'reject' } as ButtonMoreItem, row)
+                  })
+                )
               } else if (status === 'approved') {
-                // 常用操作「已打款」内联展示，「打款失败」收入更多菜单
+                // 标记已打款、打款失败均内联展示
                 buttons.push(
                   h(ArtButtonTable, {
                     icon: 'ri:bank-line',
@@ -280,22 +281,16 @@
                     onClick: () => handleAction({ key: 'transfer' } as ButtonMoreItem, row)
                   })
                 )
-                moreList.push({
-                  key: 'fail',
-                  label: '打款失败',
-                  icon: 'ri:close-circle-line',
-                  color: '#f56c6c'
-                })
+                buttons.push(
+                  h(ArtButtonTable, {
+                    icon: 'ri:close-circle-line',
+                    iconColor: 'var(--el-color-danger)',
+                    buttonBgColor: 'rgba(245,108,108,0.12)',
+                    title: '打款失败',
+                    onClick: () => handleAction({ key: 'fail' } as ButtonMoreItem, row)
+                  })
+                )
               }
-            }
-
-            if (moreList.length > 0) {
-              buttons.push(
-                h(ArtButtonMore, {
-                  list: moreList,
-                  onClick: (item: ButtonMoreItem) => handleAction(item, row)
-                })
-              )
             }
 
             return h('div', { class: 'flex items-center' }, buttons)

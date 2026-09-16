@@ -71,9 +71,6 @@
   import { h, ref } from 'vue'
   import { ElTag, ElMessageBox, ElSwitch } from 'element-plus'
   import { Plus, Refresh, Upload } from '@element-plus/icons-vue'
-  import ArtButtonMore, {
-    type ButtonMoreItem
-  } from '@/components/core/forms/art-button-more/index.vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { useAuth } from '@/hooks/core/useAuth'
@@ -182,21 +179,16 @@
                 ? h(ArtButtonTable, {
                     type: 'edit',
                     title: '编辑',
-                    onClick: () => handleAction({ key: 'edit' } as ButtonMoreItem, row)
+                    onClick: () => openEditDialog(row)
                   })
                 : null,
-              h(ArtButtonMore, {
-                list: [
-                  {
-                    key: 'delete',
-                    label: '删除',
-                    icon: 'ri:delete-bin-4-line',
-                    color: '#f56c6c',
-                    auth: 'sensitive-words.delete'
-                  }
-                ] as ButtonMoreItem[],
-                onClick: (item: ButtonMoreItem) => handleAction(item, row)
-              })
+              hasAuth('sensitive-words.delete')
+                ? h(ArtButtonTable, {
+                    type: 'delete',
+                    title: '删除',
+                    onClick: () => handleDelete(row)
+                  })
+                : null
             ])
         }
       ]
@@ -217,17 +209,6 @@
 
   const onEditSuccess = () => {
     refreshData()
-  }
-
-  const handleAction = (item: ButtonMoreItem, row: Item) => {
-    switch (item.key) {
-      case 'edit':
-        openEditDialog(row)
-        break
-      case 'delete':
-        handleDelete(row)
-        break
-    }
   }
 
   const handleDelete = (row: Item) => {

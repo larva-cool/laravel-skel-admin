@@ -46,8 +46,9 @@
 
 <script setup lang="ts">
   import { fetchDeleteArea, fetchGetAreaTree } from '@/api/system-manage'
-  import ArtButtonMore, { ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTableColumns } from '@/hooks/core/useTableColumns'
+  import { useAuth } from '@/hooks/core/useAuth'
   import { ElMessageBox } from 'element-plus'
   import AreaDialog from './modules/area-dialog.vue'
 
@@ -62,6 +63,7 @@
 
   // 弹窗
   const dialogRef = ref<InstanceType<typeof AreaDialog>>()
+  const { hasAuth } = useAuth()
 
   // 搜索相关
   const formFilters = reactive({ name: '' })
@@ -92,27 +94,32 @@
     {
       prop: 'operation',
       label: '操作',
-      width: 180,
+      width: 150,
       align: 'right',
       formatter: (row: AreaListItem) => {
-        return h(ArtButtonMore, {
-          list: [
-            { key: 'add', label: '新增子级', icon: 'ri:add-line', auth: 'areas.create' },
-            { key: 'edit', label: '编辑', icon: 'ri:edit-2-line', auth: 'areas.edit' },
-            {
-              key: 'delete',
-              label: '删除',
-              icon: 'ri:delete-bin-4-line',
-              color: '#f56c6c',
-              auth: 'areas.delete'
-            }
-          ],
-          onClick: (item: ButtonMoreItem) => {
-            if (item.key === 'add') handleAddChild(row)
-            else if (item.key === 'edit') handleEdit(row)
-            else if (item.key === 'delete') handleDelete(row)
-          }
-        })
+        return h('div', { class: 'flex items-center justify-end' }, [
+          hasAuth('areas.create')
+            ? h(ArtButtonTable, {
+                type: 'add',
+                title: '新增子级',
+                onClick: () => handleAddChild(row)
+              })
+            : null,
+          hasAuth('areas.edit')
+            ? h(ArtButtonTable, {
+                type: 'edit',
+                title: '编辑',
+                onClick: () => handleEdit(row)
+              })
+            : null,
+          hasAuth('areas.delete')
+            ? h(ArtButtonTable, {
+                type: 'delete',
+                title: '删除',
+                onClick: () => handleDelete(row)
+              })
+            : null
+        ])
       }
     }
   ])

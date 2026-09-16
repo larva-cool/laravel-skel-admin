@@ -41,7 +41,7 @@
     fetchGetNotificationList,
     fetchMarkNotificationRead
   } from '@/api/notification'
-  import ArtButtonMore, { ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { ElMessage, ElMessageBox, ElTag } from 'element-plus'
   import { h } from 'vue'
@@ -127,47 +127,33 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 180,
+          width: 150,
           fixed: 'right',
           formatter: (row: NotificationItem) =>
-            h('div', [
-              h(ArtButtonMore, {
-                list: [
-                  { key: 'view', label: '查看', icon: 'ri:eye-line' },
-                  {
-                    key: 'read',
-                    label: '标记已读',
-                    icon: 'ri:check-double-line',
-                    disabled: !!row.read_at
-                  },
-                  {
-                    key: 'delete',
-                    label: '删除',
-                    icon: 'ri:delete-bin-4-line',
-                    color: '#f56c6c'
-                  }
-                ],
-                onClick: (item: ButtonMoreItem) => handleAction(item, row)
+            h('div', { class: 'flex items-center' }, [
+              h(ArtButtonTable, {
+                type: 'view',
+                title: '查看',
+                onClick: () => handleView(row)
+              }),
+              h(ArtButtonTable, {
+                icon: 'ri:check-double-line',
+                iconClass: 'bg-info/12 text-info',
+                title: row.read_at ? '已读' : '标记已读',
+                onClick: () => {
+                  if (!row.read_at) handleMarkRead(row)
+                }
+              }),
+              h(ArtButtonTable, {
+                type: 'delete',
+                title: '删除',
+                onClick: () => handleDelete(row)
               })
             ])
         }
       ]
     }
   })
-
-  const handleAction = (item: ButtonMoreItem, row: NotificationItem) => {
-    switch (item.key) {
-      case 'view':
-        handleView(row)
-        break
-      case 'read':
-        handleMarkRead(row)
-        break
-      case 'delete':
-        handleDelete(row)
-        break
-    }
-  }
 
   const handleView = (row: NotificationItem) => {
     // 查看时自动标记为已读

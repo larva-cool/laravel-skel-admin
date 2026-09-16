@@ -45,7 +45,9 @@
 <script setup lang="ts">
   import { fetchDeleteAdmin, fetchGetAdminList, fetchToggleAdminStatus } from '@/api/system-manage'
   import ArtButtonMore, { ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
+  import { useAuth } from '@/hooks/core/useAuth'
   import { ElAvatar, ElMessageBox, ElTag } from 'element-plus'
   import { h } from 'vue'
   import AdminDetailDialog from './modules/admin-detail-dialog.vue'
@@ -59,6 +61,7 @@
   const showSearchBar = ref(true)
   const editDialogRef = ref<InstanceType<typeof AdminEditDialog>>()
   const detailDialogRef = ref<InstanceType<typeof AdminDetailDialog>>()
+  const { hasAuth } = useAuth()
 
   const {
     columns,
@@ -134,14 +137,24 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 180,
+          width: 150,
           fixed: 'right',
           formatter: (row: AdminListItem) =>
-            h('div', [
+            h('div', { class: 'flex items-center' }, [
+              h(ArtButtonTable, {
+                type: 'view',
+                title: '查看',
+                onClick: () => handleAction({ key: 'view' } as ButtonMoreItem, row)
+              }),
+              hasAuth('admins.edit')
+                ? h(ArtButtonTable, {
+                    type: 'edit',
+                    title: '编辑',
+                    onClick: () => handleAction({ key: 'edit' } as ButtonMoreItem, row)
+                  })
+                : null,
               h(ArtButtonMore, {
                 list: [
-                  { key: 'view', label: '查看', icon: 'ri:eye-line' },
-                  { key: 'edit', label: '编辑', icon: 'ri:edit-2-line', auth: 'admins.edit' },
                   {
                     key: 'toggle',
                     label: row.status.value === 1 ? '禁用' : '启用',
@@ -155,7 +168,7 @@
                     color: '#f56c6c',
                     auth: 'admins.delete'
                   }
-                ],
+                ] as ButtonMoreItem[],
                 onClick: (item: ButtonMoreItem) => handleAction(item, row)
               })
             ])

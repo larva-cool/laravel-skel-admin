@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
   import { fetchScheduleLogList } from '@/api/monitor'
-  import ArtButtonMore from '@/components/core/forms/art-button-more/index.vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { ElTag } from 'element-plus'
   import { h } from 'vue'
@@ -110,15 +110,14 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 100,
+          width: 80,
           fixed: 'right',
           formatter: (row: ScheduleLogItem) =>
-            h('div', [
-              h(ArtButtonMore, {
-                list: [{ key: 'view', label: '查看', icon: 'ri:eye-line' }],
-                onClick: () => handleAction(row)
-              })
-            ])
+            h(ArtButtonTable, {
+              type: 'view',
+              title: '查看',
+              onClick: () => handleAction(row)
+            })
         }
       ]
     }

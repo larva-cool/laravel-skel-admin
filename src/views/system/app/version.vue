@@ -46,7 +46,9 @@
     fetchWithdrawVersion
   } from '@/api/app-manage'
   import ArtButtonMore, { ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
+  import { useAuth } from '@/hooks/core/useAuth'
   import { mittBus } from '@/utils/sys'
   import { ElTag, ElMessageBox } from 'element-plus'
   import { ArrowLeft } from '@element-plus/icons-vue'
@@ -62,6 +64,7 @@
 
   const showSearchBar = ref(true)
   const dialogRef = ref<InstanceType<typeof VersionDialog>>()
+  const { hasAuth } = useAuth()
 
   const formFilters = reactive({
     platform: '',
@@ -165,12 +168,21 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 280,
+          width: 150,
           align: 'right',
           formatter: (row: VersionListItem) => {
-            const actions: ButtonMoreItem[] = [
-              { key: 'edit', label: '编辑', icon: 'ri:edit-2-line', auth: 'app-versions.edit' }
-            ]
+            const buttons: any[] = []
+            if (hasAuth('app-versions.edit')) {
+              buttons.push(
+                h(ArtButtonTable, {
+                  type: 'edit',
+                  title: '编辑',
+                  onClick: () => handleEdit(row)
+                })
+              )
+            }
+
+            const actions: ButtonMoreItem[] = []
             if (row.status.value === 'draft' || row.status.value === 'withdrawn') {
               actions.push({
                 key: 'publish',
@@ -205,16 +217,20 @@
                 auth: 'app-versions.delete'
               })
             }
-            return h(ArtButtonMore, {
-              list: actions,
-              onClick: (item: ButtonMoreItem) => {
-                if (item.key === 'edit') handleEdit(row)
-                else if (item.key === 'publish') handlePublish(row)
-                else if (item.key === 'withdraw') handleWithdraw(row)
-                else if (item.key === 'obsolete') handleObsolete(row)
-                else if (item.key === 'delete') handleDelete(row)
-              }
-            })
+            if (actions.length > 0) {
+              buttons.push(
+                h(ArtButtonMore, {
+                  list: actions,
+                  onClick: (item: ButtonMoreItem) => {
+                    if (item.key === 'publish') handlePublish(row)
+                    else if (item.key === 'withdraw') handleWithdraw(row)
+                    else if (item.key === 'obsolete') handleObsolete(row)
+                    else if (item.key === 'delete') handleDelete(row)
+                  }
+                })
+              )
+            }
+            return h('div', { class: 'flex items-center justify-end' }, buttons)
           }
         }
       ]

@@ -47,7 +47,8 @@
 
 <script setup lang="ts">
   import { fetchDeleteMenu, fetchGetMenuTree } from '@/api/system-manage'
-  import ArtButtonMore, { ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
+  import { useAuth } from '@/hooks/core/useAuth'
   import { useTableColumns } from '@/hooks/core/useTableColumns'
   import { ElMessageBox, ElTag } from 'element-plus'
   import MenuDialog from './modules/menu-dialog.vue'
@@ -63,6 +64,7 @@
 
   // 弹窗
   const dialogRef = ref<InstanceType<typeof MenuDialog>>()
+  const { hasAuth } = useAuth()
 
   // 搜索相关
   const formFilters = reactive({ name: '', route: '' })
@@ -164,27 +166,32 @@
     {
       prop: 'operation',
       label: '操作',
-      width: 180,
+      width: 150,
       align: 'right',
       formatter: (row: MenuTreeItem) => {
-        return h(ArtButtonMore, {
-          list: [
-            { key: 'add', label: '新增子菜单', icon: 'ri:add-line', auth: 'menus.create' },
-            { key: 'edit', label: '编辑', icon: 'ri:edit-2-line', auth: 'menus.edit' },
-            {
-              key: 'delete',
-              label: '删除',
-              icon: 'ri:delete-bin-4-line',
-              color: '#f56c6c',
-              auth: 'menus.delete'
-            }
-          ],
-          onClick: (item: ButtonMoreItem) => {
-            if (item.key === 'add') handleAddChild(row)
-            else if (item.key === 'edit') handleEdit(row)
-            else if (item.key === 'delete') handleDelete(row)
-          }
-        })
+        return h('div', { class: 'flex items-center justify-end' }, [
+          hasAuth('menus.create')
+            ? h(ArtButtonTable, {
+                type: 'add',
+                title: '新增子菜单',
+                onClick: () => handleAddChild(row)
+              })
+            : null,
+          hasAuth('menus.edit')
+            ? h(ArtButtonTable, {
+                type: 'edit',
+                title: '编辑',
+                onClick: () => handleEdit(row)
+              })
+            : null,
+          hasAuth('menus.delete')
+            ? h(ArtButtonTable, {
+                type: 'delete',
+                title: '删除',
+                onClick: () => handleDelete(row)
+              })
+            : null
+        ])
       }
     }
   ])

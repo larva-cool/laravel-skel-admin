@@ -50,6 +50,9 @@
   import { h, ref } from 'vue'
   import { ElButton, ElIcon, ElMessage, ElMessageBox, ElSwitch, ElTag } from 'element-plus'
   import { Plus } from '@element-plus/icons-vue'
+  import ArtButtonMore, {
+    type ButtonMoreItem
+  } from '@/components/core/forms/art-button-more/index.vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { useAuth } from '@/hooks/core/useAuth'
@@ -155,43 +158,60 @@
         {
           prop: 'actions',
           label: '操作',
-          width: 280,
+          width: 150,
           fixed: 'right',
-          formatter: (row: Item) =>
-            h('div', { class: 'flex items-center' }, [
-              hasAuth('segments.index')
-                ? h(ArtButtonTable, {
-                    icon: 'ri:user-line',
-                    iconClass: 'bg-secondary/12 text-secondary',
-                    onClick: () => openUsersDialog(row)
-                  })
-                : null,
+          formatter: (row: Item) => {
+            const moreList: ButtonMoreItem[] = []
+            if (hasAuth('segments.index')) {
+              moreList.push({
+                key: 'users',
+                label: '用户列表',
+                icon: 'ri:user-line'
+              })
+            }
+            if (row.type === 2 && hasAuth('segments.edit')) {
+              moreList.push({
+                key: 'sync',
+                label: '同步',
+                icon: 'ri:refresh-line'
+              })
+            }
+            if (hasAuth('segments.delete')) {
+              moreList.push({
+                key: 'delete',
+                label: '删除',
+                icon: 'ri:delete-bin-4-line',
+                color: '#f56c6c'
+              })
+            }
+
+            return h('div', { class: 'flex items-center' }, [
               row.type === 2 && hasAuth('segments.edit')
                 ? h(ArtButtonTable, {
                     type: 'view',
+                    title: '预览',
                     onClick: () => openPreviewDialog(row)
-                  })
-                : null,
-              row.type === 2 && hasAuth('segments.edit')
-                ? h(ArtButtonTable, {
-                    icon: 'ri:refresh-line',
-                    iconClass: 'bg-warning/12 text-warning',
-                    onClick: () => handleSync(row)
                   })
                 : null,
               hasAuth('segments.edit')
                 ? h(ArtButtonTable, {
                     type: 'edit',
+                    title: '编辑',
                     onClick: () => openEditDialog(row)
                   })
                 : null,
-              hasAuth('segments.delete')
-                ? h(ArtButtonTable, {
-                    type: 'delete',
-                    onClick: () => handleDelete(row)
+              moreList.length > 0
+                ? h(ArtButtonMore, {
+                    list: moreList,
+                    onClick: (item: ButtonMoreItem) => {
+                      if (item.key === 'users') openUsersDialog(row)
+                      else if (item.key === 'sync') handleSync(row)
+                      else if (item.key === 'delete') handleDelete(row)
+                    }
                   })
                 : null
             ])
+          }
         }
       ]
     }

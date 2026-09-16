@@ -42,8 +42,9 @@
 
 <script setup lang="ts">
   import { fetchDeleteSetting, fetchGetSettingList } from '@/api/system-manage'
-  import ArtButtonMore, { ButtonMoreItem } from '@/components/core/forms/art-button-more/index.vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
+  import { useAuth } from '@/hooks/core/useAuth'
   import { ElMessageBox, ElTag } from 'element-plus'
   import SettingEditDialog from './modules/setting-edit-dialog.vue'
   import SettingSearch from './modules/setting-search.vue'
@@ -72,6 +73,7 @@
 
   const showSearchBar = ref(true)
   const editDialogRef = ref<InstanceType<typeof SettingEditDialog>>()
+  const { hasAuth } = useAuth()
 
   const {
     columns,
@@ -126,36 +128,26 @@
           width: 120,
           fixed: 'right',
           formatter: (row: SettingListItem) =>
-            h('div', [
-              h(ArtButtonMore, {
-                list: [
-                  { key: 'edit', label: '编辑', icon: 'ri:edit-2-line', auth: 'settings.edit' },
-                  {
-                    key: 'delete',
-                    label: '删除',
-                    icon: 'ri:delete-bin-4-line',
-                    color: '#f56c6c',
-                    auth: 'settings.delete'
-                  }
-                ],
-                onClick: (item: ButtonMoreItem) => handleAction(item, row)
-              })
+            h('div', { class: 'flex items-center' }, [
+              hasAuth('settings.edit')
+                ? h(ArtButtonTable, {
+                    type: 'edit',
+                    title: '编辑',
+                    onClick: () => editDialogRef.value?.open(row)
+                  })
+                : null,
+              hasAuth('settings.delete')
+                ? h(ArtButtonTable, {
+                    type: 'delete',
+                    title: '删除',
+                    onClick: () => handleDelete(row)
+                  })
+                : null
             ])
         }
       ]
     }
   })
-
-  const handleAction = (item: ButtonMoreItem, row: SettingListItem) => {
-    switch (item.key) {
-      case 'edit':
-        editDialogRef.value?.open(row)
-        break
-      case 'delete':
-        handleDelete(row)
-        break
-    }
-  }
 
   const handleSearch = (params: Partial<Api.SystemManage.SettingSearchParams>) => {
     const paramsRecord = searchParams as Record<string, unknown>
