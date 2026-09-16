@@ -640,19 +640,18 @@ declare namespace Api {
       size_text: string
     }
 
-    /** 实名认证申请用户（管理端简化） */
-    interface IdentityUserBrief {
+    /** 实名认证申请人（管理端简化，多态） */
+    interface IdentityVerifiableBrief {
       id: number
-      username: string
       name: string | null
-      phone: string | null
     }
 
     /** 实名认证列表项（对齐 Admin IdentityVerificationResource） */
     interface IdentityVerificationListItem {
       id: number
-      user_id: number
-      user: IdentityUserBrief | null
+      verifiable_type: string
+      verifiable_id: number
+      verifiable: IdentityVerifiableBrief | null
       type: 'personal' | 'enterprise'
       type_label: string
       status: 'pending' | 'review' | 'approved' | 'rejected'
@@ -690,7 +689,7 @@ declare namespace Api {
     /** 实名认证搜索参数 */
     interface IdentityVerificationSearchParams extends Api.Common.CommonSearchParams {
       keyword?: string
-      user_id?: number
+      verifiable_id?: number
       type?: 'personal' | 'enterprise'
       status?: 'pending' | 'review' | 'approved' | 'rejected'
       start_date?: string

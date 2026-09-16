@@ -138,15 +138,9 @@
               >申请人信息</div
             >
             <ElDescriptions :column="2" border size="small">
-              <ElDescriptionsItem label="用户 ID">{{ detail.user_id }}</ElDescriptionsItem>
-              <ElDescriptionsItem label="用户名">
-                {{ detail.user?.username || '-' }}
-              </ElDescriptionsItem>
+              <ElDescriptionsItem label="用户 ID">{{ detail.verifiable_id }}</ElDescriptionsItem>
               <ElDescriptionsItem label="昵称">
-                {{ detail.user?.name || '-' }}
-              </ElDescriptionsItem>
-              <ElDescriptionsItem label="手机号">
-                {{ detail.user?.phone || '-' }}
+                {{ detail.verifiable?.name || '-' }}
               </ElDescriptionsItem>
             </ElDescriptions>
           </div>

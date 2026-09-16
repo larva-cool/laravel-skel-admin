@@ -95,15 +95,14 @@
       columnsFactory: () => [
         { prop: 'id', label: 'ID', width: 80, fixed: 'left' },
         {
-          prop: 'user',
+          prop: 'verifiable',
           label: '申请人',
           width: 180,
           showOverflowTooltip: true,
           formatter: (row: IdentityItem) => {
-            if (!row.user) return '-'
+            if (!row.verifiable) return '-'
             return h('div', { class: 'flex flex-col' }, [
-              h('span', { class: 'text-sm' }, row.user.username || `ID:${row.user_id}`),
-              h('span', { class: 'text-xs text-g-500' }, row.user.phone || row.user.name || '')
+              h('span', { class: 'text-sm' }, row.verifiable.name || `ID:${row.verifiable_id}`)
             ])
           }
         },
