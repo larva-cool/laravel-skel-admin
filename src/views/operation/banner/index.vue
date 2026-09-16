@@ -187,22 +187,28 @@
                     onClick: () => handleAction({ key: 'edit' } as ButtonMoreItem, row)
                   })
                 : null,
+              hasAuth('banners.edit')
+                ? h(ArtButtonTable, {
+                    icon: 'ri:arrow-up-line',
+                    iconColor: 'var(--el-color-info)',
+                    buttonBgColor: 'rgba(144,147,153,0.12)',
+                    title: '上移',
+                    disabled: isFirstInPosition(row),
+                    onClick: () => handleAction({ key: 'move-up' } as ButtonMoreItem, row)
+                  })
+                : null,
+              hasAuth('banners.edit')
+                ? h(ArtButtonTable, {
+                    icon: 'ri:arrow-down-line',
+                    iconColor: 'var(--el-color-info)',
+                    buttonBgColor: 'rgba(144,147,153,0.12)',
+                    title: '下移',
+                    disabled: isLastInPosition(row),
+                    onClick: () => handleAction({ key: 'move-down' } as ButtonMoreItem, row)
+                  })
+                : null,
               h(ArtButtonMore, {
                 list: [
-                  {
-                    key: 'move-up',
-                    label: '上移',
-                    icon: 'ri:arrow-up-line',
-                    disabled: isFirstInPosition(row),
-                    auth: 'banners.edit'
-                  },
-                  {
-                    key: 'move-down',
-                    label: '下移',
-                    icon: 'ri:arrow-down-line',
-                    disabled: isLastInPosition(row),
-                    auth: 'banners.edit'
-                  },
                   {
                     key: 'delete',
                     label: '删除',

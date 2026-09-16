@@ -171,14 +171,17 @@
                     onClick: () => handleAction({ key: 'edit' } as ButtonMoreItem, row)
                   })
                 : null,
+              hasAuth('users.edit')
+                ? h(ArtButtonTable, {
+                    icon: row.status.value === 1 ? 'ri:forbid-line' : 'ri:checkbox-circle-line',
+                    iconColor: 'var(--el-color-warning)',
+                    buttonBgColor: 'rgba(230,162,60,0.12)',
+                    title: row.status.value === 1 ? '冻结' : '启用',
+                    onClick: () => handleAction({ key: 'toggle' } as ButtonMoreItem, row)
+                  })
+                : null,
               h(ArtButtonMore, {
                 list: [
-                  {
-                    key: 'toggle',
-                    label: row.status.value === 1 ? '冻结' : '启用',
-                    icon: row.status.value === 1 ? 'ri:forbid-line' : 'ri:checkbox-circle-line',
-                    auth: 'users.edit'
-                  },
                   {
                     key: 'reset-pwd',
                     label: '重置密码',

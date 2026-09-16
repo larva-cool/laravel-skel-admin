@@ -168,7 +168,7 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 150,
+          width: 200,
           align: 'right',
           formatter: (row: VersionListItem) => {
             const buttons: any[] = []
@@ -181,55 +181,92 @@
                 })
               )
             }
-
-            const actions: ButtonMoreItem[] = []
-            if (row.status.value === 'draft' || row.status.value === 'withdrawn') {
-              actions.push({
-                key: 'publish',
-                label: '发布',
-                icon: 'ri:upload-2-line',
-                auth: 'app-versions.edit'
-              })
-            }
-            if (row.status.value === 'published') {
-              actions.push({
-                key: 'withdraw',
-                label: '撤回',
-                icon: 'ri:arrow-go-back-line',
-                auth: 'app-versions.edit'
-              })
-            }
-            if (row.status.value !== 'obsolete') {
-              actions.push({
-                key: 'obsolete',
-                label: '废弃',
-                icon: 'ri:archive-line',
-                color: '#e6a23c',
-                auth: 'app-versions.edit'
-              })
-            }
-            if (row.status.value !== 'published') {
-              actions.push({
-                key: 'delete',
-                label: '删除',
-                icon: 'ri:delete-bin-4-line',
-                color: '#f56c6c',
-                auth: 'app-versions.delete'
-              })
-            }
-            if (actions.length > 0) {
+            if (
+              (row.status.value === 'draft' || row.status.value === 'withdrawn') &&
+              hasAuth('app-versions.edit')
+            ) {
               buttons.push(
-                h(ArtButtonMore, {
-                  list: actions,
-                  onClick: (item: ButtonMoreItem) => {
-                    if (item.key === 'publish') handlePublish(row)
-                    else if (item.key === 'withdraw') handleWithdraw(row)
-                    else if (item.key === 'obsolete') handleObsolete(row)
-                    else if (item.key === 'delete') handleDelete(row)
-                  }
+                h(ArtButtonTable, {
+                  icon: 'ri:upload-2-line',
+                  iconColor: 'var(--el-color-success)',
+                  buttonBgColor: 'rgba(103,194,58,0.12)',
+                  title: '发布',
+                  onClick: () => handlePublish(row)
                 })
               )
             }
+            if (row.status.value === 'published' && hasAuth('app-versions.edit')) {
+              buttons.push(
+                h(ArtButtonTable, {
+                  icon: 'ri:arrow-go-back-line',
+                  iconColor: 'var(--el-color-warning)',
+                  buttonBgColor: 'rgba(230,162,60,0.12)',
+                  title: '撤回',
+                  onClick: () => handleWithdraw(row)
+                })
+              )
+            }
+
+            // 废弃与删除为次要/危险操作，当内联按钮已达 3 个时收入更多菜单
+            const moreList: ButtonMoreItem[] = []
+            if (row.status.value !== 'obsolete' && hasAuth('app-versions.edit')) {
+              moreList.push({
+                key: 'obsolete',
+                label: '废弃',
+                icon: 'ri:archive-line',
+                color: '#e6a23c'
+              })
+            }
+            if (row.status.value !== 'published' && hasAuth('app-versions.delete')) {
+              moreList.push({
+                key: 'delete',
+                label: '删除',
+                icon: 'ri:delete-bin-4-line',
+                color: '#f56c6c'
+              })
+            }
+
+            // 非已发布状态：编辑 + 发布(可选) + 废弃 = 3 个内联，删除入 More
+            // 已发布状态：编辑 + 撤回 + 废弃 = 3 个内联，删除入 More
+            // 已废弃状态：仅编辑 + 删除 2 个，全部内联
+            if (row.status.value === 'obsolete' && hasAuth('app-versions.delete')) {
+              buttons.push(
+                h(ArtButtonTable, {
+                  type: 'delete',
+                  title: '删除',
+                  onClick: () => handleDelete(row)
+                })
+              )
+            } else {
+              const obsolete = moreList.find((item) => item.key === 'obsolete')
+              if (obsolete) {
+                buttons.push(
+                  h(ArtButtonTable, {
+                    icon: obsolete.icon,
+                    iconColor: 'var(--el-color-warning)',
+                    buttonBgColor: 'rgba(230,162,60,0.12)',
+                    title: '废弃',
+                    onClick: () => handleObsolete(row)
+                  })
+                )
+              }
+              if (moreList.some((item) => item.key === 'delete')) {
+                buttons.push(
+                  h(ArtButtonMore, {
+                    list: [
+                      {
+                        key: 'delete',
+                        label: '删除',
+                        icon: 'ri:delete-bin-4-line',
+                        color: '#f56c6c'
+                      }
+                    ] as ButtonMoreItem[],
+                    onClick: () => handleDelete(row)
+                  })
+                )
+              }
+            }
+
             return h('div', { class: 'flex items-center justify-end' }, buttons)
           }
         }

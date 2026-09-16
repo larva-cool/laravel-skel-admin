@@ -4,7 +4,8 @@
     <div
       :class="[
         'inline-flex items-center justify-center min-w-8 h-8 px-2.5 mr-2.5 text-sm c-p rounded-md align-middle',
-        buttonClass
+        buttonClass,
+        disabled ? 'opacity-40 cursor-not-allowed' : ''
       ]"
       :style="{ backgroundColor: buttonBgColor, color: iconColor }"
       :title="title"
@@ -31,6 +32,8 @@
     buttonBgColor?: string
     /** 鼠标悬停提示文本（HTML title 属性） */
     title?: string
+    /** 是否禁用 */
+    disabled?: boolean
   }
 
   const props = withDefaults(defineProps<Props>(), {})
@@ -64,6 +67,7 @@
   })
 
   const handleClick = () => {
+    if (props.disabled) return
     emit('click')
   }
 </script>

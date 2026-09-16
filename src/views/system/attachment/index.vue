@@ -326,16 +326,10 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 150,
+          width: 200,
           fixed: 'right',
           formatter: (row: AttachmentListItem) => {
-            const moreList: ButtonMoreItem[] = [
-              {
-                key: 'copy-link',
-                label: '复制链接',
-                icon: 'ri:link'
-              }
-            ]
+            const moreList: ButtonMoreItem[] = []
             if (hasAuth('attachments.edit')) {
               moreList.push({
                 key: 'rename',
@@ -370,11 +364,16 @@
                 title: '下载',
                 onClick: () => handleDownload(row)
               }),
+              h(ArtButtonTable, {
+                icon: 'ri:link',
+                iconClass: 'bg-success/12 text-success',
+                title: '复制链接',
+                onClick: () => handleCopyLink(row)
+              }),
               h(ArtButtonMore, {
                 list: moreList,
                 onClick: (item: ButtonMoreItem) => {
-                  if (item.key === 'copy-link') handleCopyLink(row)
-                  else if (item.key === 'rename') renameDialogRef.value?.open(row)
+                  if (item.key === 'rename') renameDialogRef.value?.open(row)
                   else if (item.key === 'move') moveDialogRef.value?.open(row)
                   else if (item.key === 'delete') handleDelete(row)
                 }

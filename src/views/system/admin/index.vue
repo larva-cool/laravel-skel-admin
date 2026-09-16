@@ -137,7 +137,7 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 150,
+          width: 200,
           fixed: 'right',
           formatter: (row: AdminListItem) =>
             h('div', { class: 'flex items-center' }, [
@@ -153,14 +153,17 @@
                     onClick: () => handleAction({ key: 'edit' } as ButtonMoreItem, row)
                   })
                 : null,
+              hasAuth('admins.edit')
+                ? h(ArtButtonTable, {
+                    icon: row.status.value === 1 ? 'ri:forbid-line' : 'ri:checkbox-circle-line',
+                    iconColor: 'var(--el-color-warning)',
+                    buttonBgColor: 'rgba(230,162,60,0.12)',
+                    title: row.status.value === 1 ? '禁用' : '启用',
+                    onClick: () => handleAction({ key: 'toggle' } as ButtonMoreItem, row)
+                  })
+                : null,
               h(ArtButtonMore, {
                 list: [
-                  {
-                    key: 'toggle',
-                    label: row.status.value === 1 ? '禁用' : '启用',
-                    icon: row.status.value === 1 ? 'ri:forbid-line' : 'ri:checkbox-circle-line',
-                    auth: 'admins.edit'
-                  },
                   {
                     key: 'delete',
                     label: '删除',

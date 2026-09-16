@@ -158,17 +158,41 @@
         {
           prop: 'actions',
           label: '操作',
-          width: 150,
+          width: 200,
           fixed: 'right',
           formatter: (row: Item) => {
-            const moreList: ButtonMoreItem[] = []
-            if (hasAuth('segments.index')) {
-              moreList.push({
-                key: 'users',
-                label: '用户列表',
-                icon: 'ri:user-line'
-              })
+            const buttons: any[] = []
+            if (row.type === 2 && hasAuth('segments.edit')) {
+              buttons.push(
+                h(ArtButtonTable, {
+                  type: 'view',
+                  title: '预览',
+                  onClick: () => openPreviewDialog(row)
+                })
+              )
             }
+            if (hasAuth('segments.edit')) {
+              buttons.push(
+                h(ArtButtonTable, {
+                  type: 'edit',
+                  title: '编辑',
+                  onClick: () => openEditDialog(row)
+                })
+              )
+            }
+            if (hasAuth('segments.index')) {
+              buttons.push(
+                h(ArtButtonTable, {
+                  icon: 'ri:user-line',
+                  iconClass: 'bg-secondary/12 text-secondary',
+                  title: '用户列表',
+                  onClick: () => openUsersDialog(row)
+                })
+              )
+            }
+
+            // 手动分群（type=2）额外有同步操作，与删除一并收入更多菜单
+            const moreList: ButtonMoreItem[] = []
             if (row.type === 2 && hasAuth('segments.edit')) {
               moreList.push({
                 key: 'sync',
@@ -184,33 +208,19 @@
                 color: '#f56c6c'
               })
             }
+            if (moreList.length > 0) {
+              buttons.push(
+                h(ArtButtonMore, {
+                  list: moreList,
+                  onClick: (item: ButtonMoreItem) => {
+                    if (item.key === 'sync') handleSync(row)
+                    else if (item.key === 'delete') handleDelete(row)
+                  }
+                })
+              )
+            }
 
-            return h('div', { class: 'flex items-center' }, [
-              row.type === 2 && hasAuth('segments.edit')
-                ? h(ArtButtonTable, {
-                    type: 'view',
-                    title: '预览',
-                    onClick: () => openPreviewDialog(row)
-                  })
-                : null,
-              hasAuth('segments.edit')
-                ? h(ArtButtonTable, {
-                    type: 'edit',
-                    title: '编辑',
-                    onClick: () => openEditDialog(row)
-                  })
-                : null,
-              moreList.length > 0
-                ? h(ArtButtonMore, {
-                    list: moreList,
-                    onClick: (item: ButtonMoreItem) => {
-                      if (item.key === 'users') openUsersDialog(row)
-                      else if (item.key === 'sync') handleSync(row)
-                      else if (item.key === 'delete') handleDelete(row)
-                    }
-                  })
-                : null
-            ])
+            return h('div', { class: 'flex items-center' }, buttons)
           }
         }
       ]
