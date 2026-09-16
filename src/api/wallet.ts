@@ -43,6 +43,23 @@ export function fetchGetUserWallet(userId: number) {
   })
 }
 
+/** 获取指定用户钱包流水（分页） */
+export function fetchUserWalletTrades(
+  userId: number,
+  params?: Api.Common.LaravelPaginationRequest & {
+    type?: string
+    status?: string
+    keyword?: string
+    start_date?: string
+    end_date?: string
+  }
+) {
+  return request.get<Api.WalletManage.WalletTradeList>({
+    url: `/admin/users/${userId}/wallet-trades`,
+    params
+  })
+}
+
 /** 调整指定用户余额（正数充正，负数扣减） */
 export function fetchAdjustUserWallet(userId: number, data: Api.WalletManage.WalletAdjustParams) {
   return request.put<Api.WalletManage.UserWallet>({
