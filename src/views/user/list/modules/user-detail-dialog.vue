@@ -302,6 +302,138 @@
         </div>
       </ElTabPane>
 
+      <ElTabPane label="钱包流水" name="wallet" lazy>
+        <!-- 钱包概览 -->
+        <div v-if="walletOverview" class="wallet-overview mt-4">
+          <ElDescriptions :column="4" border size="small">
+            <ElDescriptionsItem label="可用余额">
+              <span class="font-semibold text-primary"
+                >¥{{ formatMoney(walletOverview.balance) }}</span
+              >
+            </ElDescriptionsItem>
+            <ElDescriptionsItem label="冻结余额">
+              <span class="text-warning">¥{{ formatMoney(walletOverview.frozen_balance) }}</span>
+            </ElDescriptionsItem>
+            <ElDescriptionsItem label="累计收入">
+              <span class="text-success">¥{{ formatMoney(walletOverview.total_income) }}</span>
+            </ElDescriptionsItem>
+            <ElDescriptionsItem label="累计支出">
+              <span class="text-danger">¥{{ formatMoney(walletOverview.total_expense) }}</span>
+            </ElDescriptionsItem>
+          </ElDescriptions>
+        </div>
+
+        <div class="tab-filters mt-4">
+          <ElInput
+            v-model="walletKeyword"
+            placeholder="搜索交易描述"
+            clearable
+            style="width: 200px"
+            @keyup.enter="handleWalletSearch"
+            @clear="handleWalletSearch"
+          />
+          <ElSelect
+            v-model="walletType"
+            placeholder="交易类型"
+            clearable
+            style="width: 140px"
+            @change="handleWalletSearch"
+          >
+            <ElOption
+              v-for="opt in walletTypeOptions"
+              :key="opt.value"
+              :label="opt.label"
+              :value="opt.value"
+            />
+          </ElSelect>
+          <ElSelect
+            v-model="walletStatus"
+            placeholder="流水状态"
+            clearable
+            style="width: 120px"
+            @change="handleWalletSearch"
+          >
+            <ElOption
+              v-for="opt in walletStatusOptions"
+              :key="opt.value"
+              :label="opt.label"
+              :value="opt.value"
+            />
+          </ElSelect>
+          <ElDatePicker
+            v-model="walletDateRange"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            format="YYYY-MM-DD"
+            value-format="YYYY-MM-DD"
+            clearable
+            @change="handleWalletSearch"
+          />
+          <ElButton type="primary" @click="handleWalletSearch">搜索</ElButton>
+        </div>
+        <ElTable
+          v-loading="walletLoading"
+          :data="walletList"
+          stripe
+          border
+          size="default"
+          class="mt-4"
+          style="width: 100%"
+        >
+          <ElTableColumn prop="id" label="流水号" width="90" />
+          <ElTableColumn prop="amount" label="变动金额" width="130" align="right">
+            <template #default="{ row }">
+              <span :class="toNumber(row.amount) >= 0 ? 'amount-plus' : 'amount-minus'">
+                {{ toNumber(row.amount) >= 0 ? '+' : '-' }}¥{{
+                  formatMoney(Math.abs(toNumber(row.amount)))
+                }}
+              </span>
+            </template>
+          </ElTableColumn>
+          <ElTableColumn prop="type" label="交易类型" min-width="110">
+            <template #default="{ row }">
+              <ElTag :type="mapTagType(row.type_label_type)" size="small" effect="plain">
+                {{ row.type?.label || '—' }}
+              </ElTag>
+            </template>
+          </ElTableColumn>
+          <ElTableColumn prop="status" label="状态" min-width="90">
+            <template #default="{ row }">
+              <ElTag :type="mapTagType(row.status_label_type)" size="small">
+                {{ row.status?.label || '—' }}
+              </ElTag>
+            </template>
+          </ElTableColumn>
+          <ElTableColumn prop="before_balance" label="变动前余额" min-width="120" align="right">
+            <template #default="{ row }">¥{{ formatMoney(row.before_balance) }}</template>
+          </ElTableColumn>
+          <ElTableColumn prop="after_balance" label="变动后余额" min-width="120" align="right">
+            <template #default="{ row }">
+              <span class="font-semibold">¥{{ formatMoney(row.after_balance) }}</span>
+            </template>
+          </ElTableColumn>
+          <ElTableColumn prop="description" label="交易描述" min-width="180" show-overflow-tooltip>
+            <template #default="{ row }">{{ row.description || '—' }}</template>
+          </ElTableColumn>
+          <ElTableColumn prop="created_at" label="交易时间" min-width="170" />
+        </ElTable>
+
+        <div class="tab-pagination">
+          <ElPagination
+            v-model:current-page="walletPage.page"
+            v-model:page-size="walletPage.per_page"
+            :page-sizes="[10, 15, 20, 30, 50]"
+            :total="walletTotal"
+            layout="total, sizes, prev, pager, next, jumper"
+            background
+            @size-change="loadWalletTrades"
+            @current-change="loadWalletTrades"
+          />
+        </div>
+      </ElTabPane>
+
       <ElTabPane label="邀请记录" name="invites" lazy>
         <ElTable
           v-loading="inviteLoading"
@@ -363,6 +495,7 @@
     fetchUserPointTrades,
     fetchUserSocials
   } from '@/api/user-manage'
+  import { fetchGetUserWallet, fetchUserWalletTrades } from '@/api/wallet'
   import { useExport } from '@/hooks/core/useExport'
   import { Download } from '@element-plus/icons-vue'
 
@@ -374,11 +507,12 @@
   type PointTradeItem = Api.UserManage.PointTradeItem
   type CoinTradeItem = Api.UserManage.CoinTradeItem
   type InviteRecordItem = Api.UserManage.InviteRecordItem
+  type WalletTradeItem = Api.WalletManage.WalletTrade
 
   const dialogVisible = ref(false)
-  const activeTab = ref<'profile' | 'histories' | 'socials' | 'points' | 'coins' | 'invites'>(
-    'profile'
-  )
+  const activeTab = ref<
+    'profile' | 'histories' | 'socials' | 'points' | 'coins' | 'wallet' | 'invites'
+  >('profile')
 
   const user = ref<UserDetail | null>(null)
 
@@ -421,6 +555,35 @@
   const inviteLoaded = ref(false)
   const inviteTotal = ref(0)
   const invitePage = reactive({ page: 1, per_page: 15 })
+
+  // 钱包流水
+  const walletList = ref<WalletTradeItem[]>([])
+  const walletLoading = ref(false)
+  const walletLoaded = ref(false)
+  const walletTotal = ref(0)
+  const walletKeyword = ref('')
+  const walletType = ref('')
+  const walletStatus = ref('')
+  const walletDateRange = ref<string[]>([])
+  const walletPage = reactive({ page: 1, per_page: 15 })
+  const walletOverview = ref<Api.WalletManage.UserWallet | null>(null)
+
+  const walletTypeOptions = [
+    { label: '充值', value: 'recharge' },
+    { label: '提现', value: 'withdraw' },
+    { label: '冻结', value: 'freeze' },
+    { label: '解冻', value: 'unfreeze' },
+    { label: '消费', value: 'payment' },
+    { label: '退款', value: 'refund' },
+    { label: '后台充正', value: 'admin_recharge' },
+    { label: '后台扣减', value: 'admin_deduct' }
+  ]
+
+  const walletStatusOptions = [
+    { label: '处理中', value: 'pending' },
+    { label: '已完成', value: 'success' },
+    { label: '已失败', value: 'failed' }
+  ]
 
   // 导出
   const { isExporting: isPointExporting, handleExport: doPointExport } = useExport()
@@ -482,6 +645,16 @@
     inviteList.value = []
     inviteTotal.value = 0
 
+    walletPage.page = 1
+    walletLoaded.value = false
+    walletList.value = []
+    walletTotal.value = 0
+    walletKeyword.value = ''
+    walletType.value = ''
+    walletStatus.value = ''
+    walletDateRange.value = []
+    walletOverview.value = null
+
     // 拉取详情（含 profile）
     try {
       user.value = await fetchGetUserDetail(row.id)
@@ -501,6 +674,7 @@
     if (name === 'socials' && !socialLoaded.value) loadSocials()
     if (name === 'points' && !pointLoaded.value) loadPointTrades()
     if (name === 'coins' && !coinLoaded.value) loadCoinTrades()
+    if (name === 'wallet' && !walletLoaded.value) loadWalletTrades()
     if (name === 'invites' && !inviteLoaded.value) loadInvites()
   }
 
@@ -626,6 +800,67 @@
       inviteLoaded.value = true
     } finally {
       inviteLoading.value = false
+    }
+  }
+
+  // ========== 钱包流水 ==========
+
+  const mapTagType = (t?: string) => {
+    if (!t || t === 'default') return undefined
+    return t as 'primary' | 'success' | 'warning' | 'danger' | 'info'
+  }
+
+  function toNumber(v: number | string | null | undefined): number {
+    if (v == null) return 0
+    const n = typeof v === 'number' ? v : Number(v)
+    return Number.isFinite(n) ? n : 0
+  }
+
+  function formatMoney(v: number | string | null | undefined): string {
+    return toNumber(v).toFixed(2)
+  }
+
+  const handleWalletSearch = () => {
+    walletPage.page = 1
+    loadWalletTrades()
+  }
+
+  const loadWalletTrades = async () => {
+    if (!user.value) return
+    walletLoading.value = true
+    try {
+      // 首次加载时获取钱包概览
+      if (!walletOverview.value) {
+        try {
+          walletOverview.value = await fetchGetUserWallet(user.value.id)
+        } catch {
+          // 概览加载失败不阻塞流水列表
+        }
+      }
+
+      const params: Api.Common.LaravelPaginationRequest & {
+        type?: string
+        status?: string
+        keyword?: string
+        start_date?: string
+        end_date?: string
+      } = {
+        page: walletPage.page,
+        per_page: walletPage.per_page
+      }
+      if (walletKeyword.value) params.keyword = walletKeyword.value
+      if (walletType.value) params.type = walletType.value
+      if (walletStatus.value) params.status = walletStatus.value
+      if (walletDateRange.value?.length === 2) {
+        params.start_date = walletDateRange.value[0]
+        params.end_date = walletDateRange.value[1]
+      }
+      const res = await fetchUserWalletTrades(user.value.id, params)
+      walletList.value = res?.data || []
+      walletTotal.value = res?.meta?.total || 0
+      walletLoaded.value = true
+    } finally {
+      walletLoading.value = false
     }
   }
 
