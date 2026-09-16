@@ -434,6 +434,162 @@
         </div>
       </ElTabPane>
 
+      <ElTabPane label="实名信息" name="identity" lazy>
+        <ElEmpty
+          v-if="!identityLoading && identityList.length === 0"
+          description="暂无实名认证记录"
+          :image-size="80"
+          class="mt-4"
+        />
+        <template v-else>
+          <ElTable
+            v-loading="identityLoading"
+            :data="identityList"
+            stripe
+            border
+            size="default"
+            class="mt-4"
+            style="width: 100%"
+          >
+            <ElTableColumn prop="id" label="ID" width="80" />
+            <ElTableColumn prop="type" label="认证类型" min-width="100">
+              <template #default="{ row }">
+                <ElTag :type="row.type === 'personal' ? 'primary' : 'success'" size="small">
+                  {{ row.type_label || '—' }}
+                </ElTag>
+              </template>
+            </ElTableColumn>
+            <ElTableColumn
+              prop="real_name"
+              label="真实姓名/企业名称"
+              min-width="160"
+              show-overflow-tooltip
+            >
+              <template #default="{ row }">
+                {{ row.type === 'personal' ? row.real_name || '—' : row.company_name || '—' }}
+              </template>
+            </ElTableColumn>
+            <ElTableColumn prop="status" label="状态" min-width="100">
+              <template #default="{ row }">
+                <ElTag :type="mapTagType(row.status_label_type)" size="small">
+                  {{ row.status_label || '—' }}
+                </ElTag>
+              </template>
+            </ElTableColumn>
+            <ElTableColumn prop="submitted_at" label="提交时间" min-width="170">
+              <template #default="{ row }">{{
+                row.submitted_at || row.created_at || '—'
+              }}</template>
+            </ElTableColumn>
+            <ElTableColumn prop="reviewed_at" label="审核时间" min-width="170">
+              <template #default="{ row }">{{ row.reviewed_at || '—' }}</template>
+            </ElTableColumn>
+            <ElTableColumn prop="expires_at" label="有效期" min-width="170">
+              <template #default="{ row }">{{ row.expires_at || '—' }}</template>
+            </ElTableColumn>
+          </ElTable>
+
+          <!-- 最新认证详情 -->
+          <template v-if="identityLatest">
+            <ElDivider content-position="left">最新认证详情</ElDivider>
+            <!-- 个人认证 -->
+            <template v-if="identityLatest.type === 'personal'">
+              <ElDescriptions :column="2" border size="small">
+                <ElDescriptionsItem label="真实姓名">{{
+                  identityLatest.real_name || '—'
+                }}</ElDescriptionsItem>
+                <ElDescriptionsItem label="身份证号">{{
+                  identityLatest.id_card_no || '—'
+                }}</ElDescriptionsItem>
+              </ElDescriptions>
+              <div class="grid grid-cols-3 gap-3 mt-3">
+                <div v-for="item in identityPersonalAttachments" :key="item.label">
+                  <div class="text-xs text-g-500 mb-1">{{ item.label }}</div>
+                  <ElImage
+                    v-if="item.att"
+                    :src="item.att.url"
+                    :preview-src-list="[item.att.url]"
+                    fit="cover"
+                    class="w-full h-32 rounded-md overflow-hidden border border-[var(--el-border-color-lighter)] cursor-zoom-in"
+                    preview-teleported
+                  />
+                  <div
+                    v-else
+                    class="w-full h-32 rounded-md border border-dashed border-[var(--el-border-color-lighter)] flex items-center justify-center text-xs text-g-400"
+                  >
+                    未上传
+                  </div>
+                </div>
+              </div>
+            </template>
+            <!-- 企业认证 -->
+            <template v-else>
+              <ElDescriptions :column="2" border size="small">
+                <ElDescriptionsItem label="企业名称" :span="2">{{
+                  identityLatest.company_name || '—'
+                }}</ElDescriptionsItem>
+                <ElDescriptionsItem label="统一社会信用代码">{{
+                  identityLatest.credit_code || '—'
+                }}</ElDescriptionsItem>
+                <ElDescriptionsItem label="法人姓名">{{
+                  identityLatest.legal_person_name || '—'
+                }}</ElDescriptionsItem>
+                <ElDescriptionsItem label="法人身份证号">{{
+                  identityLatest.legal_person_id_card_no || '—'
+                }}</ElDescriptionsItem>
+                <ElDescriptionsItem label="对公账户">{{
+                  identityLatest.bank_account || '—'
+                }}</ElDescriptionsItem>
+                <ElDescriptionsItem label="开户行" :span="2">{{
+                  identityLatest.bank_name || '—'
+                }}</ElDescriptionsItem>
+              </ElDescriptions>
+              <div class="grid grid-cols-2 gap-3 mt-3">
+                <div v-for="item in identityEnterpriseAttachments" :key="item.label">
+                  <div class="text-xs text-g-500 mb-1">{{ item.label }}</div>
+                  <ElImage
+                    v-if="item.att"
+                    :src="item.att.url"
+                    :preview-src-list="[item.att.url]"
+                    fit="cover"
+                    class="w-full h-40 rounded-md overflow-hidden border border-[var(--el-border-color-lighter)] cursor-zoom-in"
+                    preview-teleported
+                  />
+                  <div
+                    v-else
+                    class="w-full h-40 rounded-md border border-dashed border-[var(--el-border-color-lighter)] flex items-center justify-center text-xs text-g-400"
+                  >
+                    未上传
+                  </div>
+                </div>
+              </div>
+            </template>
+            <!-- 审核信息 -->
+            <ElDescriptions :column="2" border size="small" class="mt-3">
+              <ElDescriptionsItem label="审核管理员">{{
+                identityLatest.admin_name || '未审核'
+              }}</ElDescriptionsItem>
+              <ElDescriptionsItem label="审核时间">{{
+                identityLatest.reviewed_at || '—'
+              }}</ElDescriptionsItem>
+              <ElDescriptionsItem label="驳回原因">
+                <ElTag
+                  v-if="identityLatest.reject_reason"
+                  :type="mapTagType(identityLatest.reject_reason_label_type)"
+                  size="small"
+                >
+                  {{ identityLatest.reject_reason_label || identityLatest.reject_reason }}
+                </ElTag>
+                <span v-else>—</span>
+              </ElDescriptionsItem>
+              <ElDescriptionsItem label="驳回备注">{{
+                identityLatest.reject_remark || '—'
+              }}</ElDescriptionsItem>
+            </ElDescriptions>
+          </template>
+        </template>
+      </ElTabPane>
+
       <ElTabPane label="邀请记录" name="invites" lazy>
         <ElTable
           v-loading="inviteLoading"
