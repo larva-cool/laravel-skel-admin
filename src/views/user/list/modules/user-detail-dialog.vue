@@ -652,6 +652,7 @@
     fetchUserSocials
   } from '@/api/user-manage'
   import { fetchGetUserWallet, fetchUserWalletTrades } from '@/api/wallet'
+  import { fetchGetIdentityVerificationList } from '@/api/system-manage'
   import { useExport } from '@/hooks/core/useExport'
   import { Download } from '@element-plus/icons-vue'
 
@@ -664,10 +665,11 @@
   type CoinTradeItem = Api.UserManage.CoinTradeItem
   type InviteRecordItem = Api.UserManage.InviteRecordItem
   type WalletTradeItem = Api.WalletManage.WalletTrade
+  type IdentityItem = Api.SystemManage.IdentityVerificationListItem
 
   const dialogVisible = ref(false)
   const activeTab = ref<
-    'profile' | 'histories' | 'socials' | 'points' | 'coins' | 'wallet' | 'invites'
+    'profile' | 'histories' | 'socials' | 'points' | 'coins' | 'wallet' | 'identity' | 'invites'
   >('profile')
 
   const user = ref<UserDetail | null>(null)
@@ -723,6 +725,31 @@
   const walletDateRange = ref<string[]>([])
   const walletPage = reactive({ page: 1, per_page: 15 })
   const walletOverview = ref<Api.WalletManage.UserWallet | null>(null)
+
+  // 实名认证
+  const identityList = ref<IdentityItem[]>([])
+  const identityLoading = ref(false)
+  const identityLoaded = ref(false)
+  const identityLatest = computed(() => identityList.value[0] ?? null)
+
+  const identityPersonalAttachments = computed(() => {
+    const d = identityLatest.value
+    if (!d) return []
+    return [
+      { label: '身份证人像面', att: d.id_card_front },
+      { label: '身份证国徽面', att: d.id_card_back },
+      { label: '手持身份证', att: d.handheld }
+    ]
+  })
+
+  const identityEnterpriseAttachments = computed(() => {
+    const d = identityLatest.value
+    if (!d) return []
+    return [
+      { label: '营业执照', att: d.business_license },
+      { label: '开户许可证', att: d.opening_permit }
+    ]
+  })
 
   const walletTypeOptions = [
     { label: '充值', value: 'recharge' },
@@ -811,6 +838,9 @@
     walletDateRange.value = []
     walletOverview.value = null
 
+    identityLoaded.value = false
+    identityList.value = []
+
     // 拉取详情（含 profile）
     try {
       user.value = await fetchGetUserDetail(row.id)
@@ -831,6 +861,7 @@
     if (name === 'points' && !pointLoaded.value) loadPointTrades()
     if (name === 'coins' && !coinLoaded.value) loadCoinTrades()
     if (name === 'wallet' && !walletLoaded.value) loadWalletTrades()
+    if (name === 'identity' && !identityLoaded.value) loadIdentityVerifications()
     if (name === 'invites' && !inviteLoaded.value) loadInvites()
   }
 
@@ -1017,6 +1048,24 @@
       walletLoaded.value = true
     } finally {
       walletLoading.value = false
+    }
+  }
+
+  // ========== 实名认证 ==========
+
+  const loadIdentityVerifications = async () => {
+    if (!user.value) return
+    identityLoading.value = true
+    try {
+      const res = await fetchGetIdentityVerificationList({
+        verifiable_id: user.value.id,
+        page: 1,
+        per_page: 20
+      })
+      identityList.value = res?.data || []
+      identityLoaded.value = true
+    } finally {
+      identityLoading.value = false
     }
   }
 
