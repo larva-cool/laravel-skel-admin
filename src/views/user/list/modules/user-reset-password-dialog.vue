@@ -8,7 +8,7 @@
   >
     <ElForm ref="formRef" :model="form" :rules="rules" label-width="90px">
       <ElFormItem label="用户名">
-        <ElInput :value="username" disabled />
+        <ElInput :value="username" disabled autocomplete="off" />
       </ElFormItem>
       <ElFormItem label="新密码" prop="password">
         <ElInput
@@ -17,6 +17,7 @@
           show-password
           placeholder="请输入新密码（至少8位）"
           clearable
+          autocomplete="new-password"
         />
       </ElFormItem>
       <ElFormItem label="确认密码" prop="password_confirmation">
@@ -26,6 +27,7 @@
           show-password
           placeholder="请再次输入新密码"
           clearable
+          autocomplete="new-password"
         />
       </ElFormItem>
     </ElForm>

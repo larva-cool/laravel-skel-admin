@@ -8,16 +8,16 @@
   >
     <ElForm ref="formRef" :model="form" :rules="rules" label-width="90px">
       <ElFormItem label="用户名" prop="username">
-        <ElInput v-model="form.username" placeholder="请输入用户名" clearable />
+        <ElInput v-model="form.username" placeholder="请输入用户名" clearable autocomplete="off" />
       </ElFormItem>
       <ElFormItem label="昵称" prop="name">
         <ElInput v-model="form.name" placeholder="请输入昵称" clearable />
       </ElFormItem>
       <ElFormItem label="邮箱" prop="email">
-        <ElInput v-model="form.email" placeholder="请输入邮箱" clearable />
+        <ElInput v-model="form.email" placeholder="请输入邮箱" clearable autocomplete="off" />
       </ElFormItem>
       <ElFormItem label="手机号" prop="phone">
-        <ElInput v-model="form.phone" placeholder="请输入手机号" clearable />
+        <ElInput v-model="form.phone" placeholder="请输入手机号" clearable autocomplete="off" />
       </ElFormItem>
       <ElFormItem label="状态" prop="status">
         <ElRadioGroup v-model="form.status">

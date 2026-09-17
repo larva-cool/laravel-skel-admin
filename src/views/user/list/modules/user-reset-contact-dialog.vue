@@ -8,13 +8,14 @@
   >
     <ElForm ref="formRef" :model="form" :rules="rules" label-width="90px">
       <ElFormItem label="用户名">
-        <ElInput :value="username" disabled />
+        <ElInput :value="username" disabled autocomplete="off" />
       </ElFormItem>
       <ElFormItem :label="contactType === 'email' ? '新邮箱' : '新手机号'" prop="value">
         <ElInput
           v-model="form.value"
           :placeholder="contactType === 'email' ? '请输入新邮箱' : '请输入新手机号'"
           clearable
+          autocomplete="off"
         />
       </ElFormItem>
     </ElForm>
