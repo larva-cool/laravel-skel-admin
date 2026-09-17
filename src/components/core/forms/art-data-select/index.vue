@@ -113,8 +113,7 @@
         <div class="art-data-select__table-wrap">
           <table class="art-data-select-table">
             <colgroup>
-              <col v-if="isMultiple" style="width: 48px" />
-              <col v-else style="width: 48px" />
+              <col style="width: 56px" />
               <col
                 v-for="col in columns"
                 :key="col.prop"
@@ -131,7 +130,7 @@
                     @change="handleToggleAll"
                   />
                 </th>
-                <th v-else class="col-index">#</th>
+                <th v-else class="col-selection"></th>
                 <th
                   v-for="col in columns"
                   :key="col.prop"
@@ -143,24 +142,20 @@
             </thead>
             <tbody>
               <tr
-                v-for="(row, idx) in tableData"
+                v-for="row in tableData"
                 :key="row[rowKey]"
                 class="art-data-select-row"
                 :class="{
-                  'is-selected': isRowSelected(row),
-                  'is-single-active': !isMultiple && isRowSelected(row)
+                  'is-selected': isRowSelected(row)
                 }"
                 @click="handleRowClick(row)"
               >
-                <td v-if="isMultiple" class="col-selection" @click.stop>
+                <td class="col-selection" @click.stop>
                   <ElCheckbox
                     :model-value="isRowSelected(row)"
                     :disabled="isRowDisabled(row)"
                     @change="(val: any) => handleToggleRow(row, !!val)"
                   />
-                </td>
-                <td v-else class="col-index">
-                  {{ (pageState.current - 1) * pageState.size + idx + 1 }}
                 </td>
                 <td
                   v-for="col in columns"
@@ -249,7 +244,9 @@
           <span v-if="isMultiple" class="art-data-select__footer-count">
             当前已选择 <em>{{ selectedList.length }}</em> 项
           </span>
-          <span v-else></span>
+          <span v-else class="art-data-select__footer-single">
+            当前选择：<em>{{ singleValue ? getTagLabel(singleValue) : '未选择' }}</em>
+          </span>
           <div class="art-data-select__footer-actions">
             <ElButton @click="handleCancel">取消</ElButton>
             <ElButton type="primary" :disabled="loading" @click="handleConfirm">确定</ElButton>
@@ -261,8 +258,8 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, nextTick, ref, watch } from 'vue'
   import type { ColumnOption } from '@/types/component'
+  import { computed, nextTick, ref, watch } from 'vue'
 
   defineOptions({ name: 'ArtDataSelect' })
 
@@ -491,9 +488,8 @@
     if (isMultiple.value) {
       handleToggleRow(row, !isRowSelected(row))
     } else {
-      // 单选：点击行直接选中并确认
-      selectedList.value = [row]
-      handleConfirm()
+      // 单选：点击行切换选中状态，不自动关闭
+      handleToggleRow(row, !isRowSelected(row))
     }
   }
 
@@ -1131,6 +1127,17 @@
           font-style: normal;
           font-weight: 600;
           color: $ads-primary;
+        }
+      }
+
+      &-single {
+        font-size: 13px;
+        color: $ads-text-regular;
+
+        em {
+          font-style: normal;
+          font-weight: 500;
+          color: $ads-text-primary;
         }
       }
 
