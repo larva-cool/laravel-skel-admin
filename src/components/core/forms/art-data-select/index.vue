@@ -738,7 +738,8 @@
     }
 
     .el-dialog__header {
-      display: none;
+      padding: 0;
+      margin: 0;
     }
 
     .el-dialog__body {
