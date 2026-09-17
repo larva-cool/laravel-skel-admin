@@ -43,6 +43,22 @@
       }
     },
     {
+      label: '实名状态',
+      key: 'identity_status',
+      type: 'select',
+      props: {
+        placeholder: '请选择实名状态',
+        clearable: true,
+        options: [
+          { label: '未提交', value: 'unsubmitted' },
+          { label: '待审核', value: 'pending' },
+          { label: '需复审', value: 'review' },
+          { label: '已通过', value: 'approved' },
+          { label: '已驳回', value: 'rejected' }
+        ]
+      }
+    },
+    {
       label: 'VIP',
       key: 'vip',
       type: 'select',

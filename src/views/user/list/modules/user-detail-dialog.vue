@@ -23,6 +23,14 @@
             <ElTag v-if="user?.is_vip" type="warning">VIP 至 {{ user.vip_expires_at }}</ElTag>
             <span v-else>普通用户</span>
           </ElDescriptionsItem>
+          <ElDescriptionsItem label="实名状态" :span="1">
+            <ElTag :type="mapIdentityTagType(user?.identity_status?.value)">
+              {{ user?.identity_status?.label || '—' }}
+            </ElTag>
+          </ElDescriptionsItem>
+          <ElDescriptionsItem label="认证类型" :span="1">
+            {{ user?.identity_type?.label || '未提交' }}
+          </ElDescriptionsItem>
           <ElDescriptionsItem label="积分/金币" :span="1">
             积分 {{ user?.available_points ?? 0 }} | 金币 {{ user?.available_coins ?? 0 }}
           </ElDescriptionsItem>
@@ -673,6 +681,24 @@
   >('profile')
 
   const user = ref<UserDetail | null>(null)
+
+  // 实名认证状态 → Element Plus Tag 类型
+  function mapIdentityTagType(
+    status?: string
+  ): 'success' | 'warning' | 'danger' | 'info' | 'primary' {
+    switch (status) {
+      case 'approved':
+        return 'success'
+      case 'pending':
+      case 'review':
+        return 'warning'
+      case 'rejected':
+        return 'danger'
+      case 'unsubmitted':
+      default:
+        return 'info'
+    }
+  }
 
   // 登录历史
   const historyList = ref<LoginHistoryItem[]>([])

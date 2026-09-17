@@ -76,6 +76,24 @@
 
   const { hasAuth } = useAuth()
 
+  // 实名认证状态映射到 Element Plus Tag 类型
+  function mapIdentityTagType(
+    status: string
+  ): 'success' | 'warning' | 'danger' | 'info' | 'primary' {
+    switch (status) {
+      case 'approved':
+        return 'success'
+      case 'pending':
+      case 'review':
+        return 'warning'
+      case 'rejected':
+        return 'danger'
+      case 'unsubmitted':
+      default:
+        return 'info'
+    }
+  }
+
   const showSearchBar = ref(true)
   const detailDialogRef = ref<InstanceType<typeof UserDetailDialog>>()
   const editDialogRef = ref<InstanceType<typeof UserEditDialog>>()
@@ -147,6 +165,17 @@
               ElTag,
               { type: row.status.value === 1 ? 'success' : 'danger' },
               () => row.status.label
+            )
+        },
+        {
+          prop: 'identity_status',
+          label: '实名状态',
+          width: 100,
+          formatter: (row: UserListItem) =>
+            h(
+              ElTag,
+              { type: mapIdentityTagType(row.identity_status.value) },
+              () => row.identity_status.label
             )
         },
         { prop: 'login_count', label: '登录次数', width: 90 },

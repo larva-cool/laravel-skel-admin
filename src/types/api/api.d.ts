@@ -1262,6 +1262,10 @@ declare namespace Api {
       available_points: number
       available_coins: number
       login_count: number
+      /** 实名认证状态枚举 { value, label } */
+      identity_status: { value: string; label: string }
+      /** 实名认证类型枚举 { value, label }，未认证时为 null */
+      identity_type: { value: string; label: string } | null
       last_login_ip: string | null
       vip_expires_at: string | null
       is_vip: boolean
@@ -1372,6 +1376,8 @@ declare namespace Api {
     interface UserSearchParams extends Api.Common.CommonSearchParams {
       keyword?: string
       status?: number
+      /** 实名认证状态 */
+      identity_status?: string
       /** 1=VIP, 0=非VIP */
       vip?: string
       /** 最后登录开始日期 YYYY-MM-DD */
