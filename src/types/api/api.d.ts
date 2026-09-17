@@ -1109,8 +1109,11 @@ declare namespace Api {
     /** 规则字段 */
     type SegmentRuleField =
       | 'status'
+      | 'identity_status'
+      | 'identity_type'
       | 'vip_expires_at'
       | 'last_login_at'
+      | 'last_active_at'
       | 'created_at'
       | 'available_points'
       | 'available_coins'

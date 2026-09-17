@@ -103,6 +103,20 @@
             <ElOption :label="'正常'" :value="1" />
             <ElOption :label="'已冻结'" :value="0" />
           </ElSelect>
+          <ElSelect
+            v-else-if="isStringEnumField(cond.field as string)"
+            :model-value="(cond.value as string) ?? null"
+            :placeholder="cond.field === 'identity_status' ? '认证状态' : '认证类型'"
+            style="width: 160px"
+            @change="(v) => (cond.value = v as string)"
+          >
+            <ElOption
+              v-for="opt in stringEnumOptions(cond.field as string)"
+              :key="opt.value"
+              :label="opt.label"
+              :value="opt.value"
+            />
+          </ElSelect>
         </template>
       </template>
 
@@ -129,8 +143,11 @@
   // 字段选项（与后端 SegmentRuleField 枚举保持一致）
   const fieldOptions = [
     { label: '账号状态', value: 'status' },
+    { label: '实名认证状态', value: 'identity_status' },
+    { label: '实名认证类型', value: 'identity_type' },
     { label: 'VIP 到期时间', value: 'vip_expires_at' },
     { label: '最近登录时间', value: 'last_login_at' },
+    { label: '最后活跃时间', value: 'last_active_at' },
     { label: '注册时间', value: 'created_at' },
     { label: '可用积分', value: 'available_points' },
     { label: '可用金币', value: 'available_coins' },
@@ -149,14 +166,31 @@
   function operatorOptions(field: string | null | undefined) {
     if (!field) return []
     const isNumber = ['available_points', 'available_coins', 'login_count'].includes(field)
-    const isDate = ['vip_expires_at', 'last_login_at', 'created_at'].includes(field)
+    const isDate = ['vip_expires_at', 'last_login_at', 'last_active_at', 'created_at'].includes(
+      field
+    )
     const isStatus = field === 'status'
+    const isStringEnum = field === 'identity_status' || field === 'identity_type'
     if (isStatus) {
       return [
         { label: '等于', value: '=' },
         { label: '不等于', value: '!=' },
         { label: '包含于', value: 'in' },
         { label: '不包含于', value: 'not_in' }
+      ]
+    }
+    if (isStringEnum) {
+      return [
+        { label: '等于', value: '=' },
+        { label: '不等于', value: '!=' },
+        { label: '包含于', value: 'in' },
+        { label: '不包含于', value: 'not_in' },
+        ...(field === 'identity_type'
+          ? [
+              { label: '为空', value: 'is_null' },
+              { label: '不为空', value: 'is_not_null' }
+            ]
+          : [])
       ]
     }
     if (isDate) {
@@ -193,7 +227,28 @@
     return ['available_points', 'available_coins', 'login_count'].includes(f)
   }
   function isDateField(f: string): boolean {
-    return ['vip_expires_at', 'last_login_at', 'created_at'].includes(f)
+    return ['vip_expires_at', 'last_login_at', 'last_active_at', 'created_at'].includes(f)
+  }
+  function isStringEnumField(f: string): boolean {
+    return f === 'identity_status' || f === 'identity_type'
+  }
+
+  // 字符串枚举字段的可选值
+  const identityStatusOptions = [
+    { label: '未提交', value: 'unsubmitted' },
+    { label: '待审核', value: 'pending' },
+    { label: '需复审', value: 'review' },
+    { label: '已通过', value: 'approved' },
+    { label: '已驳回', value: 'rejected' }
+  ]
+  const identityTypeOptions = [
+    { label: '个人认证', value: 'personal' },
+    { label: '企业认证', value: 'enterprise' }
+  ]
+  function stringEnumOptions(field: string) {
+    if (field === 'identity_status') return identityStatusOptions
+    if (field === 'identity_type') return identityTypeOptions
+    return []
   }
 
   // 双向绑定：把 modelValue 拆为本地状态
