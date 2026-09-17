@@ -41,11 +41,10 @@
 
   const statusMap: Record<string, string> = {
     pending: '待审核',
-    review: '需复审',
     approved: '已通过',
     rejected: '已驳回'
   }
-  const canAct = (s?: string) => s === 'pending' || s === 'review'
+  const canAct = (s?: string) => s === 'pending'
 
   const open = async (row: IdentityItem) => {
     detail.value = { ...row }

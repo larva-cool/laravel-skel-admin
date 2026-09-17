@@ -74,7 +74,7 @@
     return t as 'primary' | 'success' | 'warning' | 'danger' | 'info'
   }
 
-  const isActable = (s?: string) => s === 'pending' || s === 'review'
+  const isActable = (s?: string) => s === 'pending'
 
   const {
     columns,

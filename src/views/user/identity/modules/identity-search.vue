@@ -25,7 +25,6 @@
 
   const statusOptions = [
     { label: '待审核', value: 'pending' },
-    { label: '需复审', value: 'review' },
     { label: '已通过', value: 'approved' },
     { label: '已驳回', value: 'rejected' }
   ]

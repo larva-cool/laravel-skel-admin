@@ -690,7 +690,6 @@
       case 'approved':
         return 'success'
       case 'pending':
-      case 'review':
         return 'warning'
       case 'rejected':
         return 'danger'
