@@ -37,7 +37,7 @@
         </button>
         <art-svg-icon
           name="arrow-down-s"
-          :size="16"
+          :size="14"
           class="art-data-select__arrow"
           :class="{ 'is-open': visible }"
         />
@@ -47,7 +47,6 @@
     <!-- 选择弹窗 -->
     <ElDialog
       v-model="visible"
-      :title="title"
       :width="dialogWidth"
       :close-on-click-modal="false"
       append-to-body
@@ -55,10 +54,25 @@
       class="art-data-select-dialog"
       @closed="handleClosed"
     >
-      <template v-if="titleTip" #title>
-        <div class="art-data-select__title-wrap">
-          <span>{{ title }}</span>
-          <p class="art-data-select__title-tip">{{ titleTip }}</p>
+      <template #header="{ close }">
+        <div class="art-data-select__header">
+          <div class="art-data-select__header-title">
+            <span class="art-data-select__title">{{ title }}</span>
+            <p v-if="titleTip" class="art-data-select__title-tip">{{ titleTip }}</p>
+          </div>
+          <div class="art-data-select__header-actions">
+            <button
+              type="button"
+              class="art-data-select__header-btn"
+              :class="{ 'is-fullscreen': isFullscreen }"
+              @click="toggleFullscreen"
+            >
+              <art-svg-icon :name="isFullscreen ? 'fullscreen-exit' : 'fullscreen'" :size="16" />
+            </button>
+            <button type="button" class="art-data-select__header-btn" @click="close">
+              <art-svg-icon name="close" :size="16" />
+            </button>
+          </div>
         </div>
       </template>
 
@@ -73,7 +87,7 @@
           @clear="handleSearchSubmit"
         >
           <template #prefix>
-            <art-svg-icon name="search" :size="16" class="text-gray-400" />
+            <art-svg-icon name="search" :size="14" class="art-data-select__search-icon" />
           </template>
         </ElInput>
         <ElSelect
@@ -97,71 +111,75 @@
       <div class="art-data-select__body" :class="{ 'is-single': !isMultiple }">
         <!-- 表格区 -->
         <div class="art-data-select__table-wrap">
-          <div class="art-data-select__table-scroll">
-            <table class="art-data-select-table">
-              <thead>
-                <tr>
-                  <th v-if="isMultiple" class="col-selection">
-                    <ElCheckbox
-                      :model-value="isAllSelected"
-                      :indeterminate="isIndeterminate"
-                      :disabled="!tableData.length"
-                      @change="handleToggleAll"
-                    />
-                  </th>
-                  <th v-else class="col-index">#</th>
-                  <th
-                    v-for="col in columns"
-                    :key="col.prop"
-                    :style="{
-                      width: col.width ? `${col.width}px` : undefined,
-                      textAlign: col.align || 'left'
-                    }"
-                  >
-                    {{ col.label }}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(row, idx) in tableData"
-                  :key="row[rowKey]"
-                  class="art-data-select-row"
-                  :class="{
-                    'is-selected': isRowSelected(row),
-                    'is-single-active': !isMultiple && isRowSelected(row)
-                  }"
-                  @click="handleRowClick(row)"
+          <table class="art-data-select-table">
+            <colgroup>
+              <col v-if="isMultiple" style="width: 48px" />
+              <col v-else style="width: 48px" />
+              <col
+                v-for="col in columns"
+                :key="col.prop"
+                :style="{ width: col.width ? `${col.width}px` : undefined }"
+              />
+            </colgroup>
+            <thead>
+              <tr>
+                <th v-if="isMultiple" class="col-selection">
+                  <ElCheckbox
+                    :model-value="isAllSelected"
+                    :indeterminate="isIndeterminate"
+                    :disabled="!tableData.length"
+                    @change="handleToggleAll"
+                  />
+                </th>
+                <th v-else class="col-index">#</th>
+                <th
+                  v-for="col in columns"
+                  :key="col.prop"
+                  :style="{ textAlign: col.align || 'left' }"
                 >
-                  <td v-if="isMultiple" class="col-selection" @click.stop>
-                    <ElCheckbox
-                      :model-value="isRowSelected(row)"
-                      :disabled="isRowDisabled(row)"
-                      @change="(val: any) => handleToggleRow(row, !!val)"
-                    />
-                  </td>
-                  <td v-else class="col-index">
-                    {{ (pageState.current - 1) * pageState.size + idx + 1 }}
-                  </td>
-                  <td
-                    v-for="col in columns"
-                    :key="col.prop"
-                    :style="{ textAlign: col.align || 'left' }"
-                  >
-                    <template v-if="col.formatter">
-                      {{ col.formatter(row) }}
-                    </template>
-                    <template v-else>{{ row[col.prop!] }}</template>
-                  </td>
-                </tr>
-                <tr v-if="!tableData.length && !loading" class="art-data-select-empty">
-                  <td :colspan="columns.length + 1">
-                    <ElEmpty description="暂无数据" :image-size="80" />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                  {{ col.label }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(row, idx) in tableData"
+                :key="row[rowKey]"
+                class="art-data-select-row"
+                :class="{
+                  'is-selected': isRowSelected(row),
+                  'is-single-active': !isMultiple && isRowSelected(row)
+                }"
+                @click="handleRowClick(row)"
+              >
+                <td v-if="isMultiple" class="col-selection" @click.stop>
+                  <ElCheckbox
+                    :model-value="isRowSelected(row)"
+                    :disabled="isRowDisabled(row)"
+                    @change="(val: any) => handleToggleRow(row, !!val)"
+                  />
+                </td>
+                <td v-else class="col-index">
+                  {{ (pageState.current - 1) * pageState.size + idx + 1 }}
+                </td>
+                <td
+                  v-for="col in columns"
+                  :key="col.prop"
+                  :style="{ textAlign: col.align || 'left' }"
+                >
+                  <template v-if="col.formatter">
+                    {{ col.formatter(row) }}
+                  </template>
+                  <template v-else>{{ row[col.prop!] }}</template>
+                </td>
+              </tr>
+              <tr v-if="!tableData.length && !loading" class="art-data-select-empty">
+                <td :colspan="columns.length + 1">
+                  <ElEmpty description="暂无数据" :image-size="80" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
           <!-- 分页 -->
           <div v-if="showPagination" class="art-data-select__pagination">
             <span class="art-data-select__pagination-total">共 {{ pageState.total }} 条</span>
@@ -170,7 +188,6 @@
               v-model:page-size="pageState.size"
               :total="pageState.total"
               :page-sizes="pageSizes"
-              background
               small
               layout="prev, pager, next, sizes"
               @current-change="handleCurrentChange"
@@ -200,6 +217,9 @@
               :key="item[rowKey]"
               class="art-data-select__selected-item"
             >
+              <div class="art-data-select__selected-icon">
+                <art-svg-icon name="file-list-2" :size="16" />
+              </div>
               <div class="art-data-select__selected-info">
                 <div class="art-data-select__selected-name">{{ getTagLabel(item) }}</div>
                 <div
@@ -212,7 +232,7 @@
               <button
                 type="button"
                 class="art-data-select__selected-remove"
-                @click="handleRemoveSelected(item)"
+                @click.stop="handleRemoveSelected(item)"
               >
                 <art-svg-icon name="close" :size="14" />
               </button>
@@ -229,6 +249,7 @@
           <span v-if="isMultiple" class="art-data-select__footer-count">
             当前已选择 <em>{{ selectedList.length }}</em> 项
           </span>
+          <span v-else></span>
           <div class="art-data-select__footer-actions">
             <ElButton @click="handleCancel">取消</ElButton>
             <ElButton type="primary" :disabled="loading" @click="handleConfirm">确定</ElButton>
@@ -257,7 +278,7 @@
     title?: string
     /** 标题下方说明文字 */
     titleTip?: string
-    /** 弹窗宽度，默认 900px */
+    /** 弹窗宽度，默认 1040px */
     width?: string | number
     /** 选择模式：single 单选 / multiple 多选，默认 multiple */
     mode?: 'single' | 'multiple'
@@ -299,7 +320,7 @@
   const props = withDefaults(defineProps<ArtDataSelectProps>(), {
     title: '请选择',
     titleTip: '',
-    width: 900,
+    width: 1040,
     mode: 'multiple',
     rowKey: 'id',
     showPagination: true,
@@ -320,6 +341,7 @@
 
   // ========== 状态 ==========
   const visible = ref(false)
+  const isFullscreen = ref(false)
   const loading = ref(false)
   const tableData = ref<any[]>([])
   /** 已选项（跨页持久化保存） */
@@ -339,7 +361,7 @@
   const isMultiple = computed(() => props.mode === 'multiple')
 
   const dialogWidth = computed(() =>
-    typeof props.width === 'number' ? `${props.width}px` : props.width
+    isFullscreen.value ? '100%' : typeof props.width === 'number' ? `${props.width}px` : props.width
   )
 
   const labelKey = computed(() => props.labelProp || props.columns[0]?.prop || 'name')
@@ -385,6 +407,10 @@
     return props.rowDisabled ? props.rowDisabled(row) : false
   }
 
+  function toggleFullscreen() {
+    isFullscreen.value = !isFullscreen.value
+  }
+
   /** 加载数据 */
   async function loadData() {
     if (typeof props.dataSource === 'function') {
@@ -420,6 +446,7 @@
     keyword.value = ''
     filterValue.value = undefined
     pageState.value.current = 1
+    isFullscreen.value = false
     visible.value = true
     emit('open')
     nextTick(() => loadData())
@@ -546,6 +573,7 @@
       // 未确认则回滚内部状态（不回写 v-model，保持 v-model 为上次确认值）
       selectedList.value = [...snapshotSelected]
     }
+    isFullscreen.value = false
     emit('close')
   }
 
@@ -572,7 +600,22 @@
   })
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
+  // ========== 颜色变量（SCSS 编译期替换，不依赖 DOM 位置） ==========
+  $ads-border: #e3e8ee;
+  $ads-border-light: #eef1f5;
+  $ads-text-primary: #4b4f66;
+  $ads-text-regular: #636779;
+  $ads-text-secondary: #878d9c;
+  $ads-text-placeholder: #a5acc2;
+  $ads-bg-hover: #f5f7fa;
+  $ads-bg-selected: #eff4ff;
+  $ads-primary: #377dff;
+  $ads-tag-bg: #efeff1;
+  $ads-tag-text: #4b5066;
+  $ads-radius: 4px;
+
+  // ========== 触发器（在组件内，scoped 也能生效，但为统一管理放这里） ==========
   .art-data-select {
     width: 100%;
 
@@ -583,24 +626,22 @@
       align-items: center;
       justify-content: space-between;
       width: 100%;
-      min-height: 36px;
-      padding: 4px 12px;
+      height: 36px;
+      padding: 0 12px;
       cursor: pointer;
-      background: var(--el-bg-color);
-      border: 1px solid var(--el-border-color);
-      border-radius: var(--el-border-radius-base);
-      transition:
-        border-color 0.2s,
-        box-shadow 0.2s;
+      background: #fff;
+      border: 1px solid $ads-border;
+      border-radius: $ads-radius;
+      transition: border-color 0.2s;
 
       &:hover {
-        border-color: var(--el-color-primary-light-5);
+        border-color: $ads-primary;
       }
     }
 
     &.is-focused &__trigger {
-      border-color: var(--el-color-primary);
-      box-shadow: 0 0 0 2px rgb(64 158 255 / 20%);
+      border-color: $ads-primary;
+      box-shadow: 0 0 0 2px rgb(55 125 255 / 15%);
     }
 
     &.is-disabled &__trigger {
@@ -613,7 +654,7 @@
       display: flex;
       flex: 1;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: 4px;
       align-items: center;
       min-width: 0;
     }
@@ -622,12 +663,13 @@
       display: inline-flex;
       align-items: center;
       max-width: 160px;
-      padding: 2px 6px;
+      height: 22px;
+      padding: 0 6px;
       font-size: 12px;
-      line-height: 1.5;
-      color: var(--el-text-color-regular);
-      background: var(--el-fill-color-light);
-      border-radius: 4px;
+      line-height: 22px;
+      color: $ads-tag-text;
+      background: $ads-tag-bg;
+      border-radius: $ads-radius;
 
       &-text {
         overflow: hidden;
@@ -636,26 +678,27 @@
       }
 
       &--more {
-        color: var(--el-color-primary);
-        background: var(--el-color-primary-light-9);
+        color: $ads-primary;
+        background: $ads-bg-selected;
       }
     }
 
     &__single-text {
       font-size: 14px;
-      color: var(--el-text-color-regular);
+      color: $ads-text-primary;
     }
 
     &__placeholder {
       font-size: 14px;
-      color: var(--el-text-color-placeholder);
+      color: $ads-text-placeholder;
     }
 
     &__suffix {
       display: flex;
+      flex-shrink: 0;
       gap: 4px;
       align-items: center;
-      color: var(--el-text-color-secondary);
+      color: $ads-text-secondary;
     }
 
     &__clear {
@@ -665,7 +708,7 @@
       width: 16px;
       height: 16px;
       padding: 0;
-      color: var(--el-text-color-secondary);
+      color: $ads-text-secondary;
       cursor: pointer;
       background: transparent;
       border: none;
@@ -673,7 +716,7 @@
       transition: color 0.2s;
 
       &:hover {
-        color: var(--el-text-color-regular);
+        color: $ads-text-regular;
       }
     }
 
@@ -682,6 +725,7 @@
     }
 
     &__arrow {
+      font-size: 12px;
       transition: transform 0.2s;
 
       &.is-open {
@@ -690,301 +734,410 @@
     }
   }
 
-  // ========== 弹窗样式 ==========
+  // ========== 弹窗（append-to-body，用类名命名空间隔离） ==========
   .art-data-select-dialog {
+    .el-dialog {
+      overflow: hidden;
+      border-radius: 8px;
+    }
+
+    .el-dialog__header {
+      display: none;
+    }
+
     .el-dialog__body {
-      padding-top: 12px;
-      padding-bottom: 12px;
+      padding: 0;
+      color: $ads-text-primary;
     }
 
     .el-dialog__footer {
-      padding-top: 12px;
-      padding-bottom: 12px;
+      padding: 12px 20px;
+      border-top: 1px solid $ads-border-light;
     }
-  }
 
-  .art-data-select__title-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    // 全屏态
+    &.is-fullscreen {
+      .el-dialog {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 100vh !important;
+        margin: 0 !important;
+        border-radius: 0;
+      }
 
-    > span {
+      .el-dialog__body {
+        height: calc(100vh - 120px);
+        overflow: auto;
+      }
+    }
+
+    // ========== 弹窗头部 ==========
+    .art-data-select__header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid $ads-border-light;
+
+      &-title {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      &-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+    }
+
+    .art-data-select__title {
       font-size: 16px;
       font-weight: 600;
-      color: var(--el-text-color-primary);
-    }
-  }
-
-  .art-data-select__title-tip {
-    margin: 0;
-    font-size: 12px;
-    font-weight: normal;
-    color: var(--el-text-color-secondary);
-  }
-
-  .art-data-select__search {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 220px;
-    gap: 12px;
-    margin-bottom: 16px;
-
-    &-input {
-      width: 100%;
+      color: $ads-text-primary;
     }
 
-    &-filter {
-      width: 100%;
-    }
-  }
-
-  .art-data-select__body {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 260px;
-    gap: 16px;
-    min-height: 380px;
-
-    &.is-single {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  // 表格区
-  .art-data-select__table-wrap {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    border: 1px solid var(--el-border-color-lighter);
-    border-radius: var(--el-border-radius-base);
-  }
-
-  .art-data-select__table-scroll {
-    flex: 1;
-    max-height: 400px;
-    overflow-y: auto;
-  }
-
-  .art-data-select-table {
-    width: 100%;
-    font-size: 13px;
-    table-layout: fixed;
-    border-spacing: 0;
-    border-collapse: separate;
-
-    thead {
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      background: var(--el-fill-color-light);
-
-      th {
-        padding: 10px 12px;
-        font-weight: 600;
-        color: var(--el-text-color-primary);
-        text-align: left;
-        border-bottom: 1px solid var(--el-border-color-lighter);
-
-        &.col-selection {
-          width: 44px;
-          text-align: center;
-        }
-
-        &.col-index {
-          width: 44px;
-          color: var(--el-text-color-secondary);
-          text-align: center;
-        }
-      }
-    }
-
-    tbody {
-      td {
-        padding: 10px 12px;
-        overflow: hidden;
-        color: var(--el-text-color-regular);
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        border-bottom: 1px solid var(--el-border-color-lighter);
-
-        &.col-selection {
-          text-align: center;
-        }
-
-        &.col-index {
-          color: var(--el-text-color-secondary);
-          text-align: center;
-        }
-      }
-
-      .art-data-select-row {
-        cursor: pointer;
-        transition: background-color 0.15s;
-
-        &:hover {
-          background: var(--el-fill-color-light);
-        }
-
-        &.is-selected {
-          background: var(--el-color-primary-light-9);
-        }
-
-        &.is-single-active {
-          background: var(--el-color-primary-light-9);
-        }
-      }
-
-      .art-data-select-empty {
-        td {
-          padding: 40px 0;
-          text-align: center;
-        }
-      }
-    }
-  }
-
-  .art-data-select__pagination {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 12px;
-    border-top: 1px solid var(--el-border-color-lighter);
-
-    &-total {
+    .art-data-select__title-tip {
+      margin: 0;
       font-size: 12px;
-      color: var(--el-text-color-secondary);
+      font-weight: normal;
+      color: $ads-text-secondary;
     }
 
-    .el-pagination {
-      justify-content: flex-end;
-    }
-  }
+    .art-data-select__header-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      color: $ads-text-secondary;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      border-radius: 4px;
+      transition: all 0.2s;
 
-  // 已选面板
-  .art-data-select__selected-panel {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    border: 1px solid var(--el-border-color-lighter);
-    border-radius: var(--el-border-radius-base);
-  }
-
-  .art-data-select__selected-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 12px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--el-text-color-primary);
-    border-bottom: 1px solid var(--el-border-color-lighter);
-
-    em {
-      font-style: normal;
-      color: var(--el-color-primary);
-    }
-  }
-
-  .art-data-select__selected-clear {
-    padding: 0;
-    font-size: 12px;
-    color: var(--el-color-primary);
-    cursor: pointer;
-    background: none;
-    border: none;
-
-    &:disabled {
-      color: var(--el-text-color-placeholder);
-      cursor: not-allowed;
+      &:hover {
+        color: $ads-text-primary;
+        background: $ads-bg-hover;
+      }
     }
 
-    &:hover:not(:disabled) {
-      text-decoration: underline;
+    // ========== 搜索区 ==========
+    .art-data-select__search {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 220px;
+      gap: 12px;
+      padding: 16px 20px;
+
+      .el-input__wrapper {
+        border-radius: $ads-radius;
+        box-shadow: 0 0 0 1px $ads-border inset;
+      }
     }
-  }
 
-  .art-data-select__selected-list {
-    flex: 1;
-    max-height: 400px;
-    overflow-y: auto;
-  }
-
-  .art-data-select__selected-item {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--el-border-color-lighter);
-
-    &:last-child {
-      border-bottom: none;
+    .art-data-select__search-icon {
+      color: $ads-text-secondary;
     }
-  }
 
-  .art-data-select__selected-info {
-    flex: 1;
-    min-width: 0;
-  }
+    // ========== 主体 ==========
+    .art-data-select__body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 260px;
+      gap: 16px;
+      padding: 0 20px 16px;
 
-  .art-data-select__selected-name {
-    overflow: hidden;
-    font-size: 13px;
-    color: var(--el-text-color-primary);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .art-data-select__selected-sub {
-    margin-top: 2px;
-    font-size: 12px;
-    color: var(--el-text-color-secondary);
-  }
-
-  .art-data-select__selected-remove {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    padding: 0;
-    color: var(--el-text-color-secondary);
-    cursor: pointer;
-    background: transparent;
-    border: none;
-    border-radius: 4px;
-    transition: all 0.2s;
-
-    &:hover {
-      color: var(--el-color-danger);
-      background: var(--el-color-danger-light-9);
+      &.is-single {
+        grid-template-columns: 1fr;
+      }
     }
-  }
 
-  .art-data-select__selected-empty {
-    padding: 40px 0;
-    font-size: 12px;
-    color: var(--el-text-color-placeholder);
-    text-align: center;
-  }
+    // ========== 表格区 ==========
+    .art-data-select__table-wrap {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      border: 1px solid $ads-border;
+      border-radius: $ads-radius;
+    }
 
-  // 底部
-  .art-data-select__footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    .art-data-select-table {
+      width: 100%;
+      font-size: 14px;
+      table-layout: fixed;
+      border-collapse: collapse;
 
-    &-count {
-      font-size: 13px;
-      color: var(--el-text-color-regular);
+      thead {
+        th {
+          padding: 12px 16px;
+          font-weight: 500;
+          color: $ads-text-regular;
+          text-align: left;
+          background: #fff;
+          border-bottom: 1px solid $ads-border;
+
+          &.col-selection {
+            width: 48px;
+            padding: 12px 0;
+            text-align: center;
+          }
+
+          &.col-index {
+            width: 48px;
+            padding: 12px 0;
+            color: $ads-text-secondary;
+            text-align: center;
+          }
+        }
+      }
+
+      tbody {
+        td {
+          padding: 12px 16px;
+          overflow: hidden;
+          color: $ads-text-primary;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          border-bottom: 1px solid $ads-border-light;
+
+          &.col-selection {
+            padding: 12px 0;
+            text-align: center;
+          }
+
+          &.col-index {
+            padding: 12px 0;
+            color: $ads-text-secondary;
+            text-align: center;
+          }
+        }
+
+        tr:last-child td {
+          border-bottom: none;
+        }
+
+        .art-data-select-row {
+          cursor: pointer;
+          transition: background-color 0.15s;
+
+          &:hover {
+            background: $ads-bg-hover;
+          }
+
+          &.is-selected {
+            background: $ads-bg-selected;
+          }
+
+          &.is-single-active {
+            background: $ads-bg-selected;
+          }
+        }
+
+        .art-data-select-empty {
+          td {
+            padding: 40px 0;
+            text-align: center;
+            border-bottom: none;
+          }
+        }
+      }
+    }
+
+    // 分页
+    .art-data-select__pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-top: 1px solid $ads-border-light;
+
+      &-total {
+        font-size: 12px;
+        color: $ads-text-secondary;
+      }
+
+      .el-pagination {
+        justify-content: flex-end;
+
+        .el-pager li {
+          min-width: 24px;
+          height: 24px;
+          font-size: 12px;
+          line-height: 24px;
+          border-radius: 4px;
+        }
+
+        .btn-prev,
+        .btn-next {
+          width: 24px;
+          height: 24px;
+          line-height: 24px;
+        }
+
+        .el-pagination__sizes .el-input .el-input__wrapper {
+          height: 24px;
+        }
+      }
+    }
+
+    // ========== 已选面板 ==========
+    .art-data-select__selected-panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 348px;
+      overflow: hidden;
+      border: 1px solid $ads-border;
+      border-radius: $ads-radius;
+    }
+
+    .art-data-select__selected-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: $ads-text-primary;
+      background: #fff;
+      border-bottom: 1px solid $ads-border;
 
       em {
         font-style: normal;
         font-weight: 600;
-        color: var(--el-color-primary);
+        color: $ads-primary;
       }
     }
 
-    &-actions {
+    .art-data-select__selected-clear {
+      padding: 0;
+      font-size: 12px;
+      color: $ads-primary;
+      cursor: pointer;
+      background: none;
+      border: none;
+
+      &:disabled {
+        color: $ads-text-placeholder;
+        cursor: not-allowed;
+      }
+
+      &:hover:not(:disabled) {
+        text-decoration: underline;
+      }
+    }
+
+    .art-data-select__selected-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .art-data-select__selected-item {
       display: flex;
-      gap: 8px;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 12px 16px;
+      border-bottom: 1px solid $ads-border-light;
+      transition: background-color 0.15s;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background: $ads-bg-hover;
+      }
+    }
+
+    .art-data-select__selected-icon {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      margin-top: 2px;
+      color: $ads-primary;
+      background: $ads-bg-selected;
+      border-radius: $ads-radius;
+    }
+
+    .art-data-select__selected-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .art-data-select__selected-name {
+      overflow: hidden;
+      font-size: 13px;
+      font-weight: 500;
+      color: $ads-text-primary;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .art-data-select__selected-sub {
+      margin-top: 2px;
+      font-size: 12px;
+      color: $ads-text-secondary;
+    }
+
+    .art-data-select__selected-remove {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      margin-top: 6px;
+      color: $ads-text-secondary;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      border-radius: 4px;
+      opacity: 0;
+      transition: all 0.2s;
+
+      &:hover {
+        color: var(--el-color-danger);
+        background: var(--el-color-danger-light-9);
+      }
+    }
+
+    .art-data-select__selected-item:hover .art-data-select__selected-remove {
+      opacity: 1;
+    }
+
+    .art-data-select__selected-empty {
+      padding: 40px 0;
+      font-size: 12px;
+      color: $ads-text-placeholder;
+      text-align: center;
+    }
+
+    // ========== 底部 ==========
+    .art-data-select__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      &-count {
+        font-size: 13px;
+        color: $ads-text-regular;
+
+        em {
+          font-style: normal;
+          font-weight: 600;
+          color: $ads-primary;
+        }
+      }
+
+      &-actions {
+        display: flex;
+        gap: 8px;
+      }
     }
   }
 </style>

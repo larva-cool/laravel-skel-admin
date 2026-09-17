@@ -75,7 +75,8 @@ export default [
       'public',
       '.vscode/**',
       'src/assets/**',
-      'src/utils/console.ts'
+      'src/utils/console.ts',
+      'src/types/import/**'
     ]
   },
   // prettier 配置
