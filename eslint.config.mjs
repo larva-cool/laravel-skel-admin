@@ -76,7 +76,8 @@ export default [
       '.vscode/**',
       'src/assets/**',
       'src/utils/console.ts',
-      'src/types/import/**'
+      'src/types/import/auto-imports.d.ts',
+      'src/types/import/components.d.ts'
     ]
   },
   // prettier 配置
