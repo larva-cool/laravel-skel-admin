@@ -93,7 +93,7 @@
         <ElSelect
           v-if="filterOptions?.length"
           v-model="filterValue"
-          placeholder="请选择分类"
+          placeholder="请选择"
           clearable
           class="art-data-select__search-filter"
           @change="handleSearchSubmit"
