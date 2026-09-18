@@ -38,7 +38,7 @@ import { headerBarConfig } from './modules/headerBar'
 const appConfig: SystemConfig = {
   // 系统信息
   systemInfo: {
-    name: 'Laravel Skel Admin' // 系统名称
+    name: import.meta.env.VITE_APP_TITLE || 'Laravel Skel Admin' // 系统名称（优先读 .env 中的 VITE_APP_TITLE）
   },
   // 系统主题
   systemThemeStyles: {

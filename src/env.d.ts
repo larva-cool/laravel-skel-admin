@@ -11,6 +11,7 @@ declare module 'file-saver'
 declare module 'laravel-echo'
 
 interface ImportMetaEnv {
+  readonly VITE_APP_TITLE: string
   readonly VITE_VERSION: string
   readonly VITE_PORT: string
   readonly VITE_BASE_URL: string
