@@ -1962,5 +1962,35 @@ declare namespace Api {
       reason: string
       remark?: string | null
     }
+
+    // ========== 收款账户（管理端） ==========
+
+    /** 收款账户状态 */
+    type WithdrawAccountStatusValue = 'active' | 'disabled'
+
+    /** 收款账户项（管理端完整信息） */
+    interface WithdrawAccount {
+      id: number
+      /** 账户类型枚举 { value, label } */
+      account_type: { value: WithdrawAccountTypeValue | string; label: string }
+      account_type_label_type?: TagType
+      real_name: string
+      /** 完整账号（管理端可见，用于审核打款） */
+      account_no: string
+      bank_name: string | null
+      bank_branch: string | null
+      is_default: boolean
+      is_verified: boolean
+      /** 账户状态枚举 { value, label } */
+      status: { value: WithdrawAccountStatusValue | string; label: string }
+      status_label_type?: TagType
+      last_used_at: string | null
+      owner?: { id: number; name: string } | null
+      created_at: string | null
+      updated_at: string | null
+    }
+
+    /** 收款账户列表（Laravel 分页） */
+    type WithdrawAccountList = Api.Common.PaginatedResponse<WithdrawAccount>
   }
 }

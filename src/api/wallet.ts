@@ -60,6 +60,17 @@ export function fetchUserWalletTrades(
   })
 }
 
+/** 获取指定用户收款账户列表（分页） */
+export function fetchUserWithdrawAccounts(
+  userId: number,
+  params?: Api.Common.LaravelPaginationRequest
+) {
+  return request.get<Api.WalletManage.WithdrawAccountList>({
+    url: `/admin/users/${userId}/withdraw-accounts`,
+    params
+  })
+}
+
 /** 调整指定用户余额（正数充正，负数扣减） */
 export function fetchAdjustUserWallet(userId: number, data: Api.WalletManage.WalletAdjustParams) {
   return request.put<Api.WalletManage.UserWallet>({

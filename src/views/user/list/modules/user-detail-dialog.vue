@@ -598,6 +598,79 @@
         </div>
       </ElTabPane>
 
+      <ElTabPane label="收款账户" name="withdraw_accounts" lazy>
+        <ElEmpty
+          v-if="!withdrawAccountLoading && withdrawAccountList.length === 0"
+          description="暂无收款账户"
+          :image-size="80"
+          class="mt-4"
+        />
+        <template v-else>
+          <ElTable
+            v-loading="withdrawAccountLoading"
+            :data="withdrawAccountList"
+            stripe
+            border
+            size="default"
+            class="mt-4"
+            style="width: 100%"
+          >
+            <ElTableColumn prop="id" label="ID" width="80" />
+            <ElTableColumn prop="account_type" label="账户类型" min-width="100">
+              <template #default="{ row }">
+                <ElTag :type="mapTagType(row.account_type_label_type)" size="small">
+                  {{ row.account_type?.label || '—' }}
+                </ElTag>
+              </template>
+            </ElTableColumn>
+            <ElTableColumn prop="real_name" label="开户人姓名" min-width="120">
+              <template #default="{ row }">{{ row.real_name || '—' }}</template>
+            </ElTableColumn>
+            <ElTableColumn prop="account_no" label="收款账号" min-width="180" show-overflow-tooltip>
+              <template #default="{ row }">{{ row.account_no || '—' }}</template>
+            </ElTableColumn>
+            <ElTableColumn prop="bank_name" label="开户银行" min-width="140" show-overflow-tooltip>
+              <template #default="{ row }">{{ row.bank_name || '—' }}</template>
+            </ElTableColumn>
+            <ElTableColumn prop="bank_branch" label="支行" min-width="160" show-overflow-tooltip>
+              <template #default="{ row }">{{ row.bank_branch || '—' }}</template>
+            </ElTableColumn>
+            <ElTableColumn label="标签" width="150">
+              <template #default="{ row }">
+                <div class="flex flex-wrap gap-1">
+                  <ElTag v-if="row.is_default" type="success" size="small">默认</ElTag>
+                  <ElTag v-if="row.is_verified" type="primary" size="small">已验证</ElTag>
+                </div>
+              </template>
+            </ElTableColumn>
+            <ElTableColumn prop="status" label="状态" min-width="90">
+              <template #default="{ row }">
+                <ElTag :type="mapTagType(row.status_label_type)" size="small">
+                  {{ row.status?.label || '—' }}
+                </ElTag>
+              </template>
+            </ElTableColumn>
+            <ElTableColumn prop="last_used_at" label="最后使用时间" min-width="170">
+              <template #default="{ row }">{{ row.last_used_at || '—' }}</template>
+            </ElTableColumn>
+            <ElTableColumn prop="created_at" label="添加时间" min-width="170" />
+          </ElTable>
+
+          <div class="tab-pagination">
+            <ElPagination
+              v-model:current-page="withdrawAccountPage.page"
+              v-model:page-size="withdrawAccountPage.per_page"
+              :page-sizes="[10, 15, 20, 30, 50]"
+              :total="withdrawAccountTotal"
+              layout="total, sizes, prev, pager, next, jumper"
+              background
+              @size-change="loadWithdrawAccounts"
+              @current-change="loadWithdrawAccounts"
+            />
+          </div>
+        </template>
+      </ElTabPane>
+
       <ElTabPane label="邀请记录" name="invites" lazy>
         <ElTable
           v-loading="inviteLoading"
@@ -659,7 +732,11 @@
     fetchUserPointTrades,
     fetchUserSocials
   } from '@/api/user-manage'
-  import { fetchGetUserWallet, fetchUserWalletTrades } from '@/api/wallet'
+  import {
+    fetchGetUserWallet,
+    fetchUserWalletTrades,
+    fetchUserWithdrawAccounts
+  } from '@/api/wallet'
   import { fetchGetIdentityVerificationList } from '@/api/system-manage'
   import { useExport } from '@/hooks/core/useExport'
   import { Download } from '@element-plus/icons-vue'
@@ -673,11 +750,20 @@
   type CoinTradeItem = Api.UserManage.CoinTradeItem
   type InviteRecordItem = Api.UserManage.InviteRecordItem
   type WalletTradeItem = Api.WalletManage.WalletTrade
+  type WithdrawAccountItem = Api.WalletManage.WithdrawAccount
   type IdentityItem = Api.SystemManage.IdentityVerificationListItem
 
   const dialogVisible = ref(false)
   const activeTab = ref<
-    'profile' | 'histories' | 'socials' | 'points' | 'coins' | 'wallet' | 'identity' | 'invites'
+    | 'profile'
+    | 'histories'
+    | 'socials'
+    | 'points'
+    | 'coins'
+    | 'wallet'
+    | 'withdraw_accounts'
+    | 'identity'
+    | 'invites'
   >('profile')
 
   const user = ref<UserDetail | null>(null)
@@ -750,6 +836,13 @@
   const walletDateRange = ref<string[]>([])
   const walletPage = reactive({ page: 1, per_page: 15 })
   const walletOverview = ref<Api.WalletManage.UserWallet | null>(null)
+
+  // 收款账户
+  const withdrawAccountList = ref<WithdrawAccountItem[]>([])
+  const withdrawAccountLoading = ref(false)
+  const withdrawAccountLoaded = ref(false)
+  const withdrawAccountTotal = ref(0)
+  const withdrawAccountPage = reactive({ page: 1, per_page: 15 })
 
   // 实名认证
   const identityList = ref<IdentityItem[]>([])
@@ -863,6 +956,11 @@
     walletDateRange.value = []
     walletOverview.value = null
 
+    withdrawAccountPage.page = 1
+    withdrawAccountLoaded.value = false
+    withdrawAccountList.value = []
+    withdrawAccountTotal.value = 0
+
     identityLoaded.value = false
     identityList.value = []
 
@@ -886,6 +984,7 @@
     if (name === 'points' && !pointLoaded.value) loadPointTrades()
     if (name === 'coins' && !coinLoaded.value) loadCoinTrades()
     if (name === 'wallet' && !walletLoaded.value) loadWalletTrades()
+    if (name === 'withdraw_accounts' && !withdrawAccountLoaded.value) loadWithdrawAccounts()
     if (name === 'identity' && !identityLoaded.value) loadIdentityVerifications()
     if (name === 'invites' && !inviteLoaded.value) loadInvites()
   }
@@ -1073,6 +1172,24 @@
       walletLoaded.value = true
     } finally {
       walletLoading.value = false
+    }
+  }
+
+  // ========== 收款账户 ==========
+
+  const loadWithdrawAccounts = async () => {
+    if (!user.value) return
+    withdrawAccountLoading.value = true
+    try {
+      const res = await fetchUserWithdrawAccounts(user.value.id, {
+        page: withdrawAccountPage.page,
+        per_page: withdrawAccountPage.per_page
+      })
+      withdrawAccountList.value = res?.data || []
+      withdrawAccountTotal.value = res?.meta?.total || 0
+      withdrawAccountLoaded.value = true
+    } finally {
+      withdrawAccountLoading.value = false
     }
   }
 
