@@ -46,6 +46,13 @@ export default [
       globals: {
         // 合并从 autoImportConfig 中读取的全局变量配置
         ...autoImportConfig.globals,
+        // Element Plus 命令式 API（unplugin-auto-import ElementPlusResolver 注册为全局）
+        // 兜底声明，避免 ESLint no-undef 报错
+        ElMessage: 'readonly',
+        ElMessageBox: 'readonly',
+        ElNotification: 'readonly',
+        ElLoading: 'readonly',
+        ElMessageService: 'readonly',
         // TypeScript 全局命名空间
         Api: 'readonly'
       }

@@ -314,13 +314,16 @@
   /** 分组图标映射 */
   const groupIcons: Record<string, string> = {
     system: 'ri:global-line',
+    admin: 'ri:shield-user-line',
     sms_captcha: 'ri:message-2-line',
     email_captcha: 'ri:mail-line',
     user: 'ri:user-3-line',
     upload: 'ri:upload-cloud-2-line',
+    password: 'ri:lock-password-line',
     openai: 'ri:robot-2-line',
     broadcast: 'ri:live-line',
-    wallet: 'ri:wallet-3-line'
+    wallet: 'ri:wallet-3-line',
+    schedule: 'ri:time-line'
   }
 
   /** 获取分组图标（未配置时降级为通用设置图标） */
