@@ -52,11 +52,13 @@
         </ul>
       </ElScrollbar>
 
-      <ArtIconButton
-        class="switch-btn size-10"
-        icon="ri:arrow-left-right-fill"
-        @click="toggleDualMenuMode"
-      />
+      <div class="switch-btn-wrap">
+        <ArtIconButton
+          class="size-10"
+          icon="ri:arrow-left-right-fill"
+          @click="toggleDualMenuMode"
+        />
+      </div>
     </div>
 
     <!-- 左侧菜单 || 双列菜单（右侧） -->

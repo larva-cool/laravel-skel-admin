@@ -14,7 +14,7 @@
           : ''
       ]"
     >
-      <div class="flex-c flex-1 min-w-0 leading-15" style="display: flex">
+      <div class="pl-4.5 flex-c flex-1 min-w-0 leading-15" style="display: flex">
         <!-- 系统信息  -->
         <div class="flex-c c-p" @click="toHome" v-if="isTopMenu">
           <ArtLogo class="pl-4.5" />
@@ -26,9 +26,9 @@
           @click="toHome"
         />
 
-        <!-- 菜单按钮 -->
+        <!-- 菜单按钮（左菜单 + 双列菜单均显示） -->
         <ArtIconButton
-          v-if="isLeftMenu && shouldShowMenuButton"
+          v-if="(isLeftMenu || isDualMenu) && shouldShowMenuButton"
           icon="ri:menu-2-fill"
           class="ml-3 max-sm:ml-[7px]"
           @click="visibleMenu"

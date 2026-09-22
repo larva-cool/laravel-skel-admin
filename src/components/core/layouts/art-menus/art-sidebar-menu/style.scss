@@ -77,12 +77,13 @@
       }
     }
 
-    .switch-btn {
+    .switch-btn-wrap {
       position: absolute;
       right: 0;
       bottom: 15px;
       left: 0;
-      margin: auto;
+      display: flex;
+      justify-content: center;
     }
   }
 
