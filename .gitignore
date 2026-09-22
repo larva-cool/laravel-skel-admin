@@ -9,5 +9,7 @@ default.profraw
 
 # Auto-generated files
 .auto-import.json
+src/types/import/components.d.ts
+src/types/import/auto-imports.d.ts
 skills-lock.json
 .trae/skills/apifox*
