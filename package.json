@@ -11,9 +11,9 @@
   "scripts": {
     "dev": "vite --open",
     "dev:testing": "vite --mode testing",
-    "build": "vue-tsc --noEmit && vite build",
-    "build:testing": "vue-tsc --noEmit && vite build --mode testing",
-    "build:production": "vue-tsc --noEmit && vite build --mode production",
+    "build": "vite build && vue-tsc --noEmit",
+    "build:testing": "vite build --mode testing && vue-tsc --noEmit",
+    "build:production": "vite build --mode production && vue-tsc --noEmit",
     "serve": "vite preview",
     "lint": "eslint",
     "fix": "eslint --fix",
