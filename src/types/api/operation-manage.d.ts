@@ -306,5 +306,46 @@ declare namespace Api {
       categories: OptionItem[]
       levels: OptionItem[]
     }
+
+    // ========== 协议管理（运营） ==========
+
+    /** 协议列表（分页） */
+    type AgreementList = Api.Common.PaginatedResponse<AgreementListItem>
+
+    /** 协议列表项（Admin AgreementResource） */
+    interface AgreementListItem {
+      id: number
+      title: string
+      category: string
+      content?: string
+      version: string
+      status: string
+      status_label?: string
+      status_label_type?: string
+      effective_at: string | null
+      sort: number
+      admin_id: number
+      admin?: { id: number; name: string } | null
+      created_at: string | null
+      updated_at: string | null
+    }
+
+    /** 协议搜索参数 */
+    interface AgreementSearchParams extends Api.Common.CommonSearchParams {
+      keyword?: string
+      category?: string
+      status?: string
+    }
+
+    /** 协议保存参数（创建/编辑共用） */
+    interface AgreementSaveParams {
+      title: string
+      category: string
+      content: string
+      version: string
+      status?: string
+      effective_at?: string | null
+      sort?: number
+    }
   }
 }

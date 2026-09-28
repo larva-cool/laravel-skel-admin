@@ -347,3 +347,58 @@ export function fetchGetSensitiveWordOptions() {
     url: '/admin/sensitive-words/options'
   })
 }
+
+// ========== 协议管理（运营） ==========
+
+/** 获取协议列表（分页） */
+export function fetchGetAgreementList(params: Api.OperationManage.AgreementSearchParams) {
+  return request.get<Api.OperationManage.AgreementList>({
+    url: '/admin/agreements',
+    params
+  })
+}
+
+/** 获取协议详情 */
+export function fetchGetAgreementDetail(id: number) {
+  return request.get<Api.OperationManage.AgreementListItem>({
+    url: `/admin/agreements/${id}`
+  })
+}
+
+/** 创建协议 */
+export function fetchCreateAgreement(data: Api.OperationManage.AgreementSaveParams) {
+  return request.post<Api.OperationManage.AgreementListItem>({
+    url: '/admin/agreements',
+    data,
+    showSuccessMessage: true,
+    successMessage: '创建成功'
+  })
+}
+
+/** 更新协议 */
+export function fetchUpdateAgreement(id: number, data: Api.OperationManage.AgreementSaveParams) {
+  return request.put<Api.OperationManage.AgreementListItem>({
+    url: `/admin/agreements/${id}`,
+    data,
+    showSuccessMessage: true,
+    successMessage: '更新成功'
+  })
+}
+
+/** 删除协议 */
+export function fetchDeleteAgreement(id: number) {
+  return request.del<null>({
+    url: `/admin/agreements/${id}`,
+    showSuccessMessage: true,
+    successMessage: '删除成功'
+  })
+}
+
+/** 切换协议状态（草稿→发布 / 发布→归档 / 归档→发布） */
+export function fetchToggleAgreementStatus(id: number) {
+  return request.put<Api.OperationManage.AgreementListItem>({
+    url: `/admin/agreements/${id}/toggle-status`,
+    showSuccessMessage: true,
+    successMessage: '状态切换成功'
+  })
+}
