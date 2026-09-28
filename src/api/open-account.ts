@@ -8,6 +8,32 @@ export function fetchGetOpenAccountList(params: Api.OpenAccount.OpenAccountSearc
   })
 }
 
+/** 获取回收站列表（已软删除的开放平台账户） */
+export function fetchGetTrashOpenAccountList(params: Api.OpenAccount.OpenAccountSearchParams) {
+  return request.get<Api.OpenAccount.OpenAccountList>({
+    url: '/admin/open-accounts/trash',
+    params
+  })
+}
+
+/** 恢复软删除的开放平台账户 */
+export function fetchRestoreOpenAccount(id: number) {
+  return request.put<null>({
+    url: `/admin/open-accounts/${id}/restore`,
+    showSuccessMessage: true,
+    successMessage: '恢复成功'
+  })
+}
+
+/** 彻底删除开放平台账户（不可恢复） */
+export function fetchForceDeleteOpenAccount(id: number) {
+  return request.del<null>({
+    url: `/admin/open-accounts/${id}/force-delete`,
+    showSuccessMessage: true,
+    successMessage: '彻底删除成功'
+  })
+}
+
 /** 获取开放平台账户详情 */
 export function fetchGetOpenAccountDetail(id: number) {
   return request.get<Api.OpenAccount.OpenAccountItem>({

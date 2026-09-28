@@ -2031,6 +2031,7 @@ declare namespace Api {
       tokens_count?: number
       created_at: string | null
       updated_at: string | null
+      deleted_at: string | null
     }
 
     /** 开放平台账户搜索参数 */
