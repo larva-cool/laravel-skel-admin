@@ -126,6 +126,17 @@ export function fetchBatchDetachSegments(data: Api.SegmentManage.SegmentBatchAtt
   })
 }
 
+/** 获取分群成员列表（分页） */
+export function fetchGetSegmentUsers(
+  segmentId: number,
+  params: { page?: number; per_page?: number; keyword?: string }
+) {
+  return request.get<Api.Common.PaginatedResponse<Api.UserManage.UserListItem>>({
+    url: `/admin/user-segments/${segmentId}/users`,
+    params
+  })
+}
+
 // ========== 分群异步任务（> 1000 ID 时自动入队） ==========
 
 /** 获取分群异步任务列表（分页） */

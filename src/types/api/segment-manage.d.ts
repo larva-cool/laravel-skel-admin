@@ -43,6 +43,8 @@ declare namespace Api {
     /** 规则字段 */
     type SegmentRuleField =
       | 'status'
+      | 'gender'
+      | 'birthday'
       | 'identity_status'
       | 'identity_type'
       | 'vip_expires_at'
