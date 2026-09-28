@@ -2,7 +2,7 @@ declare namespace Api {
   /** 通知管理 */
   namespace Notification {
     /** 通知列表查询参数 */
-    interface ListParams extends Api.Common.LaravelPaginationRequest {
+    interface ListParams extends Api.Common.PaginationRequest {
       type?: string
     }
 

@@ -23,7 +23,7 @@ declare namespace Api {
     }
 
     /** 会话列表分页参数 */
-    type ConversationListParams = Api.Common.LaravelPaginationRequest
+    type ConversationListParams = Api.Common.PaginationRequest
 
     /** 会话列表项 */
     interface ConversationItem {

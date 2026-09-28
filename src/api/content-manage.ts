@@ -26,10 +26,7 @@ export function fetchGetCommentDetail(id: number) {
 }
 
 // 获取评论回复列表
-export function fetchGetCommentReplies(
-  id: number,
-  params?: Partial<Api.Common.LaravelPaginationRequest>
-) {
+export function fetchGetCommentReplies(id: number, params?: Partial<Api.Common.PaginationRequest>) {
   return request.get<Api.ContentManage.CommentList>({
     url: `/admin/comments/${id}/replies`,
     params

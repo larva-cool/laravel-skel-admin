@@ -46,7 +46,7 @@ export function fetchGetUserWallet(userId: number) {
 /** 获取指定用户钱包流水（分页） */
 export function fetchUserWalletTrades(
   userId: number,
-  params?: Api.Common.LaravelPaginationRequest & {
+  params?: Api.Common.PaginationRequest & {
     type?: string
     status?: string
     keyword?: string
@@ -61,10 +61,7 @@ export function fetchUserWalletTrades(
 }
 
 /** 获取指定用户收款账户列表（分页） */
-export function fetchUserWithdrawAccounts(
-  userId: number,
-  params?: Api.Common.LaravelPaginationRequest
-) {
+export function fetchUserWithdrawAccounts(userId: number, params?: Api.Common.PaginationRequest) {
   return request.get<Api.WalletManage.WithdrawAccountList>({
     url: `/admin/users/${userId}/withdraw-accounts`,
     params

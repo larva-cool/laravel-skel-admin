@@ -12,7 +12,7 @@ declare namespace Api {
     }
 
     /** 分页请求参数（Laravel 格式：发送给后端的参数名） */
-    interface LaravelPaginationRequest {
+    interface PaginationRequest {
       /** 当前页码 */
       page: number
       /** 每页条数 */
@@ -35,7 +35,7 @@ declare namespace Api {
     }
 
     /** 通用搜索参数（继承 Laravel 分页请求参数） */
-    type CommonSearchParams = LaravelPaginationRequest
+    type CommonSearchParams = PaginationRequest
 
     /** 启用状态 */
     type EnableStatus = '1' | '2'

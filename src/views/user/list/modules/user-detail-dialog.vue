@@ -998,7 +998,7 @@
     if (!user.value) return
     historyLoading.value = true
     try {
-      const params: Api.Common.LaravelPaginationRequest & {
+      const params: Api.Common.PaginationRequest & {
         login_start?: string
         login_end?: string
       } = {
@@ -1043,7 +1043,7 @@
     if (!user.value) return
     pointLoading.value = true
     try {
-      const params: Api.Common.LaravelPaginationRequest & {
+      const params: Api.Common.PaginationRequest & {
         keyword?: string
         start_date?: string
         end_date?: string
@@ -1074,7 +1074,7 @@
     if (!user.value) return
     coinLoading.value = true
     try {
-      const params: Api.Common.LaravelPaginationRequest & {
+      const params: Api.Common.PaginationRequest & {
         keyword?: string
         start_date?: string
         end_date?: string
@@ -1149,7 +1149,7 @@
         }
       }
 
-      const params: Api.Common.LaravelPaginationRequest & {
+      const params: Api.Common.PaginationRequest & {
         type?: string
         status?: string
         keyword?: string

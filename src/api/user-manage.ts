@@ -89,7 +89,7 @@ export function fetchExtendUserVip(id: number, data: Api.UserManage.ExtendVipPar
 // 获取用户登录历史（分页）
 export function fetchUserLoginHistories(
   id: number | string,
-  params?: Api.Common.LaravelPaginationRequest & {
+  params?: Api.Common.PaginationRequest & {
     keyword?: string
     login_start?: string
     login_end?: string
@@ -104,7 +104,7 @@ export function fetchUserLoginHistories(
 // 获取用户社交账号（分页）
 export function fetchUserSocials(
   id: number | string,
-  params?: Api.Common.LaravelPaginationRequest & { provider?: string }
+  params?: Api.Common.PaginationRequest & { provider?: string }
 ) {
   return request.get<Api.UserManage.SocialList>({
     url: `/admin/users/${id}/socials`,
@@ -115,7 +115,7 @@ export function fetchUserSocials(
 // 获取用户积分流水（分页）
 export function fetchUserPointTrades(
   id: number | string,
-  params?: Api.Common.LaravelPaginationRequest & {
+  params?: Api.Common.PaginationRequest & {
     keyword?: string
     type?: string
     start_date?: string
@@ -131,7 +131,7 @@ export function fetchUserPointTrades(
 // 获取用户金币流水（分页）
 export function fetchUserCoinTrades(
   id: number | string,
-  params?: Api.Common.LaravelPaginationRequest & {
+  params?: Api.Common.PaginationRequest & {
     keyword?: string
     type?: string
     start_date?: string
