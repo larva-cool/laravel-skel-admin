@@ -594,5 +594,100 @@ declare namespace Api {
       priority?: number
       admin_remark?: string | null
     }
+
+    // ========== 举报管理 ==========
+
+    /** 举报统计数据 */
+    interface ReportStats {
+      total: number
+      pending: number
+      today: number
+      closed: number
+    }
+
+    /** 举报被举报对象快照（按类型返回不同字段） */
+    interface ReportSnapshotComment {
+      type: 'comment'
+      id: number
+      user_id?: number
+      username?: string | null
+      content?: string
+      status?: string
+      status_label?: string
+      created_at?: string | null
+    }
+
+    /** 举报被举报对象快照（用户） */
+    interface ReportSnapshotUser {
+      type: 'user'
+      id: number
+      username?: string | null
+      nickname?: string | null
+      avatar?: string | null
+      status?: number
+      status_label?: string
+      registered_at?: string | null
+    }
+
+    type ReportSnapshot =
+      ReportSnapshotComment | ReportSnapshotUser | Record<string, unknown> | null
+
+    /** 联动处置动作记录 */
+    interface ReportProcessAction {
+      type: 'hide_comment' | 'delete_comment' | 'freeze_user'
+      duration?: number
+      reason?: string
+    }
+
+    /** 举报列表项（Admin ReportResource 列表形态） */
+    interface ReportListItem {
+      id: number
+      user_id: number
+      username?: string | null
+      nickname?: string | null
+      category: string
+      category_label?: string
+      category_label_type?: string
+      status: 'pending' | 'processing' | 'resolved' | 'rejected'
+      status_label?: string
+      status_label_type?: string
+      reportable_type: string
+      reportable_type_label?: string
+      reportable_id: number
+      handler_id?: number | null
+      handler_name?: string | null
+      processed_at?: string | null
+      created_at: string | null
+    }
+
+    /** 举报详情（Admin ReportResource 详情形态，含 reason/evidence/snapshot/process_actions） */
+    interface ReportDetail extends ReportListItem {
+      reason?: string | null
+      evidence?: string[]
+      reportable_snapshot?: ReportSnapshot
+      process_remark?: string | null
+      process_actions?: ReportProcessAction[]
+    }
+
+    /** 举报列表（分页） */
+    type ReportList = Api.Common.PaginatedResponse<ReportListItem>
+
+    /** 举报搜索参数 */
+    interface ReportSearchParams extends Api.Common.CommonSearchParams {
+      keyword?: string
+      status?: 'pending' | 'processing' | 'resolved' | 'rejected'
+      category?: string
+      reportable_type?: string
+      handler_id?: number
+      start_date?: string
+      end_date?: string
+    }
+
+    /** 举报处理参数（处理举报） */
+    interface ReportProcessParams {
+      status: 'resolved' | 'rejected'
+      remark?: string | null
+      actions?: ReportProcessAction[]
+    }
   }
 }

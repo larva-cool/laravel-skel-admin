@@ -704,3 +704,48 @@ export function fetchRejectIdentityVerification(id: number, data: RejectIdentity
     successMessage: '已驳回'
   })
 }
+
+// ========== 举报管理 ==========
+
+/** 获取举报列表（分页） */
+export function fetchGetReportList(params: Api.SystemManage.ReportSearchParams) {
+  return request.get<Api.SystemManage.ReportList>({
+    url: '/admin/reports',
+    params
+  })
+}
+
+/** 获取举报统计数据 */
+export function fetchGetReportStats() {
+  return request.get<Api.SystemManage.ReportStats>({
+    url: '/admin/reports/stats'
+  })
+}
+
+/** 获取举报详情 */
+export function fetchGetReportDetail(id: number) {
+  return request.get<Api.SystemManage.ReportDetail>({
+    url: `/admin/reports/${id}`
+  })
+}
+
+/** 处理举报（PUT/PATCH） */
+export function fetchProcessReport(id: number, data: Api.SystemManage.ReportProcessParams) {
+  return request.put<Api.SystemManage.ReportDetail>({
+    url: `/admin/reports/${id}`,
+    data,
+    showSuccessMessage: true,
+    successMessage: '处理成功'
+  })
+}
+
+/** 导出举报列表 */
+export function fetchExportReports(params?: Api.SystemManage.ReportSearchParams) {
+  return request.get<AxiosResponse>({
+    url: '/admin/reports/export',
+    params,
+    responseType: 'blob',
+    returnRawResponse: true,
+    showErrorMessage: true
+  })
+}
