@@ -221,9 +221,6 @@
             >
               <ArtSvgIcon icon="ri:shield-check-line" class="text-primary" />
               <span class="font-medium">{{ actionTypeLabel(action.type) }}</span>
-              <span v-if="action.duration !== undefined" class="text-xs text-g-500">
-                （{{ action.duration === 0 ? '永久' : `${action.duration} 天` }}）
-              </span>
               <span v-if="action.reason" class="text-xs text-g-500 ml-2"
                 >- {{ action.reason }}</span
               >

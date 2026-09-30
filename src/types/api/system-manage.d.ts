@@ -635,7 +635,6 @@ declare namespace Api {
     /** 联动处置动作记录 */
     interface ReportProcessAction {
       type: 'hide_comment' | 'delete_comment' | 'freeze_user'
-      duration?: number
       reason?: string
     }
 

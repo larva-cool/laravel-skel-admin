@@ -81,7 +81,7 @@
     }
   )
 
-  // 永久冻结：UI 不再渲染冻结天数（frozen_until 始终为 null），duration 字段在提交时自动设为 0
+  // 永久冻结：动作仅含 type，协议不携带时长字段（冻结为永久，需管理员人工解冻）
 
   const resetForm = () => {
     form.status = 'resolved'
