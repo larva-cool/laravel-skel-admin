@@ -30,8 +30,8 @@
   ]
 
   const reportableTypeOptions = [
-    { label: '评论', value: 'App\\Models\\Content\\Comment' },
-    { label: '用户', value: 'App\\Models\\User' }
+    { label: '评论', value: 'comment' },
+    { label: '用户', value: 'user' }
   ]
 
   const formItems = computed(() => [

@@ -59,19 +59,19 @@
             value: 'hide_comment',
             label: '隐藏评论',
             description: '将评论状态置为「已驳回」',
-            targetType: ['App\\Models\\Content\\Comment']
+            targetType: ['comment']
           },
           {
             value: 'delete_comment',
             label: '删除评论',
             description: '递归删除该评论及其回复',
-            targetType: ['App\\Models\\Content\\Comment']
+            targetType: ['comment']
           },
           {
             value: 'freeze_user',
             label: '冻结用户（永久）',
             description: '永久冻结被举报用户，需管理员人工解冻',
-            targetType: ['App\\Models\\User', 'App\\Models\\Content\\Comment']
+            targetType: ['user', 'comment']
           }
         ]
       if (!targetTypeLabel.value) return []
