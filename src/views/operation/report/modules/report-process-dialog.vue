@@ -9,7 +9,6 @@
     ElCheckboxGroup,
     ElCheckbox,
     ElInput,
-    ElInputNumber,
     ElButton,
     ElAlert,
     ElDivider
@@ -34,15 +33,12 @@
     remark: string
     /** 选中的动作类型（字符串数组，传给 ElCheckboxGroup） */
     selectedActions: ActionType[]
-    /** 冻结用户的天数（0 = 永久） */
-    freezeDuration: number
   }
 
   const form = reactive<HandleForm>({
     status: 'resolved',
     remark: '',
-    selectedActions: [],
-    freezeDuration: 0
+    selectedActions: []
   })
 
   const rules: FormRules<HandleForm> = {
@@ -73,8 +69,8 @@
           },
           {
             value: 'freeze_user',
-            label: '冻结用户',
-            description: '冻结被举报用户',
+            label: '冻结用户（永久）',
+            description: '永久冻结被举报用户，需管理员人工解冻',
             targetType: ['App\\Models\\User', 'App\\Models\\Content\\Comment']
           }
         ]
@@ -85,13 +81,12 @@
     }
   )
 
-  const showFreezeDuration = computed(() => form.selectedActions.includes('freeze_user'))
+  // 永久冻结：UI 不再渲染冻结天数（frozen_until 始终为 null），duration 字段在提交时自动设为 0
 
   const resetForm = () => {
     form.status = 'resolved'
     form.remark = ''
     form.selectedActions = []
-    form.freezeDuration = 0
     targetTypeLabel.value = ''
     formRef.value?.resetFields()
   }
@@ -102,7 +97,6 @@
     form.status = 'resolved'
     form.remark = ''
     form.selectedActions = []
-    form.freezeDuration = 0
     visible.value = true
   }
 
@@ -119,11 +113,7 @@
     try {
       const actions: Api.SystemManage.ReportProcessAction[] | undefined =
         form.status === 'resolved' && form.selectedActions.length > 0
-          ? form.selectedActions.map((type) =>
-              type === 'freeze_user'
-                ? { type, duration: Number(form.freezeDuration) || 0 }
-                : { type }
-            )
+          ? form.selectedActions.map((type) => ({ type }))
           : undefined
 
       const payload: Api.SystemManage.ReportProcessParams = {
@@ -192,16 +182,6 @@
               </div>
             </ElCheckbox>
           </ElCheckboxGroup>
-        </ElFormItem>
-
-        <ElFormItem v-if="showFreezeDuration" label="冻结天数">
-          <ElInputNumber
-            v-model="form.freezeDuration"
-            :min="0"
-            :max="365"
-            placeholder="0 表示永久冻结"
-            class="!w-full"
-          />
         </ElFormItem>
       </template>
 
