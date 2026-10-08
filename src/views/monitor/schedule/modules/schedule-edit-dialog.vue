@@ -38,7 +38,11 @@
       </ElFormItem>
 
       <ElFormItem label="Cron 表达式" prop="expression">
-        <ElInput v-model="form.expression" placeholder="例如：* * * * *" clearable />
+        <ElInput v-model="form.expression" placeholder="例如：* * * * *" readonly>
+          <template #append>
+            <ElButton @click="openCronDialog">配置</ElButton>
+          </template>
+        </ElInput>
         <div class="form-tip">
           标准五段式 Cron：分 时 日 月 周（例如
           <code>* * * * *</code> 每分钟、<code>0 * * * *</code> 每小时、<code>0 0 * * *</code>
@@ -186,6 +190,21 @@
     <template #footer>
       <ElButton @click="handleClose">取消</ElButton>
       <ElButton type="primary" :loading="submitting" @click="handleSubmit"> 确认 </ElButton>
+    </template>
+  </ElDialog>
+
+  <!-- Cron 表达式配置弹窗 -->
+  <ElDialog
+    v-model="cronDialogVisible"
+    title="Cron 表达式配置"
+    width="560px"
+    append-to-body
+    :close-on-click-modal="false"
+  >
+    <ArtCronPicker ref="cronPickerRef" :model-value="form.expression" />
+    <template #footer>
+      <ElButton @click="cronDialogVisible = false">取消</ElButton>
+      <ElButton type="primary" @click="confirmCron">确认</ElButton>
     </template>
   </ElDialog>
 </template>
@@ -366,6 +385,22 @@
   function handleClose() {
     formRef.value?.resetFields()
     dialogVisible.value = false
+  }
+
+  // ===== Cron 配置弹窗 =====
+  const cronDialogVisible = ref(false)
+  const cronPickerRef = ref<{ getExpression: () => string }>()
+
+  function openCronDialog() {
+    cronDialogVisible.value = true
+  }
+
+  function confirmCron() {
+    const expr = cronPickerRef.value?.getExpression()
+    if (expr) {
+      form.expression = expr
+    }
+    cronDialogVisible.value = false
   }
 
   defineExpose({ open })
