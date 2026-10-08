@@ -105,6 +105,10 @@
     modelValue?: string
   }>()
 
+  const emit = defineEmits<{
+    (e: 'change', value: string): void
+  }>()
+
   // ===== 字段定义 =====
   interface FieldOption {
     label: string
@@ -244,9 +248,9 @@
     }
   })
 
-  defineExpose({
-    /** 获取当前生成的表达式 */
-    getExpression: () => resultExpr.value
+  // 表达式变化时通知父组件
+  watch(resultExpr, (value) => {
+    emit('change', value)
   })
 </script>
 

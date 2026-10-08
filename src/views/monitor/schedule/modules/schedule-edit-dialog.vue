@@ -38,12 +38,19 @@
       </ElFormItem>
 
       <ElFormItem label="Cron 表达式" prop="expression">
-        <ElInput
-          v-model="form.expression"
-          placeholder="点击配置 Cron 表达式"
-          readonly
-          @click="openCronDialog"
-        />
+        <ElPopover
+          v-model:visible="cronPopoverVisible"
+          trigger="click"
+          placement="bottom-start"
+          :width="480"
+          popper-class="cron-picker-popover"
+          :show-arrow="false"
+        >
+          <template #reference>
+            <ElInput v-model="form.expression" placeholder="点击配置 Cron 表达式" readonly />
+          </template>
+          <ArtCronPicker :model-value="form.expression" @change="form.expression = $event" />
+        </ElPopover>
         <div class="form-tip">
           标准五段式 Cron：分 时 日 月 周（例如
           <code>* * * * *</code> 每分钟、<code>0 * * * *</code> 每小时、<code>0 0 * * *</code>
@@ -191,21 +198,6 @@
     <template #footer>
       <ElButton @click="handleClose">取消</ElButton>
       <ElButton type="primary" :loading="submitting" @click="handleSubmit"> 确认 </ElButton>
-    </template>
-  </ElDialog>
-
-  <!-- Cron 表达式配置弹窗 -->
-  <ElDialog
-    v-model="cronDialogVisible"
-    title="Cron 表达式配置"
-    width="560px"
-    append-to-body
-    :close-on-click-modal="false"
-  >
-    <ArtCronPicker ref="cronPickerRef" :model-value="form.expression" />
-    <template #footer>
-      <ElButton @click="cronDialogVisible = false">取消</ElButton>
-      <ElButton type="primary" @click="confirmCron">确认</ElButton>
     </template>
   </ElDialog>
 </template>
@@ -388,21 +380,8 @@
     dialogVisible.value = false
   }
 
-  // ===== Cron 配置弹窗 =====
-  const cronDialogVisible = ref(false)
-  const cronPickerRef = ref<{ getExpression: () => string }>()
-
-  function openCronDialog() {
-    cronDialogVisible.value = true
-  }
-
-  function confirmCron() {
-    const expr = cronPickerRef.value?.getExpression()
-    if (expr) {
-      form.expression = expr
-    }
-    cronDialogVisible.value = false
-  }
+  // ===== Cron 配置 Popover =====
+  const cronPopoverVisible = ref(false)
 
   defineExpose({ open })
 </script>
