@@ -293,12 +293,12 @@ export function fetchPulseUsage(params?: PulseUsageParams) {
 
 /** 调度日志列表（分页） */
 export function fetchScheduleLogList(params: Api.Monitor.ScheduleLogSearchParams) {
-  return request.get<Api.Monitor.ScheduleLogList>({ url: '/admin/schedule-logs', params })
+  return request.get<Api.Monitor.ScheduleLogList>({ url: '/admin/schedules/logs', params })
 }
 
 /** 调度日志详情 */
 export function fetchScheduleLogDetail(id: number) {
-  return request.get<Api.Monitor.ScheduleLogItem>({ url: `/admin/schedule-logs/${id}` })
+  return request.get<Api.Monitor.ScheduleLogItem>({ url: `/admin/schedules/logs/${id}` })
 }
 
 // ========== 操作日志（审计日志） ==========
