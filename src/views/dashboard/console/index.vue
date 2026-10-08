@@ -3,6 +3,8 @@
   <div>
     <CardList></CardList>
 
+    <FinanceOverview />
+
     <ElRow :gutter="20">
       <ElCol :sm="24" :md="12" :lg="10">
         <ActiveUser />
@@ -30,6 +32,7 @@
 
 <script setup lang="ts">
   import CardList from './modules/card-list.vue'
+  import FinanceOverview from './modules/finance-overview.vue'
   import ActiveUser from './modules/active-user.vue'
   import SalesOverview from './modules/sales-overview.vue'
   import NewUser from './modules/new-user.vue'

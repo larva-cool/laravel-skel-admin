@@ -29,6 +29,25 @@ export interface LoginTrendPoint {
   count: number
 }
 
+/** 财务趋势数据点 */
+export interface FinanceTrendPoint {
+  date: string
+  recharge: number
+  withdraw: number
+}
+
+/** 财务维度统计（充值 / 提现） */
+export interface DashboardFinance {
+  total_recharge: number
+  total_withdraw: number
+  net_income: number
+  today_recharge: number
+  today_withdraw: number
+  recharge_count: number
+  withdraw_count: number
+  trend: FinanceTrendPoint[]
+}
+
 /** 最近注册用户 */
 export interface NewUserItem {
   id: number
@@ -53,6 +72,7 @@ export interface DashboardStatsResponse {
   cards: DashboardCards
   user_trend: UserTrendPoint[]
   login_trend: LoginTrendPoint[]
+  finance: DashboardFinance
   new_users: NewUserItem[]
   recent_logins: RecentLoginItem[]
 }
