@@ -38,11 +38,12 @@
       </ElFormItem>
 
       <ElFormItem label="Cron 表达式" prop="expression">
-        <ElInput v-model="form.expression" placeholder="例如：* * * * *" readonly>
-          <template #append>
-            <ElButton @click="openCronDialog">配置</ElButton>
-          </template>
-        </ElInput>
+        <ElInput
+          v-model="form.expression"
+          placeholder="点击配置 Cron 表达式"
+          readonly
+          @click="openCronDialog"
+        />
         <div class="form-tip">
           标准五段式 Cron：分 时 日 月 周（例如
           <code>* * * * *</code> 每分钟、<code>0 * * * *</code> 每小时、<code>0 0 * * *</code>

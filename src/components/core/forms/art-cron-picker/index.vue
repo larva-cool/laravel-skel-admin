@@ -1,136 +1,97 @@
 <!-- 轻量 Cron 表达式选择器（标准五段式：分 时 日 月 周） -->
 <template>
   <div class="art-cron-picker">
-    <ElTabs v-model="activeTab">
-      <!-- 常用预设 -->
-      <ElTabPane label="常用预设" name="preset">
-        <ElRadioGroup v-model="presetValue" class="cron-options">
-          <ElRadio
-            v-for="item in presets"
-            :key="item.value"
-            :value="item.value"
-            class="cron-option"
-          >
-            {{ item.label }}
-            <span class="cron-expr">{{ item.value }}</span>
-          </ElRadio>
-        </ElRadioGroup>
-      </ElTabPane>
+    <ElTabs v-model="activeField" type="border-card">
+      <ElTabPane v-for="field in fields" :key="field.key" :name="field.key">
+        <template #label>
+          <span class="tab-label">{{ field.name }}</span>
+        </template>
 
-      <!-- 周期触发 -->
-      <ElTabPane label="周期触发" name="cycle">
-        <ElForm label-width="80px" label-position="left" class="cron-form">
-          <ElFormItem label="触发周期">
-            <ElSelect v-model="cycleUnit" class="w-160">
-              <ElOption
-                v-for="item in cycleUnits"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </ElSelect>
-          </ElFormItem>
+        <div class="tab-body">
+          <!-- 任意 -->
+          <div class="cron-row">
+            <ElRadio v-model="config[field.key].mode" :value="'every'">
+              每{{ field.unit }}都执行
+            </ElRadio>
+          </div>
 
-          <!-- 每 N 分钟（仅工作时段可选） -->
-          <ElFormItem label="间隔">
-            <ElInputNumber
-              v-model="cycleInterval"
-              :min="1"
-              :max="cycleMax"
-              controls-position="right"
-            />
-          </ElFormItem>
-
-          <template v-if="cycleUnit === 'minute' || cycleUnit === 'hour'">
-            <ElFormItem label="生效时段">
-              <div class="flex items-center">
-                <ElTimePicker
-                  v-model="cycleStart"
-                  format="HH:mm"
-                  value-format="HH:mm"
-                  placeholder="开始"
-                  class="w-110"
-                />
-                <span class="mx-2 text-g-500">至</span>
-                <ElTimePicker
-                  v-model="cycleEnd"
-                  format="HH:mm"
-                  value-format="HH:mm"
-                  placeholder="结束"
-                  class="w-110"
-                />
-              </div>
-            </ElFormItem>
-          </template>
-
-          <template v-if="cycleUnit === 'day'">
-            <ElFormItem label="触发时间">
-              <ElTimePicker
-                v-model="cycleTime"
-                format="HH:mm"
-                value-format="HH:mm"
-                placeholder="选择时间"
-                class="w-160"
-              />
-            </ElFormItem>
-          </template>
-
-          <template v-if="cycleUnit === 'week'">
-            <ElFormItem label="选择星期">
-              <ElCheckboxGroup v-model="cycleWeekdays">
-                <ElCheckbox v-for="item in weekOptions" :key="item.value" :value="item.value">
-                  {{ item.label }}
-                </ElCheckbox>
-              </ElCheckboxGroup>
-            </ElFormItem>
-            <ElFormItem label="触发时间">
-              <ElTimePicker
-                v-model="cycleTime"
-                format="HH:mm"
-                value-format="HH:mm"
-                placeholder="选择时间"
-                class="w-160"
-              />
-            </ElFormItem>
-          </template>
-
-          <template v-if="cycleUnit === 'month'">
-            <ElFormItem label="选择日期">
+          <!-- 周期增量：从 start 开始，每 increment -->
+          <div class="cron-row">
+            <ElRadio v-model="config[field.key].mode" :value="'increment'">
+              <span class="mr-1">从</span>
               <ElInputNumber
-                v-model="cycleMonthDay"
-                :min="1"
-                :max="31"
+                v-model="config[field.key].start"
+                :min="field.min"
+                :max="field.max"
+                size="small"
                 controls-position="right"
-                class="w-130"
+                class="w-110"
               />
-              <span class="ml-2 text-g-500">号</span>
-            </ElFormItem>
-            <ElFormItem label="触发时间">
-              <ElTimePicker
-                v-model="cycleTime"
-                format="HH:mm"
-                value-format="HH:mm"
-                placeholder="选择时间"
-                class="w-160"
+              <span class="mx-1">{{ field.unit }}开始，每</span>
+              <ElInputNumber
+                v-model="config[field.key].increment"
+                :min="1"
+                :max="field.max"
+                size="small"
+                controls-position="right"
+                class="w-100"
               />
-            </ElFormItem>
-          </template>
-        </ElForm>
-      </ElTabPane>
+              <span class="ml-1">{{ field.unit }}执行一次</span>
+            </ElRadio>
+          </div>
 
-      <!-- 自定义表达式 -->
-      <ElTabPane label="自定义" name="custom">
-        <ElInput v-model="customExpr" placeholder="* * * * *" />
-        <div class="cron-tip mt-2">
-          五段顺序：分(0-59) 时(0-23) 日(1-31) 月(1-12) 周(0-6，0=周日)。 支持 <code>*</code>
-          <code>,</code> <code>-</code> <code>/</code> 符号。
+          <!-- 指定值多选 -->
+          <div class="cron-row">
+            <ElRadio v-model="config[field.key].mode" :value="'specific'" class="w-full">
+              <span class="mr-1">指定{{ field.unit }}（可多选）</span>
+              <ElSelect
+                v-model="config[field.key].specific"
+                multiple
+                collapse-tags
+                collapse-tags-tooltip
+                size="small"
+                class="w-300 align-middle"
+              >
+                <ElOption
+                  v-for="opt in field.options"
+                  :key="opt.value"
+                  :label="opt.label"
+                  :value="opt.value"
+                />
+              </ElSelect>
+            </ElRadio>
+          </div>
+
+          <!-- 区间范围 -->
+          <div class="cron-row">
+            <ElRadio v-model="config[field.key].mode" :value="'range'">
+              <span class="mr-1">从</span>
+              <ElInputNumber
+                v-model="config[field.key].rangeStart"
+                :min="field.min"
+                :max="field.max"
+                size="small"
+                controls-position="right"
+                class="w-110"
+              />
+              <span class="mx-1">到</span>
+              <ElInputNumber
+                v-model="config[field.key].rangeEnd"
+                :min="field.min"
+                :max="field.max"
+                size="small"
+                controls-position="right"
+                class="w-110"
+              />
+              <span class="ml-1">{{ field.unit }}之间执行</span>
+            </ElRadio>
+          </div>
         </div>
       </ElTabPane>
     </ElTabs>
 
-    <!-- 当前表达式预览 -->
-    <div class="cron-preview">
-      <span class="text-g-500">当前表达式：</span>
+    <!-- 结果预览 -->
+    <div class="cron-result">
       <code>{{ resultExpr }}</code>
     </div>
   </div>
@@ -144,52 +105,32 @@
     modelValue?: string
   }>()
 
-  const activeTab = ref('preset')
-  const customExpr = ref('* * * * *')
-
-  // ===== 预设 =====
-  interface PresetItem {
+  // ===== 字段定义 =====
+  interface FieldOption {
     label: string
-    value: string
+    value: number | string
   }
 
-  const presets: PresetItem[] = [
-    { label: '每分钟', value: '* * * * *' },
-    { label: '每 5 分钟', value: '*/5 * * * *' },
-    { label: '每 10 分钟', value: '*/10 * * * *' },
-    { label: '每 30 分钟', value: '*/30 * * * *' },
-    { label: '每小时整点', value: '0 * * * *' },
-    { label: '每天 00:00', value: '0 0 * * *' },
-    { label: '每天 01:00', value: '0 1 * * *' },
-    { label: '每天 02:00', value: '0 2 * * *' },
-    { label: '每周一 00:00', value: '0 0 * * 1' },
-    { label: '每月 1 号 00:00', value: '0 0 1 * *' }
-  ]
-
-  const presetValue = ref('* * * * *')
-
-  // ===== 周期触发 =====
-  interface CycleUnitItem {
-    label: string
-    value: string
+  interface FieldDef {
+    key: string
+    name: string
+    unit: string
+    min: number
+    max: number
+    options: FieldOption[]
   }
 
-  const cycleUnits: CycleUnitItem[] = [
-    { label: '分钟', value: 'minute' },
-    { label: '小时', value: 'hour' },
-    { label: '每天', value: 'day' },
-    { label: '每周', value: 'week' },
-    { label: '每月', value: 'month' }
-  ]
+  /** 生成数字区间选项 */
+  function numberOptions(min: number, max: number): FieldOption[] {
+    const list: FieldOption[] = []
+    for (let i = min; i <= max; i++) {
+      list.push({ label: String(i), value: i })
+    }
 
-  const cycleUnit = ref('day')
-  const cycleInterval = ref(1)
-  const cycleTime = ref('00:00')
-  const cycleStart = ref('00:00')
-  const cycleEnd = ref('23:59')
-  const cycleMonthDay = ref(1)
+    return list
+  }
 
-  const weekOptions = [
+  const weekOptions: FieldOption[] = [
     { label: '周一', value: 1 },
     { label: '周二', value: 2 },
     { label: '周三', value: 3 },
@@ -198,99 +139,108 @@
     { label: '周六', value: 6 },
     { label: '周日', value: 0 }
   ]
-  const cycleWeekdays = ref<number[]>([1])
 
-  // 根据周期单位限制间隔范围
-  const cycleMax = computed(() => {
-    if (cycleUnit.value === 'minute' || cycleUnit.value === 'hour') {
-      return cycleUnit.value === 'minute' ? 59 : 23
-    }
+  const fields: FieldDef[] = [
+    { key: 'minute', name: '分钟', unit: '分钟', min: 0, max: 59, options: numberOptions(0, 59) },
+    { key: 'hour', name: '小时', unit: '小时', min: 0, max: 23, options: numberOptions(0, 23) },
+    { key: 'day', name: '日', unit: '日', min: 1, max: 31, options: numberOptions(1, 31) },
+    { key: 'month', name: '月', unit: '月', min: 1, max: 12, options: numberOptions(1, 12) },
+    { key: 'week', name: '周', unit: '星期', min: 0, max: 6, options: weekOptions }
+  ]
 
-    return 31
-  })
+  // ===== 每个字段的配置 =====
+  type FieldMode = 'every' | 'increment' | 'specific' | 'range'
 
-  // ===== 根据周期配置生成表达式 =====
-  function buildCycleExpr(): string {
-    const time = (cycleTime.value || '00:00').split(':')
-    const hour = time[0] ?? '0'
-    const minute = time[1] ?? '0'
+  interface FieldConfig {
+    mode: FieldMode
+    start: number
+    increment: number
+    specific: Array<number | string>
+    rangeStart: number
+    rangeEnd: number
+  }
 
-    switch (cycleUnit.value) {
-      case 'minute': {
-        // 限定生效时段：分从 0 开始按间隔，小时限定在起止小时范围
-        const startHour = Number((cycleStart.value || '00:00').split(':')[0])
-        const endHour = Number((cycleEnd.value || '23:59').split(':')[0])
-        const hours = range(startHour, endHour).join(',')
+  function defaultConfig(key: string): FieldConfig {
+    const dayLike = key === 'day' || key === 'month'
 
-        return `*/${cycleInterval.value} ${hours} * * *`
-      }
-      case 'hour': {
-        const startHour = Number((cycleStart.value || '00:00').split(':')[0])
-        const endHour = Number((cycleEnd.value || '23:59').split(':')[0])
-        const startMinute = Number((cycleStart.value || '00:00').split(':')[1]) || 0
-        const hours = range(startHour, endHour, cycleInterval.value).join(',')
-
-        return `${startMinute} ${hours} * * *`
-      }
-      case 'day':
-        return `${minute} ${hour} * * *`
-      case 'week': {
-        const days = [...cycleWeekdays.value].sort((a, b) => a - b).join(',')
-
-        return `${minute} ${hour} * * ${days}`
-      }
-      case 'month':
-        return `${minute} ${hour} ${cycleMonthDay.value} * *`
-      default:
-        return '* * * * *'
+    return {
+      mode: 'every',
+      start: dayLike ? 1 : 0,
+      increment: 1,
+      specific: [],
+      rangeStart: dayLike ? 1 : 0,
+      rangeEnd: dayLike ? 1 : 1
     }
   }
 
-  /** 生成连续整数序列，支持步长 */
-  function range(start: number, end: number, step = 1): number[] {
-    const result: number[] = []
-    if (start <= end) {
-      for (let i = start; i <= end; i += step) {
-        result.push(i)
-      }
-    } else {
-      // 跨午夜场景，如 22 点至次日 6 点
-      for (let i = start; i <= 23; i += step) {
-        result.push(i)
-      }
-      for (let i = 0; i <= end; i += step) {
-        result.push(i)
-      }
-    }
+  const config = reactive<Record<string, FieldConfig>>(
+    Object.fromEntries(fields.map((f) => [f.key, defaultConfig(f.key)]))
+  )
 
-    return result
+  const activeField = ref('minute')
+
+  // ===== 单字段表达式生成 =====
+  function buildFieldExpr(key: string): string {
+    const c = config[key]
+
+    switch (c.mode) {
+      case 'every':
+        return '*'
+      case 'increment':
+        return `${c.start}/${c.increment}`
+      case 'specific': {
+        const values = [...c.specific].sort((a, b) => Number(a) - Number(b))
+
+        return values.length ? values.join(',') : '*'
+      }
+      case 'range':
+        return `${c.rangeStart}-${c.rangeEnd}`
+      default:
+        return '*'
+    }
   }
 
-  // ===== 当前表达式 =====
-  const resultExpr = computed(() => {
-    switch (activeTab.value) {
-      case 'preset':
-        return presetValue.value
-      case 'cycle':
-        return buildCycleExpr()
-      case 'custom':
-        return customExpr.value || '* * * * *'
-      default:
-        return '* * * * *'
-    }
-  })
+  // ===== 完整表达式 =====
+  const resultExpr = computed(() => fields.map((f) => buildFieldExpr(f.key)).join(' '))
 
-  // 初始化：根据传入表达式判断所在标签
+  // ===== 从传入表达式解析回填 =====
+  function parseExpression(expr: string): void {
+    const parts = expr.trim().split(/\s+/)
+    if (parts.length !== 5) return
+
+    fields.forEach((field, index) => {
+      const token = parts[index]
+      const c = defaultConfig(field.key)
+
+      if (token === '*') {
+        c.mode = 'every'
+      } else if (token.includes('/')) {
+        const [start, inc] = token.split('/')
+        c.mode = 'increment'
+        c.start = Number(start) || 0
+        c.increment = Number(inc) || 1
+      } else if (token.includes('-')) {
+        const [start, end] = token.split('-')
+        c.mode = 'range'
+        c.rangeStart = Number(start) || 0
+        c.rangeEnd = Number(end) || 0
+      } else if (token.includes(',')) {
+        c.mode = 'specific'
+        c.specific = token.split(',').map((v) => {
+          return field.key === 'week' && Number.isNaN(Number(v)) ? v : Number(v)
+        })
+      } else if (token !== '') {
+        c.mode = 'specific'
+        c.specific = [field.key === 'week' && Number.isNaN(Number(token)) ? token : Number(token)]
+      }
+
+      config[field.key] = c
+    })
+  }
+
   watchEffect(() => {
-    const expr = props.modelValue
-    if (!expr) return
-
-    if (presets.some((p) => p.value === expr)) {
-      activeTab.value = 'preset'
-      presetValue.value = expr
-    } else {
-      activeTab.value = 'custom'
-      customExpr.value = expr
+    if (props.modelValue) {
+      parseExpression(props.modelValue)
     }
   })
 
@@ -305,54 +255,41 @@
     font-size: 14px;
   }
 
-  .cron-options {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    align-items: flex-start;
+  .tab-label {
+    padding: 0 2px;
   }
 
-  .cron-option {
-    height: auto;
-    padding: 6px 0;
-    margin-right: 0;
-    text-align: left;
-    white-space: normal;
+  .tab-body {
+    min-height: 200px;
+    padding: 4px 8px;
   }
 
-  .cron-expr {
-    margin-left: 8px;
-    font-family: var(--el-font-family-monospace, monospace);
-    font-size: 12px;
-    color: var(--el-color-primary);
-  }
+  .cron-row {
+    margin: 14px 0;
 
-  .cron-form {
-    margin-top: 4px;
-  }
+    :deep(.el-radio) {
+      align-items: center;
+      height: auto;
+      white-space: normal;
+    }
 
-  .cron-tip {
-    font-size: 12px;
-    line-height: 1.8;
-    color: var(--el-text-color-secondary);
-
-    code {
-      padding: 0 4px;
-      font-family: var(--el-font-family-monospace, monospace);
-      background: var(--el-fill-color-light);
-      border-radius: 3px;
+    :deep(.el-radio__label) {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
     }
   }
 
-  .cron-preview {
-    padding: 10px 12px;
-    margin-top: 12px;
+  .cron-result {
+    padding: 12px;
+    margin-top: 14px;
+    text-align: center;
     background: var(--el-fill-color-light);
     border-radius: 4px;
 
     code {
       font-family: var(--el-font-family-monospace, monospace);
-      font-size: 14px;
+      font-size: 16px;
       color: var(--el-color-primary);
     }
   }
