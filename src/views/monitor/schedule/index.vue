@@ -81,7 +81,12 @@
       apiFn: fetchScheduleList,
       apiParams: { page: 1, per_page: 20 },
       columnsFactory: () => [
-        { prop: 'id', label: 'ID', width: 80 },
+        {
+          prop: 'id',
+          label: 'ID',
+          width: 100,
+          formatter: (row: ScheduleItem) => String(row.id).padStart(8, '0')
+        },
         { prop: 'name', label: '任务名称', minWidth: 180, showOverflowTooltip: true },
         {
           prop: 'command_string',
