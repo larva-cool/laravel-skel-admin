@@ -38,19 +38,11 @@
       </ElFormItem>
 
       <ElFormItem label="Cron 表达式" prop="expression">
-        <ElPopover
-          v-model:visible="cronPopoverVisible"
-          trigger="click"
-          placement="bottom-start"
-          :width="480"
-          popper-class="cron-picker-popover"
-          :show-arrow="false"
-        >
-          <template #reference>
-            <ElInput v-model="form.expression" placeholder="点击配置 Cron 表达式" readonly />
-          </template>
-          <ArtCronPicker :model-value="form.expression" @change="form.expression = $event" />
-        </ElPopover>
+        <ElInput
+          v-model="form.expression"
+          placeholder="例如：* * * * *  0 1 * * *  0 0 1 * *"
+          clearable
+        />
         <div class="form-tip">
           标准五段式 Cron：分 时 日 月 周（例如
           <code>* * * * *</code> 每分钟、<code>0 * * * *</code> 每小时、<code>0 0 * * *</code>
@@ -379,9 +371,6 @@
     formRef.value?.resetFields()
     dialogVisible.value = false
   }
-
-  // ===== Cron 配置 Popover =====
-  const cronPopoverVisible = ref(false)
 
   defineExpose({ open })
 </script>

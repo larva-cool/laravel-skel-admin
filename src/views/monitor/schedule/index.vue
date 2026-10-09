@@ -37,25 +37,29 @@
 
     <!-- 新增/编辑弹窗 -->
     <ScheduleEditDialog ref="editDialogRef" @success="onEditSuccess" />
+
+    <!-- 详情弹窗（含调度日志） -->
+    <ScheduleDetailDialog ref="detailDialogRef" />
   </div>
 </template>
 
 <script setup lang="ts">
-  import { h } from 'vue'
-  import { ElTag, ElMessageBox } from 'element-plus'
-  import { Plus } from '@element-plus/icons-vue'
-  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
-  import { useTable } from '@/hooks/core/useTable'
-  import { useAuth } from '@/hooks/core/useAuth'
   import {
-    fetchScheduleList,
     fetchDeleteSchedule,
-    fetchToggleSchedule,
     fetchExecuteSchedule,
+    fetchScheduleList,
+    fetchToggleSchedule,
     type ScheduleItem
   } from '@/api/schedule'
-  import ScheduleSearch from './modules/schedule-search.vue'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
+  import { useAuth } from '@/hooks/core/useAuth'
+  import { useTable } from '@/hooks/core/useTable'
+  import { Plus } from '@element-plus/icons-vue'
+  import { ElMessageBox, ElTag } from 'element-plus'
+  import { h } from 'vue'
   import ScheduleEditDialog from './modules/schedule-edit-dialog.vue'
+  import ScheduleDetailDialog from './modules/schedule-detail-dialog.vue'
+  import ScheduleSearch from './modules/schedule-search.vue'
 
   defineOptions({ name: 'ScheduleManage' })
 
@@ -63,6 +67,7 @@
 
   const showSearchBar = ref(true)
   const editDialogRef = ref<InstanceType<typeof ScheduleEditDialog>>()
+  const detailDialogRef = ref<InstanceType<typeof ScheduleDetailDialog>>()
 
   const {
     columns,
@@ -123,10 +128,15 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 200,
+          width: 240,
           fixed: 'right',
           formatter: (row: ScheduleItem) =>
             h('div', { class: 'flex items-center' }, [
+              h(ArtButtonTable, {
+                type: 'view',
+                title: '详情',
+                onClick: () => openDetailDialog(row)
+              }),
               hasAuth('schedules.edit')
                 ? h(ArtButtonTable, {
                     type: 'edit',
@@ -173,6 +183,10 @@
     editDialogRef.value?.open(row)
   }
 
+  const openDetailDialog = (row: ScheduleItem) => {
+    detailDialogRef.value?.open(row)
+  }
+
   const onEditSuccess = () => {
     refreshData()
   }
@@ -199,7 +213,8 @@
     ElMessageBox.confirm(`确认手动执行定时任务「${row.name}」吗？`, '执行定时任务', {
       type: 'warning',
       confirmButtonText: '确认执行',
-      cancelButtonText: '取消'
+      cancelButtonText: '取消',
+      customClass: 'schedule-execute-msgbox'
     })
       .then(async () => {
         const result = await fetchExecuteSchedule(row.id)
@@ -215,7 +230,8 @@
           '执行结果',
           {
             confirmButtonText: '关闭',
-            dangerouslyUseHTMLString: false
+            dangerouslyUseHTMLString: false,
+            customClass: 'schedule-execute-msgbox'
           }
         )
       })
@@ -234,4 +250,10 @@
   }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+  // 全局覆盖：通过 customClass 命中的 el-message-box 容器宽度加宽一倍
+  :global(.schedule-execute-msgbox) {
+    width: 640px;
+    max-width: calc(100vw - 64px);
+  }
+</style>
