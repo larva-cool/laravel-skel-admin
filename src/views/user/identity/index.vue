@@ -45,8 +45,8 @@
 
 <script setup lang="ts">
   import { h, ref } from 'vue'
-  import { ElTag, ElButton, ElMessageBox } from 'element-plus'
-  import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
+  import { ElTag, ElMessageBox } from 'element-plus'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { useAuth } from '@/hooks/core/useAuth'
   import {
@@ -158,45 +158,41 @@
         {
           prop: 'actions',
           label: '操作',
-          width: 160,
+          width: 150,
           fixed: 'right',
-          formatter: (row: IdentityItem) =>
-            h('div', { class: 'flex items-center gap-1' }, [
-              h(
-                ElButton,
-                {
-                  type: 'primary',
-                  link: true,
-                  size: 'small',
-                  onClick: () => viewDetail(row)
-                },
-                () => [h(ArtSvgIcon, { icon: 'ri:eye-line', class: 'mr-0.5' }), '查看']
-              ),
-              hasAuth('identity-verifications.edit') && isActable(row.status)
-                ? h(
-                    ElButton,
-                    {
-                      type: 'success',
-                      link: true,
-                      size: 'small',
-                      onClick: () => onApprove(row)
-                    },
-                    () => [h(ArtSvgIcon, { icon: 'ri:check-line', class: 'mr-0.5' }), '通过']
-                  )
-                : null,
-              hasAuth('identity-verifications.edit') && isActable(row.status)
-                ? h(
-                    ElButton,
-                    {
-                      type: 'danger',
-                      link: true,
-                      size: 'small',
-                      onClick: () => onReject(row)
-                    },
-                    () => [h(ArtSvgIcon, { icon: 'ri:close-line', class: 'mr-0.5' }), '驳回']
-                  )
-                : null
-            ])
+          formatter: (row: IdentityItem) => {
+            const buttons: any[] = [
+              h(ArtButtonTable, {
+                type: 'view',
+                title: '查看',
+                onClick: () => viewDetail(row)
+              })
+            ]
+
+            if (hasAuth('identity-verifications.edit') && isActable(row.status)) {
+              // 通过、驳回均内联展示
+              buttons.push(
+                h(ArtButtonTable, {
+                  icon: 'ri:check-line',
+                  iconColor: 'var(--el-color-success)',
+                  buttonBgColor: 'rgba(103,194,58,0.12)',
+                  title: '通过',
+                  onClick: () => onApprove(row)
+                })
+              )
+              buttons.push(
+                h(ArtButtonTable, {
+                  icon: 'ri:close-line',
+                  iconColor: 'var(--el-color-danger)',
+                  buttonBgColor: 'rgba(245,108,108,0.12)',
+                  title: '驳回',
+                  onClick: () => onReject(row)
+                })
+              )
+            }
+
+            return h('div', { class: 'flex items-center' }, buttons)
+          }
         }
       ]
     }
