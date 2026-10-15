@@ -88,7 +88,7 @@
     return { label, att }
   }
 
-  defineExpose({ open })
+  defineExpose({ open, close })
 </script>
 
 <template>

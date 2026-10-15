@@ -214,7 +214,8 @@
     )
       .then(async () => {
         await fetchApproveIdentityVerification(row.id)
-        // 触发列表/统计刷新
+        // 关闭抽屉并触发列表/统计刷新
+        detailDrawerRef.value?.close()
         refreshData()
         statsRef.value?.refresh()
       })
@@ -226,6 +227,8 @@
   }
 
   const onReviewSuccess = () => {
+    // 关闭抽屉并触发列表/统计刷新
+    detailDrawerRef.value?.close()
     refreshData()
     statsRef.value?.refresh()
   }

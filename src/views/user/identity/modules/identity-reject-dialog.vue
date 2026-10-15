@@ -1,15 +1,6 @@
 <script setup lang="ts">
   import { reactive, ref } from 'vue'
-  import {
-    ElDialog,
-    ElForm,
-    ElFormItem,
-    ElSelect,
-    ElOption,
-    ElInput,
-    ElButton,
-    ElTag
-  } from 'element-plus'
+  import { ElDialog, ElForm, ElFormItem, ElSelect, ElOption, ElInput, ElButton } from 'element-plus'
   import type { FormInstance, FormRules } from 'element-plus'
   import { fetchRejectIdentityVerification, fetchDictItemsByCode } from '@/api/system-manage'
 
@@ -18,7 +9,6 @@
   interface RejectReasonOption {
     label: string
     value: string
-    labelType?: string
   }
 
   const emit = defineEmits<{
@@ -40,11 +30,6 @@
 
   const reasonOptions = ref<RejectReasonOption[]>([])
 
-  const mapTagType = (t?: string) => {
-    if (!t || t === 'default') return undefined
-    return t as 'primary' | 'success' | 'warning' | 'danger' | 'info'
-  }
-
   const rules: FormRules<typeof form> = {
     reason: [{ required: true, message: '请选择驳回原因', trigger: 'change' }]
   }
@@ -54,8 +39,7 @@
       const items = await fetchDictItemsByCode('identity_reject_reason')
       reasonOptions.value = (items || []).map((it) => ({
         label: it.label,
-        value: it.value,
-        labelType: it.label_type || 'default'
+        value: it.value
       }))
     } catch {
       reasonOptions.value = []
@@ -119,13 +103,7 @@
             :key="opt.value"
             :value="opt.value"
             :label="opt.label"
-          >
-            <div class="flex items-center gap-2">
-              <ElTag :type="mapTagType(opt.labelType) as any" size="small" effect="light">
-                {{ opt.label }}
-              </ElTag>
-            </div>
-          </ElOption>
+          />
         </ElSelect>
       </ElFormItem>
       <ElFormItem label="驳回备注" prop="remark">
