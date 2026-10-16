@@ -55,16 +55,25 @@ export const useAuth = () => {
 
   /**
    * 检查是否拥有某权限标识（前后端模式通用）
+   *
+   * 优先匹配后端下发的全局权限列表（adminInfo.buttons，含当前管理员的全部权限），
+   * 以支持跨模块权限判断（如 A 列表页跳转查看 B 模块详情）；
+   * 全局列表未命中时，再回退匹配当前路由 meta.auth_list。
    * @param auth 权限标识
    * @returns 是否有权限
    */
   const hasAuth = (auth: string): boolean => {
-    // 前端模式
-    if (isFrontendMode.value) {
-      return frontendAuthList.includes(auth)
+    // 全局权限列表（后端 AdminInfoResource 始终下发全部权限标识）
+    if (frontendAuthList.includes(auth)) {
+      return true
     }
 
-    // 后端模式
+    // 前端模式仅以全局按钮权限为准
+    if (isFrontendMode.value) {
+      return false
+    }
+
+    // 后端模式回退匹配当前路由配置的权限列表
     return backendAuthList.some((item) => item?.auth_mark === auth)
   }
 
