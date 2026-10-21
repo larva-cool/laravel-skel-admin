@@ -166,12 +166,7 @@ export async function fetchChatStream(
  * 审批工具调用并继续流式对话
  */
 export async function fetchChatApprove(
-  data: {
-    conversation_id: string
-    approval_id: string
-    approved: boolean
-    reason?: string
-  },
+  data: Api.Chat.ApproveParams,
   handlers: ChatStreamHandlers
 ): Promise<void> {
   const { VITE_API_URL } = import.meta.env
@@ -193,6 +188,13 @@ export function fetchGetConversations(params?: Api.Chat.ConversationListParams) 
   return request.get<Api.Chat.ConversationListResponse>({
     url: '/admin/chat/conversations',
     params
+  })
+}
+
+/** 获取聊天元数据（可用智能体与模型列表） */
+export function fetchChatMeta() {
+  return request.get<Api.Chat.MetaResponse>({
+    url: '/admin/chat/meta'
   })
 }
 

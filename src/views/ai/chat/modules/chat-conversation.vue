@@ -100,6 +100,24 @@
                 </div>
               </div>
 
+              <!-- 图片附件 -->
+              <div
+                v-if="message.attachments && message.attachments.length"
+                class="mb-1.5 flex flex-wrap gap-1.5"
+                :class="message.role === 'user' ? 'justify-end' : 'justify-start'"
+              >
+                <ElImage
+                  v-for="(attachment, index) in message.attachments"
+                  :key="index"
+                  :src="attachment.url"
+                  :preview-src-list="message.attachments.map((a) => a.url)"
+                  :initial-index="index"
+                  fit="cover"
+                  class="size-20 rounded-md border border-g-300"
+                  preview-teleported
+                />
+              </div>
+
               <!-- 文本气泡 -->
               <div
                 v-if="message.content"
@@ -225,26 +243,115 @@
 
       <!-- 聊天输入区域 -->
       <div class="p-4">
+        <!-- 待发送图片预览 -->
+        <div v-if="pendingImages.length" class="mb-2 flex flex-wrap gap-2">
+          <div v-for="(img, index) in pendingImages" :key="index" class="relative size-16">
+            <img
+              :src="img.url"
+              class="size-16 rounded-md border border-g-300 object-cover"
+              :class="{ 'opacity-50': img.uploading }"
+            />
+            <div v-if="img.uploading" class="absolute inset-0 flex-cc">
+              <ElIcon class="is-loading text-g-700" :size="18"><Loading /></ElIcon>
+            </div>
+            <ElIcon
+              v-else
+              class="absolute -top-1.5 -right-1.5 c-p rounded-full bg-g-700/70 p-0.5 text-white hover:!bg-danger"
+              :size="14"
+              @click="pendingImages.splice(index, 1)"
+              ><Close
+            /></ElIcon>
+          </div>
+        </div>
+
         <ElInput
           v-model="messageText"
           type="textarea"
           :rows="3"
-          placeholder="输入消息"
+          placeholder="输入消息，Shift+Enter 换行，可粘贴图片"
           resize="none"
           :disabled="isStreaming"
           @keyup.enter.exact.prevent="sendMessage"
+          @paste="handlePaste"
         />
+
         <div class="mt-3 flex-cb">
-          <span class="text-xs text-g-500">Enter 发送，Shift+Enter 换行</span>
+          <div class="flex-c gap-1">
+            <!-- 上传图片 -->
+            <ElTooltip content="上传图片" placement="top">
+              <div
+                class="flex-cc size-8.5 c-p rounded-full text-lg text-g-600 tad-300 hover:bg-hover-color"
+                @click="fileInputRef?.click()"
+              >
+                <ArtSvgIcon icon="ri:attachment-2" />
+              </div>
+            </ElTooltip>
+            <input
+              ref="fileInputRef"
+              type="file"
+              accept="image/*"
+              multiple
+              class="hidden"
+              @change="handleFileChange"
+            />
+
+            <!-- 智能体选择 -->
+            <ElDropdown trigger="click" @command="(key: string) => (selectedAgent = key)">
+              <span
+                class="flex-c c-p rounded-md px-2 py-1.5 text-xs text-g-600 tad-300 hover:bg-hover-color"
+              >
+                {{ currentAgentName }}
+                <ElIcon class="ms-0.5"><ArrowDown /></ElIcon>
+              </span>
+              <template #dropdown>
+                <ElDropdownMenu>
+                  <ElDropdownItem
+                    v-for="agent in metaAgents"
+                    :key="agent.key"
+                    :command="agent.key"
+                    :class="{ 'text-theme': agent.key === selectedAgent }"
+                    >{{ agent.name }}</ElDropdownItem
+                  >
+                </ElDropdownMenu>
+              </template>
+            </ElDropdown>
+
+            <!-- 模型选择 -->
+            <ElDropdown
+              v-if="metaModels.length"
+              trigger="click"
+              @command="(id: string) => (selectedModel = id)"
+            >
+              <span
+                class="flex-c c-p rounded-md px-2 py-1.5 text-xs text-g-600 tad-300 hover:bg-hover-color"
+              >
+                {{ currentModelName }}
+                <ElIcon class="ms-0.5"><ArrowDown /></ElIcon>
+              </span>
+              <template #dropdown>
+                <ElDropdownMenu>
+                  <ElDropdownItem
+                    v-for="model in metaModels"
+                    :key="model.id"
+                    :command="model.id"
+                    :class="{ 'text-theme': model.id === selectedModel }"
+                    >{{ model.name }}</ElDropdownItem
+                  >
+                </ElDropdownMenu>
+              </template>
+            </ElDropdown>
+          </div>
+
           <ElButton
             type="primary"
-            class="min-w-20"
+            circle
+            class="!size-10"
             :loading="isStreaming"
-            :disabled="!messageText.trim()"
+            :disabled="!canSend"
             @click="sendMessage"
-            v-ripple
-            >发送</ElButton
           >
+            <ArtSvgIcon icon="ri:send-plane-fill" class="text-base" />
+          </ElButton>
         </div>
       </div>
     </div>
@@ -253,13 +360,22 @@
 
 <script setup lang="ts">
   import type { PendingApproval } from '@/api/chat'
-  import { fetchChatApprove, fetchChatStream, fetchGetConversation } from '@/api/chat'
+  import {
+    fetchChatApprove,
+    fetchChatMeta,
+    fetchChatStream,
+    fetchGetConversation
+  } from '@/api/chat'
+  import { fetchUploadAttachmentFile } from '@/api/system-manage'
   import aiAvatar from '@/assets/images/avatar/ai.png'
   import defaultAvatar from '@/assets/images/avatar/avatar5.webp'
   import { useUserStore } from '@/store/modules/user'
   import {
+    ArrowDown,
     Check as CircleCheck,
+    Close,
     Close as CircleClose,
+    Loading,
     Tools,
     WarningFilled
   } from '@element-plus/icons-vue'
@@ -290,6 +406,7 @@
     content: string
     created_at: string | null
     streaming?: boolean
+    attachments?: Api.Chat.MessageAttachment[]
     toolCalls?: ToolCallRecord[]
     toolResults?: ToolResultRecord[]
     pendingApprovals?: PendingApproval[]
@@ -312,7 +429,7 @@
 
   // 常量定义
   const SCROLL_DELAY = 80
-  const BOT_NAME = 'Art Bot'
+  const MAX_IMAGES = 4
   const quickQuestions = ['介绍一下系统功能', '怎么创建管理员？', '如何配置邮件？']
 
   // 工具名中文映射
@@ -333,9 +450,96 @@
   const userName = computed(() => userStore.adminInfo?.user_name || '我')
   const meAvatar = computed(() => userStore.adminInfo?.avatar || defaultAvatar)
 
+  // 元数据（智能体 / 模型）
+  const metaAgents = ref<Api.Chat.AgentOption[]>([{ key: 'assistant', name: '系统管理助手' }])
+  const metaModels = ref<Api.Chat.ModelOption[]>([])
+  const selectedAgent = ref('assistant')
+  const selectedModel = ref('')
+
+  const currentAgentName = computed(
+    () => metaAgents.value.find((a) => a.key === selectedAgent.value)?.name || '系统管理助手'
+  )
+  const currentModelName = computed(
+    () => metaModels.value.find((m) => m.id === selectedModel.value)?.name || '默认模型'
+  )
+  /** AI 助手展示名（跟随当前选择的智能体） */
+  const BOT_NAME = computed(() => currentAgentName.value)
+
+  /** 加载可用智能体与模型列表 */
+  const loadMeta = async (): Promise<void> => {
+    try {
+      const meta = await fetchChatMeta()
+      metaAgents.value = meta.agents
+      metaModels.value = meta.models
+      selectedModel.value = meta.default_model
+      if (!meta.agents.some((a) => a.key === selectedAgent.value)) {
+        selectedAgent.value = meta.agents[0]?.key || 'assistant'
+      }
+    } catch {
+      // 元数据加载失败时使用默认值，不影响聊天主流程
+    }
+  }
+
+  // 图片附件
+  interface PendingImage {
+    /** 上传成功后的附件 ID */
+    id?: number
+    /** 预览地址（上传中用本地 blob） */
+    url: string
+    uploading: boolean
+  }
+  const pendingImages = ref<PendingImage[]>([])
+  const fileInputRef = ref<HTMLInputElement | null>(null)
+
+  /** 上传单张图片到附件库 */
+  const uploadImage = async (file: File): Promise<void> => {
+    if (pendingImages.value.length >= MAX_IMAGES) {
+      ElMessage.warning(`最多上传 ${MAX_IMAGES} 张图片`)
+      return
+    }
+    const item: PendingImage = { url: URL.createObjectURL(file), uploading: true }
+    pendingImages.value.push(item)
+    try {
+      const res = await fetchUploadAttachmentFile(file)
+      item.id = res.id
+      if (res.url) item.url = res.url
+    } catch {
+      // 上传失败时移除该图片，http 拦截器已统一提示
+      pendingImages.value = pendingImages.value.filter((i) => i !== item)
+    } finally {
+      item.uploading = false
+    }
+  }
+
+  /** 选择文件上传 */
+  const handleFileChange = (e: Event): void => {
+    const files = (e.target as HTMLInputElement).files
+    if (files) Array.from(files).slice(0, MAX_IMAGES).forEach(uploadImage)
+    if (fileInputRef.value) fileInputRef.value.value = ''
+  }
+
+  /** 粘贴图片上传 */
+  const handlePaste = (e: ClipboardEvent): void => {
+    const files = Array.from(e.clipboardData?.files || []).filter((f) =>
+      f.type.startsWith('image/')
+    )
+    if (files.length) {
+      e.preventDefault()
+      files.slice(0, MAX_IMAGES).forEach(uploadImage)
+    }
+  }
+
+  /** 是否可发送 */
+  const canSend = computed(
+    () => !!messageText.value.trim() && !pendingImages.value.some((i) => i.uploading)
+  )
+
   // 头部展示
   const headerTitle = computed(
-    () => props.conversationTitle || (props.conversationId ? '' : '新的对话') || '新的对话'
+    () =>
+      props.conversationTitle ||
+      (props.conversationId ? '' : currentAgentName.value) ||
+      currentAgentName.value
   )
 
   // 组件状态
@@ -410,6 +614,7 @@
         role: m.role,
         content: m.content,
         created_at: m.created_at,
+        attachments: (m.attachments || []).map((a) => ({ type: a.type, url: a.url })),
         toolCalls: (m.tool_calls || []).map((tc) => ({
           id: tc.id,
           name: tc.name,
@@ -509,12 +714,14 @@
   const sendMessage = async (): Promise<void> => {
     const text = messageText.value.trim()
     if (!text || isStreaming.value) return
+    if (pendingImages.value.some((i) => i.uploading)) return
 
     const userMsg: ChatMessage = {
       id: genLocalId(),
       role: 'user',
       content: text,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      attachments: pendingImages.value.map((i) => ({ type: 'image', url: i.url }))
     }
     messages.value.push(userMsg)
 
@@ -530,7 +737,9 @@
       toolResults: []
     })
 
+    const attachmentIds = pendingImages.value.map((i) => i.id!).filter(Boolean)
     messageText.value = ''
+    pendingImages.value = []
     scrollToBottom()
 
     const isNewConversation = !props.conversationId
@@ -552,7 +761,10 @@
         fetchChatStream(
           {
             prompt: text,
-            conversation_id: props.conversationId
+            conversation_id: props.conversationId,
+            agent: selectedAgent.value,
+            model: selectedModel.value || undefined,
+            attachment_ids: attachmentIds.length ? attachmentIds : undefined
           },
           handlers
         ),
@@ -593,7 +805,9 @@
         {
           conversation_id: props.conversationId,
           approval_id: approvalId,
-          approved
+          approved,
+          agent: selectedAgent.value,
+          model: selectedModel.value || undefined
         },
         handlers
       )
@@ -620,10 +834,15 @@
     () => {
       messageText.value = ''
       approvingId.value = null
+      pendingImages.value = []
       loadConversation()
     },
     { immediate: true }
   )
+
+  onMounted(() => {
+    loadMeta()
+  })
 </script>
 
 <style scoped>
