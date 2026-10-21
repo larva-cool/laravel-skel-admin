@@ -17,6 +17,7 @@
  * | `segment-manage.d.ts` | `Api.SegmentManage` | 用户分群管理 |
  * | `user-manage.d.ts` | `Api.UserManage` | 用户管理（前台用户） |
  * | `chat.d.ts` | `Api.Chat` | AI 聊天模块 |
+ * | `chat-model.d.ts` | `Api.ChatModel` | AI 模型管理模块 |
  * | `notification.d.ts` | `Api.Notification` | 通知管理 |
  * | `monitor.d.ts` | `Api.Monitor` | 调度日志监控（调度日志、审计日志等） |
  * | `app-manage.d.ts` | `Api.AppManage` | App 版本管理 |
