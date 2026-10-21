@@ -30,6 +30,7 @@ declare namespace Api {
       email?: string | null
       phone?: string | null
       name: string
+      avatar?: string | null
       password: string
       status: number
       roles?: string[]
@@ -40,6 +41,7 @@ declare namespace Api {
       email?: string | null
       phone?: string | null
       name: string
+      avatar?: string | null
       password?: string | null
       status: number
       roles?: string[]

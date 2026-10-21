@@ -19,6 +19,33 @@
       <ElFormItem label="昵称" prop="name">
         <ElInput v-model="form.name" placeholder="请输入昵称" clearable />
       </ElFormItem>
+      <ElFormItem label="头像" prop="avatar">
+        <div class="avatar-upload-wrapper">
+          <ElUpload
+            class="avatar-uploader"
+            :class="{ 'is-uploading': avatarUploading }"
+            :show-file-list="false"
+            accept="image/*"
+            :http-request="handleAvatarUpload"
+            :before-upload="beforeAvatarUpload"
+            :disabled="avatarUploading"
+          >
+            <div class="avatar-box" v-loading="avatarUploading">
+              <img v-if="form.avatar" :src="form.avatar" class="avatar-image" alt="管理员头像" />
+              <ElIcon v-else class="avatar-placeholder"><Plus /></ElIcon>
+            </div>
+          </ElUpload>
+          <ElButton
+            v-if="form.avatar"
+            class="avatar-remove-btn"
+            type="danger"
+            text
+            size="small"
+            @click="handleRemoveAvatar"
+            >移除</ElButton
+          >
+        </div>
+      </ElFormItem>
       <ElFormItem label="邮箱" prop="email">
         <ElInput v-model="form.email" placeholder="请输入邮箱" clearable autocomplete="off" />
       </ElFormItem>
@@ -61,8 +88,14 @@
 </template>
 
 <script setup lang="ts">
-  import { fetchCreateAdmin, fetchGetRoleList, fetchUpdateAdmin } from '@/api/system-manage'
-  import type { FormInstance, FormRules } from 'element-plus'
+  import {
+    fetchCreateAdmin,
+    fetchGetRoleList,
+    fetchUpdateAdmin,
+    fetchUploadAttachmentFile
+  } from '@/api/system-manage'
+  import { Plus } from '@element-plus/icons-vue'
+  import type { FormInstance, FormRules, UploadRequestOptions } from 'element-plus'
 
   defineOptions({ name: 'AdminEditDialog' })
 
@@ -73,6 +106,7 @@
   const dialogVisible = ref(false)
   const formRef = ref<FormInstance>()
   const submitting = ref(false)
+  const avatarUploading = ref(false)
   const id = ref<number | null>(null)
   const isEdit = computed(() => id.value !== null)
 
@@ -81,6 +115,7 @@
   const form = reactive({
     username: '',
     name: '',
+    avatar: '',
     email: '',
     phone: '',
     password: '',
@@ -103,6 +138,38 @@
     status: [{ required: true, message: '请选择状态', trigger: 'change' }]
   }))
 
+  const beforeAvatarUpload = (rawFile: File) => {
+    if (!rawFile.type.startsWith('image/')) {
+      ElMessage.error('请选择图片文件')
+      return false
+    }
+    if (rawFile.size > 5 * 1024 * 1024) {
+      ElMessage.error('头像大小不能超过 5MB')
+      return false
+    }
+    return true
+  }
+
+  /** 自定义上传：走通用附件中转通道，成功后回填可访问 URL */
+  const handleAvatarUpload = async (options: UploadRequestOptions) => {
+    avatarUploading.value = true
+    try {
+      const res = await fetchUploadAttachmentFile(options.file)
+      form.avatar = res.url ?? ''
+      ElMessage.success('头像上传成功')
+      options.onSuccess?.(res)
+    } catch (e) {
+      ElMessage.error('头像上传失败，请重试')
+      options.onError?.(e as Error & { status: number; method: string; url: string })
+    } finally {
+      avatarUploading.value = false
+    }
+  }
+
+  const handleRemoveAvatar = () => {
+    form.avatar = ''
+  }
+
   const open = async (row?: Api.SystemManage.AdminListItem) => {
     dialogVisible.value = true
     // 加载角色选项
@@ -116,6 +183,7 @@
       Object.assign(form, {
         username: row.username,
         name: row.name,
+        avatar: row.avatar || '',
         email: row.email || '',
         phone: row.phone || '',
         password: '',
@@ -127,6 +195,7 @@
       Object.assign(form, {
         username: '',
         name: '',
+        avatar: '',
         email: '',
         phone: '',
         password: '',
@@ -145,6 +214,7 @@
         if (isEdit.value && id.value) {
           await fetchUpdateAdmin(id.value, {
             name: form.name,
+            avatar: form.avatar || null,
             email: form.email || null,
             phone: form.phone || null,
             password: form.password || null,
@@ -155,6 +225,7 @@
           await fetchCreateAdmin({
             username: form.username,
             name: form.name,
+            avatar: form.avatar || null,
             email: form.email || null,
             phone: form.phone || null,
             password: form.password,
@@ -178,4 +249,42 @@
   defineExpose({ open })
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+  .avatar-upload-wrapper {
+    display: flex;
+    align-items: center;
+
+    .avatar-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 80px;
+      overflow: hidden;
+      cursor: pointer;
+      background-color: var(--el-fill-color-lighter);
+      border: 1px dashed var(--el-border-color-darker);
+      border-radius: 50%;
+      transition: border-color 0.2s;
+
+      &:hover {
+        border-color: var(--el-color-primary);
+      }
+
+      .avatar-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .avatar-placeholder {
+        font-size: 24px;
+        color: var(--el-text-color-secondary);
+      }
+    }
+
+    .avatar-remove-btn {
+      margin-left: 12px;
+    }
+  }
+</style>
