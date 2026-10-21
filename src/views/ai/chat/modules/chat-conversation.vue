@@ -53,7 +53,7 @@
         <!-- 错误状态 -->
         <div v-if="loadError" class="flex h-full flex-col items-center justify-center text-center">
           <p class="text-sm text-danger">{{ loadError }}</p>
-          <ElButton size="small" class="mt-3" @click="loadConversation">重试</ElButton>
+          <ElButton size="small" class="mt-3" @click="loadConversation()">重试</ElButton>
         </div>
 
         <template v-for="message in messages" :key="message.id">
@@ -598,15 +598,15 @@
     })
   }
 
-  /** 加载指定会话的消息记录 */
-  const loadConversation = async (): Promise<void> => {
+  /** 加载指定会话的消息记录（silent 时不打断当前展示，加载完成后静默替换） */
+  const loadConversation = async (silent = false): Promise<void> => {
     if (!props.conversationId) {
       messages.value = []
       loadError.value = ''
       return
     }
     loadError.value = ''
-    loadingMessages.value = true
+    if (!silent) loadingMessages.value = true
     try {
       const detail = await fetchGetConversation(props.conversationId)
       messages.value = detail.messages.map((m) => ({
@@ -624,7 +624,8 @@
           id: tr.id,
           name: tr.name,
           result: tr.result,
-          successful: !!tr.successful,
+          // 存储结构中无 successful 字段：denied 为 true 表示被拒绝/失败，否则视为成功
+          successful: tr.successful ?? !tr.denied,
           denied: !!tr.denied,
           error: tr.error ?? null
         }))
@@ -637,18 +638,20 @@
     }
   }
 
-  /** 发起一次流式对话（首次提问或审批续跑共用） */
+  /** 发起一次流式对话（首次提问或审批续跑共用），返回是否成功 */
   const runStream = async (
     requester: () => Promise<void>,
     options: { pendingAssistantId: string }
-  ): Promise<void> => {
+  ): Promise<boolean> => {
     isStreaming.value = true
     try {
       await requester()
+      return true
     } catch (e: any) {
       ElMessage.error(e?.message || '请求失败，请重试')
       const m = messages.value.find((x) => x.id === options.pendingAssistantId)
       if (m) m.streaming = false
+      return false
     } finally {
       isStreaming.value = false
       scrollToBottom()
@@ -697,7 +700,7 @@
     onDone: (data: { conversationId: string | null }) => {
       const m = messages.value.find((x) => x.id === assistantId)
       if (m) m.streaming = false
-      // 新对话首轮结束后，将会话 ID 同步给父组件刷新列表
+      // 后端在 stream_end 中携带会话 ID 时直接同步给父组件
       if (!props.conversationId && data.conversationId) {
         emit('created', data.conversationId)
       }
@@ -745,18 +748,15 @@
     const isNewConversation = !props.conversationId
     const handlers = bindStreamHandlers(assistantId)
 
-    // 后端 stream_end 可能不携带 conversation_id，新会话需刷新列表兜底
-    if (isNewConversation) {
-      const rawOnDone = handlers.onDone
-      handlers.onDone = (data) => {
-        if (!data.conversationId) {
-          emit('created', '')
-        }
-        rawOnDone?.(data)
-      }
+    // SSE 内部错误（HTTP 4xx/5xx、error 事件）不抛异常，单独记录以避免误触发列表轮询
+    let sawStreamError = false
+    const rawOnError = handlers.onError
+    handlers.onError = (msg: string) => {
+      sawStreamError = true
+      rawOnError?.(msg)
     }
 
-    await runStream(
+    const succeeded = await runStream(
       () =>
         fetchChatStream(
           {
@@ -770,6 +770,12 @@
         ),
       { pendingAssistantId: assistantId }
     )
+
+    // SSE 流完整消费后，后端已完成会话保存（RememberConversation 在流末尾执行），
+    // 此时通知父组件刷新会话列表即可命中新会话
+    if (succeeded && !sawStreamError && isNewConversation) {
+      emit('created', '')
+    }
   }
 
   /** 处理审批 */
@@ -831,11 +837,13 @@
   // 会话切换时重新加载
   watch(
     () => props.conversationId,
-    () => {
+    (newId, oldId) => {
       messageText.value = ''
       approvingId.value = null
       pendingImages.value = []
-      loadConversation()
+      // 新对话首轮结束后被赋予会话 ID：本地流式消息已在界面上，静默加载替换，避免闪烁
+      const isNewConversationCreated = oldId === null && newId !== null
+      loadConversation(isNewConversationCreated)
     },
     { immediate: true }
   )

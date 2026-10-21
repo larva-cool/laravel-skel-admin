@@ -45,20 +45,35 @@
   }
 
   /**
-   * 新会话首轮消息发送完成：刷新会话列表。
-   * 后端 stream_end 携带会话 ID 时直接选中，否则回退选中最新一条。
+   * 新会话首轮消息发送完成。
+   * 后端 stream_end 携带会话 ID 时直接选中；未携带时（Laravel AI 包在流结束后
+   * 才异步生成标题并保存会话），轮询等待新会话出现在列表首位再选中。
    */
   const handleCreated = async (id: string): Promise<void> => {
     if (!sidebarRef.value) return
     if (id) {
       activeConversationId.value = id
       await sidebarRef.value.refresh()
-    } else {
-      const first = await sidebarRef.value.refresh(true)
-      if (first) {
-        activeConversationId.value = first.id
-        activeConversationTitle.value = first.title || '新的对话'
-      }
+      return
+    }
+    // 记录当前列表首条作为基准，新会话保存后首条会发生变化
+    pollNewConversation(sidebarRef.value.firstConversationId ?? null, 0)
+  }
+
+  /** 轮询等待新会话出现（后端保存含 AI 标题生成，通常需要数秒） */
+  const pollNewConversation = async (
+    previousFirstId: string | null,
+    attempt: number
+  ): Promise<void> => {
+    if (!sidebarRef.value) return
+    const first = await sidebarRef.value.refresh(true)
+    if (first && first.id !== previousFirstId) {
+      activeConversationId.value = first.id
+      activeConversationTitle.value = first.title || '新的对话'
+      return
+    }
+    if (attempt < 8) {
+      setTimeout(() => pollNewConversation(previousFirstId, attempt + 1), 1000)
     }
   }
 

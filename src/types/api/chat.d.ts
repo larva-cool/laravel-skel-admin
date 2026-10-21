@@ -93,12 +93,13 @@ declare namespace Api {
         name: string
         arguments: Record<string, unknown>
       }> | null
-      /** 工具调用结果 */
+      /** 工具调用结果（存储结构无 successful 字段，前端按 denied 推断） */
       tool_results?: Array<{
         id: string
         name: string
         result: unknown
-        successful: boolean
+        successful?: boolean
+        result_id?: string | null
         denied?: boolean
         error?: string | null
       }> | null

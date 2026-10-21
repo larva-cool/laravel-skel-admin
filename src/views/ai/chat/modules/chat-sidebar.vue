@@ -242,11 +242,14 @@
     return null
   }
 
+  /** 当前列表首条会话 ID（后端按 updated_at 倒序） */
+  const firstConversationId = computed(() => conversations.value[0]?.id ?? null)
+
   onMounted(() => {
     loadConversations(true)
   })
 
-  defineExpose({ refresh })
+  defineExpose({ refresh, firstConversationId })
 </script>
 
 <style scoped>

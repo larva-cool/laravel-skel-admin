@@ -444,7 +444,8 @@
             id: tr.id,
             name: tr.name,
             result: tr.result,
-            successful: !!tr.successful,
+            // 存储结构中无 successful 字段：denied 为 true 表示被拒绝/失败，否则视为成功
+            successful: tr.successful ?? !tr.denied,
             denied: !!tr.denied,
             error: tr.error ?? null
           }))
