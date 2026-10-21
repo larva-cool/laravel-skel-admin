@@ -364,9 +364,9 @@
     fetchChatApprove,
     fetchChatMeta,
     fetchChatStream,
-    fetchGetConversation
+    fetchGetConversation,
+    fetchUploadChatFile
   } from '@/api/chat'
-  import { fetchUploadAttachmentFile } from '@/api/system-manage'
   import aiAvatar from '@/assets/images/avatar/ai.png'
   import defaultAvatar from '@/assets/images/avatar/avatar5.webp'
   import { useUserStore } from '@/store/modules/user'
@@ -500,7 +500,7 @@
     const item: PendingImage = { url: URL.createObjectURL(file), uploading: true }
     pendingImages.value.push(item)
     try {
-      const res = await fetchUploadAttachmentFile(file)
+      const res = await fetchUploadChatFile(file)
       item.id = res.id
       if (res.url) item.url = res.url
     } catch {

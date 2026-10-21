@@ -198,6 +198,17 @@ export function fetchChatMeta() {
   })
 }
 
+/** 上传聊天图片附件（原样存储，返回附件 ID 与访问地址） */
+export function fetchUploadChatFile(file: File) {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  return request.post<Api.SystemManage.AttachmentUploadResult>({
+    url: '/admin/chat/upload-file',
+    data: formData
+  })
+}
+
 /** 获取指定会话的消息记录 */
 export function fetchGetConversation(id: string) {
   return request.get<Api.Chat.ConversationDetail>({
