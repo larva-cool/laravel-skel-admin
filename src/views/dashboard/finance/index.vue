@@ -1,3 +1,4 @@
+<!-- 财务分析页面 -->
 <template>
   <div>
     <!-- 财务指标卡片 -->
@@ -54,6 +55,8 @@
     hint: string
     icon: string
   }
+
+  defineOptions({ name: 'Finance' })
 
   const loading = ref(true)
   const cards = ref<FinanceCard[]>([])

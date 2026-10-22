@@ -18,6 +18,15 @@ export const dashboardRoutes: AppRouteRecord = {
         keep_alive: false,
         fixed_tab: true
       }
+    },
+    {
+      path: 'finance',
+      name: 'Finance',
+      component: '/dashboard/finance',
+      meta: {
+        title: 'menus.dashboard.finance',
+        keep_alive: true
+      }
     }
   ]
 }

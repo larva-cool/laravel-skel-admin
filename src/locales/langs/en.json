@@ -230,7 +230,8 @@
     },
     "dashboard": {
       "title": "Dashboard",
-      "console": "Console"
+      "console": "Console",
+      "finance": "Finance"
     },
     "result": {
       "title": "Result Page",
