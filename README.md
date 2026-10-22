@@ -150,6 +150,7 @@ src/
 ├── views/               # 页面视图
 │   ├── auth/login/      # 登录页（拖拽验证、主题/语言切换）
 │   ├── dashboard/console/ # 工作台仪表盘
+│   ├── dashboard/finance/ # 财务分析看板
 │   ├── exception/       # 异常页（403/404/500）
 │   ├── index/           # 布局容器（根路径重定向）
 │   ├── monitor/         # 监控页（audit-log 审计日志、debug、horizon、pulse、schedule-log 调度日志）
