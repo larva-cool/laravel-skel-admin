@@ -1,5 +1,33 @@
 import request from '@/utils/http'
 
+// ========== AI 辅助内容生产（运营） ==========
+
+/** AI 生成公告文案（标题/摘要/正文，仅生成不落库） */
+export function fetchGenerateAnnouncementCopy(data: { brief: string }) {
+  return request.post<Api.OperationManage.AnnouncementAiCopyResult>({
+    url: '/admin/announcements/ai-copy',
+    data
+  })
+}
+
+/** AI 生成 Banner 文案（标题 + 绘图提示词） */
+export function fetchGenerateBannerCopy(data: { brief: string }) {
+  return request.post<Api.OperationManage.BannerAiCopyResult>({
+    url: '/admin/banners/ai-copy',
+    data
+  })
+}
+
+/** AI 生成 Banner 配图（Seedream 绘图并落盘，返回访问 URL） */
+export function fetchGenerateBannerImage(data: { prompt: string }) {
+  return request.post<Api.OperationManage.BannerAiImageResult>({
+    url: '/admin/banners/ai-image',
+    data,
+    showSuccessMessage: true,
+    successMessage: '图片生成成功'
+  })
+}
+
 // ========== Banner / 轮播图管理（运营） ==========
 
 /** 获取 Banner 列表（分页） */

@@ -7,6 +7,45 @@
     @close="handleClose"
   >
     <ElForm ref="formRef" :model="form" :rules="rules" label-width="100px" label-position="right">
+      <ElFormItem label="AI 助手">
+        <div class="flex w-full flex-col gap-2">
+          <div class="flex w-full items-center gap-2">
+            <ElInput
+              v-model="aiBrief"
+              placeholder="一句话描述 Banner 需求，AI 生成标题与绘图提示词"
+              maxlength="500"
+              clearable
+              @keyup.enter="handleAiGenerateCopy"
+            />
+            <ElButton
+              type="primary"
+              plain
+              :loading="aiCopyGenerating"
+              @click="handleAiGenerateCopy"
+            >
+              <ElIcon class="mr-1"><MagicStick /></ElIcon>
+              生成文案
+            </ElButton>
+          </div>
+          <div v-if="aiImagePrompt !== null" class="flex w-full items-center gap-2">
+            <ElInput
+              v-model="aiImagePrompt"
+              placeholder="绘图提示词，可手动修改后生成图片"
+              maxlength="1000"
+              clearable
+            />
+            <ElButton
+              type="success"
+              plain
+              :loading="aiImageGenerating"
+              @click="handleAiGenerateImage"
+            >
+              <ElIcon class="mr-1"><Picture /></ElIcon>
+              生成图片
+            </ElButton>
+          </div>
+        </div>
+      </ElFormItem>
       <ElFormItem label="广告位" prop="position">
         <ElSelect
           v-model="form.position"
@@ -127,11 +166,13 @@
 <script setup lang="ts">
   import {
     fetchCreateBanner,
+    fetchGenerateBannerCopy,
+    fetchGenerateBannerImage,
     fetchGetBannerDetail,
     fetchUpdateBanner
   } from '@/api/operation-manage'
   import { fetchUploadAttachmentFile } from '@/api/system-manage'
-  import { Delete, Download, Plus, ZoomIn } from '@element-plus/icons-vue'
+  import { Delete, Download, MagicStick, Picture, Plus, ZoomIn } from '@element-plus/icons-vue'
   import type {
     FormInstance,
     FormRules,
@@ -243,6 +284,50 @@
     form.end_at = null
     dateRange.value = null
     fileList.value = []
+    aiBrief.value = ''
+    aiImagePrompt.value = null
+  }
+
+  // ========== AI 文案与配图生成 ==========
+
+  const aiBrief = ref('')
+  const aiImagePrompt = ref<string | null>(null)
+  const aiCopyGenerating = ref(false)
+  const aiImageGenerating = ref(false)
+
+  const handleAiGenerateCopy = async () => {
+    if (!aiBrief.value.trim()) {
+      ElMessage.warning('请先输入 Banner 需求简述')
+      return
+    }
+    aiCopyGenerating.value = true
+    try {
+      const res = await fetchGenerateBannerCopy({ brief: aiBrief.value.trim() })
+      if (res.title) form.title = res.title
+      if (res.image_prompt) aiImagePrompt.value = res.image_prompt
+      ElMessage.success('文案生成成功，可继续生成配图')
+    } catch {
+      // 错误信息由拦截器统一提示
+    } finally {
+      aiCopyGenerating.value = false
+    }
+  }
+
+  const handleAiGenerateImage = async () => {
+    if (!aiImagePrompt.value?.trim()) {
+      ElMessage.warning('请先输入绘图提示词')
+      return
+    }
+    aiImageGenerating.value = true
+    try {
+      const res = await fetchGenerateBannerImage({ prompt: aiImagePrompt.value.trim() })
+      form.image = res.url
+      fileList.value = [{ name: 'ai-banner', url: res.url, status: 'success' }]
+    } catch {
+      // 错误信息由拦截器统一提示
+    } finally {
+      aiImageGenerating.value = false
+    }
   }
 
   const beforeUpload = (rawFile: File) => {

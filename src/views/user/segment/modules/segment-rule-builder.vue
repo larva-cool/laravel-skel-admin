@@ -117,7 +117,7 @@
           <ElSelect
             v-else-if="isStringEnumField(cond.field as string)"
             :model-value="(cond.value as string) ?? null"
-            :placeholder="cond.field === 'identity_status' ? '认证状态' : '认证类型'"
+            :placeholder="stringEnumPlaceholder(cond.field as string)"
             style="width: 160px"
             @change="(v) => (cond.value = v as string)"
           >
@@ -164,8 +164,27 @@
     { label: '注册时间', value: 'created_at' },
     { label: '可用积分', value: 'available_points' },
     { label: '可用金币', value: 'available_coins' },
-    { label: '累计登录次数', value: 'login_count' }
+    { label: '累计登录次数', value: 'login_count' },
+    { label: '可用余额', value: 'balance' },
+    { label: '冻结余额', value: 'frozen_balance' },
+    { label: '所在省份 ID', value: 'province_id' },
+    { label: '所在城市 ID', value: 'city_id' },
+    { label: '邮箱绑定', value: 'email' },
+    { label: '手机号绑定', value: 'phone' },
+    { label: '用户名设置', value: 'username' },
+    { label: '邮箱验证时间', value: 'email_verified_at' },
+    { label: '社交平台绑定', value: 'social_provider' },
+    { label: '充值次数', value: 'recharge_count' },
+    { label: '累计充值金额', value: 'recharge_total' },
+    { label: '提现次数', value: 'withdraw_count' },
+    { label: '邀请人数', value: 'invite_count' }
   ]
+
+  // 字段分类（与后端 SegmentRuleField::allowedOperators 白名单保持一致）
+  const nullOnlyFields = ['email', 'phone', 'username', 'email_verified_at']
+  const idFields = ['province_id', 'city_id']
+  const moneyFields = ['balance', 'frozen_balance', 'recharge_total']
+  const countFields = ['recharge_count', 'withdraw_count', 'invite_count']
 
   const datePresets = [
     { label: '现在', value: 'now' },
@@ -189,6 +208,49 @@
     const isStatus = field === 'status'
     const isGender = field === 'gender'
     const isStringEnum = field === 'identity_status' || field === 'identity_type'
+    if (nullOnlyFields.includes(field)) {
+      return [
+        { label: '为空', value: 'is_null' },
+        { label: '不为空', value: 'is_not_null' }
+      ]
+    }
+    if (field === 'social_provider') {
+      return [
+        { label: '已绑定', value: '=' },
+        { label: '未绑定', value: '!=' }
+      ]
+    }
+    if (idFields.includes(field)) {
+      return [
+        { label: '等于', value: '=' },
+        { label: '不等于', value: '!=' },
+        { label: '包含于', value: 'in' },
+        { label: '不包含于', value: 'not_in' },
+        { label: '为空', value: 'is_null' },
+        { label: '不为空', value: 'is_not_null' }
+      ]
+    }
+    if (moneyFields.includes(field)) {
+      return [
+        { label: '等于', value: '=' },
+        { label: '不等于', value: '!=' },
+        { label: '大于', value: '>' },
+        { label: '大于等于', value: '>=' },
+        { label: '小于', value: '<' },
+        { label: '小于等于', value: '<=' },
+        { label: '区间', value: 'between' }
+      ]
+    }
+    if (countFields.includes(field)) {
+      return [
+        { label: '等于', value: '=' },
+        { label: '不等于', value: '!=' },
+        { label: '大于', value: '>' },
+        { label: '大于等于', value: '>=' },
+        { label: '小于', value: '<' },
+        { label: '小于等于', value: '<=' }
+      ]
+    }
     if (isStatus) {
       return [
         { label: '等于', value: '=' },
@@ -252,7 +314,14 @@
     return op !== 'is_null' && op !== 'is_not_null' && !!op
   }
   function isNumberField(f: string): boolean {
-    return ['available_points', 'available_coins', 'login_count'].includes(f)
+    return [
+      'available_points',
+      'available_coins',
+      'login_count',
+      ...moneyFields,
+      ...countFields,
+      ...idFields
+    ].includes(f)
   }
   function isDateField(f: string): boolean {
     return ['vip_expires_at', 'last_login_at', 'last_active_at', 'created_at', 'birthday'].includes(
@@ -260,7 +329,7 @@
     )
   }
   function isStringEnumField(f: string): boolean {
-    return f === 'identity_status' || f === 'identity_type'
+    return f === 'identity_status' || f === 'identity_type' || f === 'social_provider'
   }
 
   // 字符串枚举字段的可选值
@@ -274,10 +343,29 @@
     { label: '个人认证', value: 'personal' },
     { label: '企业认证', value: 'enterprise' }
   ]
+  // 与后端 SocialProvider 枚举保持一致
+  const socialProviderOptions = [
+    { label: '微信公众号', value: 'wechat_mp' },
+    { label: '微信应用', value: 'wechat_app' },
+    { label: '微信小程序', value: 'wechat_mini_program' },
+    { label: 'Apple ID', value: 'apple' },
+    { label: '抖音', value: 'douyin' },
+    { label: '快手', value: 'kuaishou' },
+    { label: '小红书', value: 'xiaohongshu' }
+  ]
   function stringEnumOptions(field: string) {
     if (field === 'identity_status') return identityStatusOptions
     if (field === 'identity_type') return identityTypeOptions
+    if (field === 'social_provider') return socialProviderOptions
     return []
+  }
+  function stringEnumPlaceholder(field: string): string {
+    const map: Record<string, string> = {
+      identity_status: '认证状态',
+      identity_type: '认证类型',
+      social_provider: '社交平台'
+    }
+    return map[field] ?? '请选择'
   }
 
   // 双向绑定：把 modelValue 拆为本地状态

@@ -7,6 +7,21 @@
     @close="handleClose"
   >
     <ElForm ref="formRef" :model="form" :rules="rules" label-width="100px" label-position="right">
+      <ElFormItem label="AI 助手">
+        <div class="flex w-full items-center gap-2">
+          <ElInput
+            v-model="aiBrief"
+            placeholder="一句话描述公告需求，AI 自动生成标题、摘要与正文"
+            maxlength="500"
+            clearable
+            @keyup.enter="handleAiGenerate"
+          />
+          <ElButton type="primary" plain :loading="aiGenerating" @click="handleAiGenerate">
+            <ElIcon class="mr-1"><MagicStick /></ElIcon>
+            生成文案
+          </ElButton>
+        </div>
+      </ElFormItem>
       <ElFormItem label="标题" prop="title">
         <ElInput
           v-model="form.title"
@@ -98,12 +113,13 @@
 <script setup lang="ts">
   import {
     fetchCreateAnnouncement,
+    fetchGenerateAnnouncementCopy,
     fetchGetAnnouncementDetail,
     fetchUpdateAnnouncement
   } from '@/api/operation-manage'
   import { fetchUploadAttachmentFile } from '@/api/system-manage'
   import ArtWangEditor from '@/components/core/forms/art-wang-editor/index.vue'
-  import { Delete, Download, Plus, ZoomIn } from '@element-plus/icons-vue'
+  import { Delete, Download, MagicStick, Plus, ZoomIn } from '@element-plus/icons-vue'
   import type {
     FormInstance,
     FormRules,
@@ -171,6 +187,35 @@
     form.status = 'draft'
     form.sort = 1000
     fileList.value = []
+    aiBrief.value = ''
+  }
+
+  // ========== AI 文案生成 ==========
+
+  const aiBrief = ref('')
+  const aiGenerating = ref(false)
+
+  const handleAiGenerate = async () => {
+    if (!aiBrief.value.trim()) {
+      ElMessage.warning('请先输入公告需求简述')
+      return
+    }
+    aiGenerating.value = true
+    try {
+      const res = await fetchGenerateAnnouncementCopy({ brief: aiBrief.value.trim() })
+      if (res.title) form.title = res.title
+      if (res.summary) form.summary = res.summary
+      if (res.content) {
+        form.content = res.content
+        await waitEditorReady()
+        editorRef.value?.setHtml(res.content)
+      }
+      ElMessage.success('文案生成成功，请检查后提交')
+    } catch {
+      // 错误信息由拦截器统一提示
+    } finally {
+      aiGenerating.value = false
+    }
   }
 
   const waitEditorReady = (): Promise<void> => {

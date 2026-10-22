@@ -43,6 +43,13 @@ export function fetchReviewComment(id: number, data: Api.ContentManage.CommentRe
   })
 }
 
+// AI 敏感词命中智能复核（减少误杀，仅给出辅助建议）
+export function fetchAiReviewComment(id: number) {
+  return request.post<Api.ContentManage.CommentAiReviewResult>({
+    url: `/admin/comments/${id}/ai-review`
+  })
+}
+
 // 删除评论
 export function fetchDeleteComment(id: number) {
   return request.del<null>({

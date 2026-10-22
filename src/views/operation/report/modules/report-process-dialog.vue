@@ -14,7 +14,7 @@
     ElDivider
   } from 'element-plus'
   import type { FormInstance, FormRules } from 'element-plus'
-  import { fetchProcessReport } from '@/api/system-manage'
+  import { fetchAiTriageReport, fetchProcessReport } from '@/api/system-manage'
 
   const emit = defineEmits<{
     success: [row: Api.SystemManage.ReportDetail]
@@ -88,7 +88,35 @@
     form.remark = ''
     form.selectedActions = []
     targetTypeLabel.value = ''
+    aiTriageResult.value = null
     formRef.value?.resetFields()
+  }
+
+  // ========== AI 智能初判 ==========
+
+  const triaging = ref(false)
+  const aiTriageResult = ref<Api.SystemManage.ReportAiTriageResult | null>(null)
+
+  const handleAiTriage = async () => {
+    if (!currentId.value) return
+    triaging.value = true
+    try {
+      aiTriageResult.value = await fetchAiTriageReport(currentId.value)
+    } catch {
+      // 错误信息由拦截器统一提示
+    } finally {
+      triaging.value = false
+    }
+  }
+
+  /** 采纳 AI 初判建议：回填处理结果与备注 */
+  const handleAdoptTriage = () => {
+    if (!aiTriageResult.value) return
+    form.status = aiTriageResult.value.suggestion === 'uphold' ? 'resolved' : 'rejected'
+    if (!form.remark) {
+      form.remark = `AI 初判：${aiTriageResult.value.reason}`
+    }
+    ElMessage.success('已采纳 AI 初判建议，请确认后提交')
   }
 
   const open = (row: Api.SystemManage.ReportDetail) => {
@@ -143,6 +171,30 @@
     align-center
   >
     <ElForm ref="formRef" :model="form" :rules="rules" label-width="90px" label-position="right">
+      <ElFormItem label="AI 初判">
+        <div class="w-full">
+          <ElButton type="primary" plain size="small" :loading="triaging" @click="handleAiTriage">
+            开始智能初判
+          </ElButton>
+          <ElAlert
+            v-if="aiTriageResult"
+            :type="aiTriageResult.suggestion === 'uphold' ? 'warning' : 'success'"
+            :closable="false"
+            class="mt-2"
+            show-icon
+          >
+            <template #title>
+              <div class="flex items-center gap-2">
+                <span>{{ aiTriageResult.suggestion_label }}</span>
+                <ElButton size="small" text type="primary" @click="handleAdoptTriage">
+                  采纳建议
+                </ElButton>
+              </div>
+            </template>
+            <div class="text-sm">{{ aiTriageResult.reason }}</div>
+          </ElAlert>
+        </div>
+      </ElFormItem>
       <ElFormItem label="处理结果" prop="status">
         <ElRadioGroup v-model="form.status">
           <ElRadio v-for="opt in statusOptions" :key="opt.value" :value="opt.value">

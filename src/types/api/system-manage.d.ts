@@ -597,7 +597,23 @@ declare namespace Api {
       admin_remark?: string | null
     }
 
+    /** AI 草拟反馈回复结果 */
+    interface FeedbackDraftReplyResult {
+      /** 回复草稿 */
+      draft: string
+    }
+
     // ========== 举报管理 ==========
+
+    /** AI 举报智能初判结果 */
+    interface ReportAiTriageResult {
+      /** 初判建议：uphold=举报成立，reject=举报不成立 */
+      suggestion: 'uphold' | 'reject'
+      /** 初判建议文案 */
+      suggestion_label: string
+      /** 判断理由 */
+      reason: string
+    }
 
     /** 举报统计数据 */
     interface ReportStats {

@@ -50,5 +50,24 @@ declare namespace Api {
       status: string
       remark?: string | null
     }
+
+    /** AI 评论敏感词复核结果 */
+    interface CommentAiReviewResult {
+      /** 复核建议：approve=建议通过，reject=建议驳回 */
+      suggestion: 'approve' | 'reject'
+      /** 复核建议文案 */
+      suggestion_label: string
+      /** 复核理由 */
+      reason: string
+      /** 命中的敏感词列表 */
+      hits: {
+        /** 命中词 */
+        word: string
+        /** 命中级别：replace/review/block */
+        level: string
+        /** 分类 */
+        category: string
+      }[]
+    }
   }
 }

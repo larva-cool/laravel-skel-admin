@@ -1,6 +1,32 @@
 declare namespace Api {
   /** 运营管理模块（Banner / 轮播图） */
   namespace OperationManage {
+    /** AI 生成公告文案结果 */
+    interface AnnouncementAiCopyResult {
+      /** 公告标题 */
+      title: string
+      /** 公告摘要 */
+      summary: string
+      /** 公告正文（HTML） */
+      content: string
+    }
+
+    /** AI 生成 Banner 文案结果 */
+    interface BannerAiCopyResult {
+      /** Banner 标题 */
+      title: string
+      /** 绘图提示词（供 AI 配图使用） */
+      image_prompt: string
+    }
+
+    /** AI 生成 Banner 配图结果 */
+    interface BannerAiImageResult {
+      /** 存储路径 */
+      path: string
+      /** 访问 URL */
+      url: string
+    }
+
     /** Banner 列表（分页） */
     type BannerList = Api.Common.PaginatedResponse<BannerListItem>
 

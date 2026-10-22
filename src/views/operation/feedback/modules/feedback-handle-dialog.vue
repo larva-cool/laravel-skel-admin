@@ -11,7 +11,7 @@
     ElTag
   } from 'element-plus'
   import type { FormInstance, FormRules } from 'element-plus'
-  import { fetchUpdateFeedback } from '@/api/system-manage'
+  import { fetchDraftFeedbackReply, fetchUpdateFeedback } from '@/api/system-manage'
 
   const emit = defineEmits<{
     success: [row: Api.SystemManage.FeedbackListItem]
@@ -60,6 +60,26 @@
     form.priority = null
     form.admin_remark = ''
     formRef.value?.resetFields()
+  }
+
+  // ========== AI 草拟回复 ==========
+
+  const drafting = ref(false)
+
+  const handleDraftReply = async () => {
+    if (!currentId.value) return
+    drafting.value = true
+    try {
+      const res = await fetchDraftFeedbackReply(currentId.value)
+      if (res.draft) {
+        form.admin_remark = res.draft
+        ElMessage.success('回复草稿已生成，请检查后提交')
+      }
+    } catch {
+      // 错误信息由拦截器统一提示
+    } finally {
+      drafting.value = false
+    }
   }
 
   const open = (row: Api.SystemManage.FeedbackListItem) => {
@@ -136,14 +156,27 @@
         </ElSelect>
       </ElFormItem>
       <ElFormItem label="处理备注" prop="admin_remark">
-        <ElInput
-          v-model="form.admin_remark"
-          type="textarea"
-          :rows="4"
-          maxlength="500"
-          show-word-limit
-          placeholder="请填写处理方案、备注或说明（可选）"
-        />
+        <div class="w-full">
+          <ElInput
+            v-model="form.admin_remark"
+            type="textarea"
+            :rows="4"
+            maxlength="500"
+            show-word-limit
+            placeholder="请填写处理方案、备注或说明（可选）"
+          />
+          <div class="mt-2 flex justify-end">
+            <ElButton
+              size="small"
+              type="primary"
+              plain
+              :loading="drafting"
+              @click="handleDraftReply"
+            >
+              AI 草拟回复
+            </ElButton>
+          </div>
+        </div>
       </ElFormItem>
     </ElForm>
 

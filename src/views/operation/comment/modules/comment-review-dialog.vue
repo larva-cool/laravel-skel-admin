@@ -11,7 +11,7 @@
     ElTag
   } from 'element-plus'
   import type { FormInstance } from 'element-plus'
-  import { fetchReviewComment } from '@/api/content-manage'
+  import { fetchAiReviewComment, fetchReviewComment } from '@/api/content-manage'
 
   const emit = defineEmits<{
     success: [row: Api.ContentManage.CommentListItem]
@@ -41,7 +41,35 @@
   const resetForm = () => {
     form.status = 'approved'
     form.remark = ''
+    aiReviewResult.value = null
     formRef.value?.resetFields()
+  }
+
+  // ========== AI 敏感词智能复核 ==========
+
+  const reviewing = ref(false)
+  const aiReviewResult = ref<Api.ContentManage.CommentAiReviewResult | null>(null)
+
+  const handleAiReview = async () => {
+    if (!currentId.value) return
+    reviewing.value = true
+    try {
+      aiReviewResult.value = await fetchAiReviewComment(currentId.value)
+    } catch {
+      // 错误信息由拦截器统一提示
+    } finally {
+      reviewing.value = false
+    }
+  }
+
+  /** 采纳 AI 复核建议：回填审核结果与备注 */
+  const handleAdoptReview = () => {
+    if (!aiReviewResult.value) return
+    form.status = aiReviewResult.value.suggestion === 'reject' ? 'rejected' : 'approved'
+    if (!form.remark) {
+      form.remark = `AI 复核：${aiReviewResult.value.reason}`
+    }
+    ElMessage.success('已采纳 AI 复核建议，请确认后提交')
   }
 
   const open = (row: Api.ContentManage.CommentListItem) => {
@@ -87,6 +115,41 @@
     align-center
   >
     <ElForm ref="formRef" :model="form" label-width="90px" label-position="right">
+      <ElFormItem label="AI 复核">
+        <div class="w-full">
+          <ElButton type="primary" plain size="small" :loading="reviewing" @click="handleAiReview">
+            敏感词智能复核
+          </ElButton>
+          <div v-if="aiReviewResult" class="mt-2">
+            <div v-if="aiReviewResult.hits.length" class="mb-1 flex flex-wrap gap-1">
+              <ElTag
+                v-for="hit in aiReviewResult.hits"
+                :key="hit.word"
+                :type="hit.level === 'block' ? 'danger' : 'warning'"
+                size="small"
+                effect="light"
+              >
+                {{ hit.word }}
+              </ElTag>
+            </div>
+            <ElAlert
+              :type="aiReviewResult.suggestion === 'reject' ? 'error' : 'success'"
+              :closable="false"
+              show-icon
+            >
+              <template #title>
+                <div class="flex items-center gap-2">
+                  <span>{{ aiReviewResult.suggestion_label }}</span>
+                  <ElButton size="small" text type="primary" @click="handleAdoptReview">
+                    采纳建议
+                  </ElButton>
+                </div>
+              </template>
+              <div class="text-sm">{{ aiReviewResult.reason }}</div>
+            </ElAlert>
+          </div>
+        </div>
+      </ElFormItem>
       <ElFormItem label="审核结果" prop="status" required>
         <ElRadioGroup v-model="form.status">
           <ElRadioButton v-for="opt in statusOptions" :key="opt.value" :value="opt.value">

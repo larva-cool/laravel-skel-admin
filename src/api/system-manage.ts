@@ -634,6 +634,13 @@ export function fetchUpdateFeedback(id: number, data: Api.SystemManage.FeedbackU
   })
 }
 
+/** AI 草拟反馈回复（仅生成草稿，不修改反馈） */
+export function fetchDraftFeedbackReply(id: number) {
+  return request.post<Api.SystemManage.FeedbackDraftReplyResult>({
+    url: `/admin/feedbacks/${id}/draft-reply`
+  })
+}
+
 // 删除反馈
 export function fetchDeleteFeedback(id: number) {
   return request.del<null>({
@@ -736,6 +743,13 @@ export function fetchProcessReport(id: number, data: Api.SystemManage.ReportProc
     data,
     showSuccessMessage: true,
     successMessage: '处理成功'
+  })
+}
+
+/** AI 举报智能初判（仅给出辅助建议，不改变举报状态） */
+export function fetchAiTriageReport(id: number) {
+  return request.post<Api.SystemManage.ReportAiTriageResult>({
+    url: `/admin/reports/${id}/ai-triage`
   })
 }
 
