@@ -31,6 +31,10 @@ import { ApiStatus } from './status'
 
 /** 请求配置常量 */
 const REQUEST_TIMEOUT = 15000
+/** AI 文本类接口超时时间（AI 生成文案、智能复核等同步调用耗时较长） */
+export const AI_REQUEST_TIMEOUT = 240000
+/** AI 绘图类接口超时时间（图片生成耗时更长） */
+export const AI_IMAGE_REQUEST_TIMEOUT = 240000
 const LOGOUT_DELAY = 500
 const MAX_RETRIES = 0
 const RETRY_DELAY = 1000

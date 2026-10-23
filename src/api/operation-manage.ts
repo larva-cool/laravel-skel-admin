@@ -1,4 +1,4 @@
-import request from '@/utils/http'
+import request, { AI_IMAGE_REQUEST_TIMEOUT, AI_REQUEST_TIMEOUT } from '@/utils/http'
 
 // ========== AI 辅助内容生产（运营） ==========
 
@@ -6,7 +6,8 @@ import request from '@/utils/http'
 export function fetchGenerateAnnouncementCopy(data: { brief: string }) {
   return request.post<Api.OperationManage.AnnouncementAiCopyResult>({
     url: '/admin/announcements/ai-copy',
-    data
+    data,
+    timeout: AI_REQUEST_TIMEOUT
   })
 }
 
@@ -14,7 +15,8 @@ export function fetchGenerateAnnouncementCopy(data: { brief: string }) {
 export function fetchGenerateBannerCopy(data: { brief: string }) {
   return request.post<Api.OperationManage.BannerAiCopyResult>({
     url: '/admin/banners/ai-copy',
-    data
+    data,
+    timeout: AI_REQUEST_TIMEOUT
   })
 }
 
@@ -23,6 +25,7 @@ export function fetchGenerateBannerImage(data: { prompt: string }) {
   return request.post<Api.OperationManage.BannerAiImageResult>({
     url: '/admin/banners/ai-image',
     data,
+    timeout: AI_IMAGE_REQUEST_TIMEOUT,
     showSuccessMessage: true,
     successMessage: '图片生成成功'
   })

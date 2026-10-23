@@ -1,4 +1,4 @@
-import request from '@/utils/http'
+import request, { AI_REQUEST_TIMEOUT } from '@/utils/http'
 import type { AxiosResponse } from 'axios'
 
 // ========== 评论管理（运营） ==========
@@ -46,7 +46,8 @@ export function fetchReviewComment(id: number, data: Api.ContentManage.CommentRe
 // AI 敏感词命中智能复核（减少误杀，仅给出辅助建议）
 export function fetchAiReviewComment(id: number) {
   return request.post<Api.ContentManage.CommentAiReviewResult>({
-    url: `/admin/comments/${id}/ai-review`
+    url: `/admin/comments/${id}/ai-review`,
+    timeout: AI_REQUEST_TIMEOUT
   })
 }
 

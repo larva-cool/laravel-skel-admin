@@ -1,5 +1,5 @@
 import { AppRouteRecord } from '@/types/router'
-import request from '@/utils/http'
+import request, { AI_REQUEST_TIMEOUT } from '@/utils/http'
 import type { AxiosResponse } from 'axios'
 
 // ========== 管理员管理 ==========
@@ -749,7 +749,8 @@ export function fetchProcessReport(id: number, data: Api.SystemManage.ReportProc
 /** AI 举报智能初判（仅给出辅助建议，不改变举报状态） */
 export function fetchAiTriageReport(id: number) {
   return request.post<Api.SystemManage.ReportAiTriageResult>({
-    url: `/admin/reports/${id}/ai-triage`
+    url: `/admin/reports/${id}/ai-triage`,
+    timeout: AI_REQUEST_TIMEOUT
   })
 }
 
