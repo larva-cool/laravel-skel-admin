@@ -3,6 +3,7 @@
 Ai Forge 企业级项目套件的管理后台前端，基于 Vue 3 + TypeScript + Vite + Element Plus 构建，配套后端为 [Ai Forge API](https://github.com/larva-cool/laravel-skel-forge)。
 
 - 官方站点：<https://www.aiforge.cn>
+- 开源地址：<https://github.com/larva-cool/laravel-skel-admin>
 - 演示后台：<https://admin-demo.aiforge.cn>
 
 ## 技术栈
@@ -314,7 +315,7 @@ const { tableData, loading, pagination, refreshData } = useTable({
 
 ## 配套后端
 
-前端 API 基于 [Ai Forge API](https://codeup.aliyun.com/xutongle/Skel/laravel-skel-forge) 后端项目，主要接口前缀：
+前端 API 基于 [Ai Forge API](https://github.com/larva-cool/laravel-skel-forge) 后端项目，主要接口前缀：
 
 - `/admin/*` - 后台管理接口（管理员、用户、角色、菜单、设置、地区、附件、审计日志、调度日志、监控、AI 聊天等）
 - `/api/v1/*` - 前台 API（注册、登录、用户资料、通知等）
