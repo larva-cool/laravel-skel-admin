@@ -334,6 +334,24 @@ pnpm build
 
 将 `dist/` 目录内容部署到任意静态文件服务器（Nginx 等）。
 
+### Docker 部署
+
+项目根目录提供多阶段 `Dockerfile`（pnpm 构建 + Nginx 托管）：
+
+```bash
+# 构建镜像（构建阶段自动执行 pnpm build:production，含 vue-tsc 类型检查）
+docker build -t aiforge-admin .
+
+# 运行容器，映射到宿主机 8080 端口
+docker run -d -p 8080:80 --name aiforge-admin aiforge-admin
+```
+
+说明：
+
+- 生产 API 地址、Reverb 配置在构建时由 `.env.production` 固化，如需修改请调整后重新构建镜像
+- 容器内 Nginx 配置为 `docker/nginx.conf`，已包含 Hash 路由回退、`assets/` 长缓存、`index.html` 禁缓存、gzip（含 `.gz` 预压缩直出）
+- 若改为同域相对路径部署，可在 `docker/nginx.conf` 中启用注释掉的 `/admin`、`/api`、Reverb WebSocket 反代配置
+
 ### Nginx 配置示例（Hash 模式）
 
 ```nginx

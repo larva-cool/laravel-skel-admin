@@ -1,0 +1,23 @@
+# 版本控制与本地产物
+.git
+.gitignore
+.gitattributes
+node_modules
+dist
+
+# 开发环境配置
+.husky
+.vscode
+.trae
+.apifox
+.env.development
+.env.testing
+
+# Docker 自身（docker/ 目录内为运行时 Nginx 配置，需保留在构建上下文中）
+Dockerfile
+.dockerignore
+
+# 文档与规范（构建无需）
+*.md
+AGENTS.md
+LICENSE
