@@ -7,16 +7,16 @@
  */
 export const WEB_LINKS = {
   // Github 主页
-  GITHUB_HOME: 'https://github.com/Daymychen/art-design-pro',
+  GITHUB_HOME: 'https://github.com/larva-cool/laravel-skel-forge',
 
   // 项目 Github 主页
-  GITHUB: 'https://github.com/Daymychen/art-design-pro',
+  GITHUB: 'https://github.com/larva-cool/laravel-skel-forge',
 
   // 个人博客
-  BLOG: 'https://www.artd.pro',
+  BLOG: 'https://www.aiforge.cn',
 
   // 项目文档
-  DOCS: 'https://www.artd.pro/docs/zh/',
+  DOCS: 'https://www.aiforge.cn',
 
   // 精简版本
   LiteVersion: 'https://www.artd.pro/docs/zh/guide/lite-version.html',
