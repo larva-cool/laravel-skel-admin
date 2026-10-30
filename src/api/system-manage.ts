@@ -429,6 +429,15 @@ export function fetchMoveAttachment(id: number, data: Api.SystemManage.Attachmen
   })
 }
 
+// ========== 微信公众号配置（只读） ==========
+
+// 获取微信公众号配置
+export function fetchGetWechatConfig() {
+  return request.get<Api.SystemManage.WechatConfig>({
+    url: '/admin/wechat'
+  })
+}
+
 // 下载附件
 export function fetchDownloadAttachment(id: number) {
   return request.get<Blob>({

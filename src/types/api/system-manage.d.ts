@@ -706,5 +706,21 @@ declare namespace Api {
       remark?: string | null
       actions?: ReportProcessAction[]
     }
+
+    // ========== 微信公众号配置（只读） ==========
+
+    /** 微信公众号配置 */
+    interface WechatConfig {
+      /** 微信公众号 AppID */
+      app_id: string
+      /** 微信公众号 AppSecret */
+      app_secret: string
+      /** 消息校验 Token */
+      token: string
+      /** 消息加解密 Key */
+      aes_key: string
+      /** 微信服务端回调地址 */
+      server_url: string
+    }
   }
 }
