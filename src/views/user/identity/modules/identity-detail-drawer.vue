@@ -209,7 +209,7 @@
                 <ElDescriptionsItem label="企业名称" :span="2">
                   {{ detail.company_name || '-' }}
                 </ElDescriptionsItem>
-                <ElDescriptionsItem label="统一社会信用代码">
+                <ElDescriptionsItem label="统一社会信用代码" :span="2">
                   <span v-if="detail.credit_code" class="flex items-center gap-1 font-mono">
                     {{ detail.credit_code }}
                     <el-button link size="small" @click="copyText(detail.credit_code!)">
@@ -220,6 +220,9 @@
                 </ElDescriptionsItem>
                 <ElDescriptionsItem label="法人姓名">
                   {{ detail.legal_person_name || '-' }}
+                </ElDescriptionsItem>
+                <ElDescriptionsItem label="法人手机号">
+                  {{ detail.legal_person_phone || '-' }}
                 </ElDescriptionsItem>
                 <ElDescriptionsItem label="法人身份证号" :span="2">
                   <span

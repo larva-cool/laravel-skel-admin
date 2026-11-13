@@ -559,6 +559,7 @@ declare namespace Api {
       company_name: string | null
       credit_code: string | null
       legal_person_name: string | null
+      legal_person_phone: string | null
       legal_person_id_card_no: string | null
       business_license: IdentityAttachment | null
       opening_permit: IdentityAttachment | null
